@@ -192,8 +192,7 @@ export default function DMCAPage() {
           <p className="section-text">
             Please send all DMCA notices and counter-notices to:
             <br />
-            <strong>Email:</strong> dmca@Flickster.com (Replace with your actual
-            email)
+            <strong>Email:</strong> deva12jith@gmail.com
             <br />
             <strong>Subject Line:</strong> "DMCA Takedown Request" or "DMCA
             Counter-Notice"
