@@ -31,7 +31,7 @@ A free movie and TV show streaming aggregator built with Next.js.
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/Flixet.git
+git clone https://github.com/yourusername/Flixet .git
 cd Flixet
 ```
 
@@ -83,4 +83,4 @@ This project is for educational purposes only.
 
 ## Disclaimer
 
-Flixetdoes not host any video content. All videos are embedded from third-party sources.
+Flixet does not host any video content. All videos are embedded from third-party sources.

@@ -86,7 +86,7 @@ export default function PrivacyPolicy() {
         <div className="section">
           <h2 className="section-title">1. Information We Collect</h2>
           <p className="section-text">
-            Flixetdoes not collect personal information from users. However, we
+            Flixet does not collect personal information from users. However, we
             may collect:
           </p>
           <ul className="list">

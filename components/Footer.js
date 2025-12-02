@@ -107,7 +107,7 @@ export default function Footer() {
               Important Disclaimer
             </div>
             <p className="disclaimer-text">
-              Flixetdoes not host, store, or distribute any video content. All
+              Flixet does not host, store, or distribute any video content. All
               videos are embedded from third-party sources. We do not claim
               ownership of any content displayed on this website. All
               trademarks, logos, and brand names are the property of their
@@ -118,9 +118,9 @@ export default function Footer() {
 
           <div className="footer-content">
             <div className="footer-section">
-              <h3>About Flixet</h3>
+              <h3>About Flixet </h3>
               <p>
-                Flixetis a free streaming aggregator that provides links to
+                Flixet is a free streaming aggregator that provides links to
                 movies and TV shows from various third-party sources. We do not
                 upload or host any files on our servers.
               </p>
@@ -162,7 +162,7 @@ export default function Footer() {
           </div>
 
           <div className="footer-bottom">
-            <p>© {new Date().getFullYear()} Flixet. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Flixet . All rights reserved.</p>
             <div className="tmdb-credit">
               <span>Powered by</span>
               <a

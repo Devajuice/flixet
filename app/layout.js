@@ -3,15 +3,15 @@ import Footer from '@/components/Footer';
 import './globals.css';
 
 export const metadata = {
-  metadataBase: new URL('https://Flixet.com'),
-  title: 'Flixet- Watch Movies Free',
+  metadataBase: new URL('https://flixet.vercel.app'),
+  title: 'Flixet - Watch Movies Free',
   description:
     'Stream movies and TV shows for free. No subscription required. Watch thousands of movies and series online.',
   keywords:
     'free movies, watch movies online, stream tv shows, free streaming, movies online',
-  authors: [{ name: 'Flixet' }],
-  creator: 'Flixet',
-  publisher: 'Flixet',
+  authors: [{ name: 'Flixet ' }],
+  creator: 'Flixet ',
+  publisher: 'Flixet ',
   robots: {
     index: true,
     follow: true,
@@ -27,9 +27,9 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://Flixet.com',
-    siteName: 'Flixet',
-    title: 'Flixet- Watch Movies & TV Shows Free',
+    url: 'https://Flixet .com',
+    siteName: 'Flixet ',
+    title: 'Flixet - Watch Movies & TV Shows Free',
     description:
       'Stream thousands of movies and TV shows for free. No subscription required.',
     images: [
@@ -37,13 +37,13 @@ export const metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Flixet- Free Movie Streaming',
+        alt: 'Flixet - Free Movie Streaming',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Flixet- Watch Movies Free',
+    title: 'Flixet - Watch Movies Free',
     description:
       'Stream movies and TV shows for free. No subscription required.',
     images: ['/og-image.png'],

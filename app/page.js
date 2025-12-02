@@ -290,7 +290,7 @@ export default function HomePage() {
       </section>
 
       {/* Rest of the sections remain the same */}
-      {/* What is FlixetSection */}
+      {/* What is Flixet Section */}
       <motion.section
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -298,15 +298,15 @@ export default function HomePage() {
         viewport={{ once: true }}
       >
         <div className="info-section">
-          <h2 className="info-title">What is Flixet?</h2>
+          <h2 className="info-title">What is Flixet ?</h2>
           <p className="info-text">
-            Flixetis a free streaming aggregator that brings you unlimited
+            Flixet is a free streaming aggregator that brings you unlimited
             access to thousands of movies and TV shows. We search and compile
             content from various third-party streaming sources, making it easy
             for you to find and watch your favorite entertainment in one place.
           </p>
           <p className="info-text">
-            Unlike traditional streaming platforms, Flixetdoesn't require any
+            Unlike traditional streaming platforms, Flixet doesn't require any
             subscription, registration, or payment. We believe entertainment
             should be accessible to everyone. Our platform is completely free
             and always will be.
@@ -405,7 +405,7 @@ export default function HomePage() {
       >
         <div className="stats-section">
           <h2 style={{ fontSize: '32px', marginBottom: '10px' }}>
-            Why Choose Flixet?
+            Why Choose Flixet ?
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
             Join thousands of users enjoying free entertainment
@@ -435,7 +435,7 @@ export default function HomePage() {
         viewport={{ once: true }}
       >
         <div className="info-section">
-          <h2 className="info-title">How Does FlixetWork?</h2>
+          <h2 className="info-title">How Does Flixet Work?</h2>
           <p className="info-text">
             <strong>1. Browse or Search:</strong> Explore our extensive library
             of movies and TV shows, or use the search function to find exactly
@@ -508,7 +508,7 @@ export default function HomePage() {
               marginBottom: '15px',
             }}
           >
-            <strong>Legal Disclaimer:</strong> Flixetis a search engine for
+            <strong>Legal Disclaimer:</strong> Flixet is a search engine for
             streaming content. We do not host, upload, or control any of the
             video content. All content is provided by third-party sources.
           </p>

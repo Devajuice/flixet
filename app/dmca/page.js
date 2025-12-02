@@ -86,7 +86,7 @@ export default function DMCAPage() {
 
         <div className="notice-box">
           <p className="section-text" style={{ marginBottom: 0 }}>
-            <strong>Important:</strong> Flixetdoes not host, upload, or store
+            <strong>Important:</strong> Flixet does not host, upload, or store
             any video files on our servers. We only provide links to content
             hosted on third-party platforms. All content is embedded from
             external sources.
@@ -96,7 +96,7 @@ export default function DMCAPage() {
         <div className="section">
           <h2 className="section-title">Copyright Infringement Notice</h2>
           <p className="section-text">
-            Flixetrespects the intellectual property rights of others and
+            Flixet respects the intellectual property rights of others and
             expects our users to do the same. We comply with the Digital
             Millennium Copyright Act (DMCA) and will respond to valid copyright
             infringement notices.

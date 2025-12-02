@@ -180,7 +180,7 @@ export default function Header() {
         .logo-icon {
           display: inline-flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
 
         .logo-text {
@@ -188,8 +188,10 @@ export default function Header() {
           font-weight: 800;
           letter-spacing: -0.5px;
           line-height: 1;
-          display: flex;
+          display: inline-flex;
           align-items: center;
+          position: relative;
+          top: -5.5px;
         }
 
         .search-btn-content {
@@ -241,7 +243,7 @@ export default function Header() {
           border-top: 1px solid rgba(229, 9, 20, 0.3);
           padding: 12px 0;
           padding-bottom: max(12px, env(safe-area-inset-bottom));
-          justify-content: space-around;
+          justify-content: space-evenly;
           align-items: center;
           z-index: 9999;
           box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8);
@@ -251,15 +253,15 @@ export default function Header() {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 10px 16px;
+          width: 56px;
+          height: 40px;
           cursor: pointer;
           transition: all 0.3s ease;
           text-decoration: none;
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(255, 255, 255, 0.8);
           background: transparent;
           border: none;
           border-radius: 8px;
-          min-width: 50px;
         }
 
         .bottom-nav-item:hover,
@@ -272,29 +274,47 @@ export default function Header() {
         .bottom-nav-item svg {
           flex-shrink: 0;
           stroke-width: 2;
+          color: #ffffff;
+        }
+        .bottom-nav-search-icon {
+          position: relative;
+          top: -2px;
         }
 
+        .search-bar-wrapper {
+          max-width: 600px;
+          width: 100%;
+          margin: 0 auto;
+        }
+
+        /* Desktop only */
         @media (min-width: 769px) {
           .desktop-nav {
             display: flex;
           }
 
           .bottom-nav {
-            display: none !important;
+            display: none !important; /* hide bottom bar on desktop */
           }
         }
 
+        /* Mobile only */
         @media (max-width: 768px) {
           .desktop-nav {
-            display: none !important;
+            display: none !important; /* hide top nav on mobile */
           }
 
           .bottom-nav {
-            display: flex !important;
+            display: flex !important; /* show bottom bar on mobile */
           }
 
           .logo-text {
             font-size: 18px;
+          }
+
+          .search-bar-wrapper {
+            max-width: 100%;
+            padding: 0 15px;
           }
         }
 
@@ -354,7 +374,7 @@ export default function Header() {
               transition={{ duration: 2, repeat: Infinity }}
             >
               <Film size={28} strokeWidth={2.5} style={{ flexShrink: 0 }} />
-              <span className="logo-text">Flixet</span>
+              <span className="logo-text">Flixet </span>
             </motion.span>
           </Link>
 
@@ -405,14 +425,15 @@ export default function Header() {
         <AnimatePresence>
           {showSearch && (
             <motion.div
-              className="container"
               style={styles.searchContainer}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <SearchBar onClose={() => setShowSearch(false)} />
+              <div className="search-bar-wrapper">
+                <SearchBar />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -427,7 +448,7 @@ export default function Header() {
               className="dropdown-menu-container"
               style={{
                 left: `${dropdownPositions.movies.left}px`,
-                top: `${dropdownPositions.movies.top + 15}px`, // Increased from 5 to 15
+                top: `${dropdownPositions.movies.top + 15}px`,
               }}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -469,7 +490,7 @@ export default function Header() {
               className="dropdown-menu-container"
               style={{
                 left: `${dropdownPositions.tv.left}px`,
-                top: `${dropdownPositions.tv.top + 15}px`, // Increased from 15 to 15
+                top: `${dropdownPositions.tv.top + 15}px`,
               }}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -489,7 +510,6 @@ export default function Header() {
                     All TV Shows
                   </Link>
                   {tvGenres.map((genre) => {
-                    // Convert "Action & Adventure" to "action-adventure"
                     const slug = genre
                       .toLowerCase()
                       .replace(/ & /g, '-')
@@ -516,11 +536,11 @@ export default function Header() {
       {/* Mobile Bottom Navigation */}
       <nav className="bottom-nav">
         <Link href="/" className="bottom-nav-item" aria-label="Home">
-          <Home size={24} />
+          <Home size={24} color="#ffffff" />
         </Link>
 
         <Link href="/movies" className="bottom-nav-item" aria-label="Movies">
-          <Film size={24} />
+          <Film size={24} color="#ffffff" />
         </Link>
 
         <button
@@ -528,11 +548,13 @@ export default function Header() {
           className="bottom-nav-item"
           aria-label="Search"
         >
-          <SearchIcon size={24} />
+          <span className="bottom-nav-search-icon">
+            <SearchIcon size={22} color="#ffffff" strokeWidth={2.2} />
+          </span>
         </button>
 
         <Link href="/tv" className="bottom-nav-item" aria-label="TV Shows">
-          <Tv size={24} />
+          <Tv size={24} color="#ffffff" />
         </Link>
       </nav>
     </>
@@ -552,6 +574,9 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    maxWidth: '1400px',
+    margin: '0 auto',
+    padding: '0 20px',
   },
   logo: {
     color: 'var(--accent)',
@@ -576,6 +601,7 @@ const styles = {
   },
   searchContainer: {
     marginTop: '20px',
-    overflow: 'hidden',
+    overflow: 'visible',
+    paddingBottom: '15px',
   },
 };
