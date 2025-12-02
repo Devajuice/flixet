@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import MovieCard from '@/components/MovieCard';
 import { motion } from 'framer-motion';
@@ -18,7 +18,8 @@ const GENRE_MAP = {
   animation: 16,
 };
 
-export default function MoviesPage() {
+// Separate component that uses useSearchParams
+function MoviesContent() {
   const searchParams = useSearchParams();
   const genreParam = searchParams.get('genre');
 
@@ -36,7 +37,6 @@ export default function MoviesPage() {
     try {
       let url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&page=${page}&sort_by=popularity.desc`;
 
-      // Add genre filter if selected
       if (genreParam && GENRE_MAP[genreParam]) {
         url += `&with_genres=${GENRE_MAP[genreParam]}`;
       }
@@ -208,6 +208,22 @@ export default function MoviesPage() {
         )}
       </motion.div>
     </>
+  );
+}
+
+// Main page component with Suspense wrapper
+export default function MoviesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div style={styles.loading}>
+          <div style={styles.spinner}></div>
+          <p>Loading movies...</p>
+        </div>
+      }
+    >
+      <MoviesContent />
+    </Suspense>
   );
 }
 
