@@ -20,21 +20,22 @@ const TV_GENRE_MAP = {
 
 function TVContent() {
   const searchParams = useSearchParams();
-  const genreParam = searchParams.get('genre'); // e.g. "crime"
+  const genreParam = searchParams.get('genre');
 
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    fetchShows();
-  }, [genreParam]); // refetch whenever genre changes
+    fetchShows(1);
+  }, [genreParam]);
 
-  const fetchShows = async () => {
+  const fetchShows = async (page) => {
     setLoading(true);
     try {
-      let url = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&page=1`;
+      let url = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&page=${page}`;
 
-      // If a genre is selected and mapped, filter by that genre
       if (genreParam && TV_GENRE_MAP[genreParam]) {
         url += `&with_genres=${TV_GENRE_MAP[genreParam]}`;
       }
@@ -42,11 +43,20 @@ function TVContent() {
       const response = await fetch(url);
       const data = await response.json();
       setShows(data.results || []);
+      setTotalPages(data.total_pages || 1);
+      setCurrentPage(page);
     } catch (error) {
       console.error('Error fetching TV shows:', error);
       setShows([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      fetchShows(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -59,7 +69,7 @@ function TVContent() {
     return `${name} TV Shows`;
   };
 
-  if (loading) {
+  if (loading && currentPage === 1) {
     return (
       <>
         <style jsx>{`
@@ -77,6 +87,14 @@ function TVContent() {
           <p>Loading TV shows...</p>
         </div>
       </>
+    );
+  }
+
+  if (!shows.length) {
+    return (
+      <div style={styles.loading}>
+        <p>No TV shows found.</p>
+      </div>
     );
   }
 
@@ -112,6 +130,33 @@ function TVContent() {
             gap: 35px;
           }
         }
+
+        .page-button {
+          padding: 12px 24px;
+          border-radius: 8px;
+          border: none;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          min-width: 120px;
+        }
+
+        .page-button:not(:disabled) {
+          background: #e50914;
+          color: white;
+        }
+
+        .page-button:not(:disabled):hover {
+          background: #f40612;
+          transform: scale(1.05);
+        }
+
+        .page-button:disabled {
+          background: rgba(50, 50, 50, 0.8);
+          color: rgba(150, 150, 150, 0.7);
+          cursor: not-allowed;
+        }
       `}</style>
 
       <motion.div
@@ -122,6 +167,29 @@ function TVContent() {
       >
         <h1 style={styles.title}>{getGenreTitle()}</h1>
         <TVGrid shows={shows} />
+
+        {/* Pagination controls */}
+        <div style={styles.pagination}>
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1 || loading}
+            className="page-button"
+          >
+            Previous
+          </button>
+
+          <span style={styles.pageInfo}>
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages || loading}
+            className="page-button"
+          >
+            Next
+          </button>
+        </div>
       </motion.div>
     </>
   );
@@ -145,15 +213,23 @@ export default function TVPage() {
 const styles = {
   container: {
     padding: '20px',
-    minHeight: '100vh',
+    paddingBottom: '100px',
+  },
+  header: {
+    marginBottom: '30px',
+    textAlign: 'center',
   },
   title: {
-    fontSize: '32px',
+    fontSize: '36px',
     fontWeight: 'bold',
-    marginBottom: '20px',
+    marginBottom: '10px',
     background: 'linear-gradient(to right, #e50914, #f40612)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
+  },
+  subtitle: {
+    fontSize: '16px',
+    color: 'var(--text-secondary)',
   },
   loading: {
     display: 'flex',
@@ -170,5 +246,41 @@ const styles = {
     borderTop: '4px solid var(--accent)',
     borderRadius: '50%',
     animation: 'spin 1s linear infinite',
+  },
+  noResults: {
+    textAlign: 'center',
+    padding: '60px 20px',
+    fontSize: '18px',
+    color: 'var(--text-secondary)',
+  },
+  pagination: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '20px',
+    marginTop: '40px',
+    marginBottom: '40px',
+    padding: '0 10px',
+  },
+  paginationButton: {
+    padding: '12px 30px',
+    backgroundColor: 'var(--accent)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+  },
+  disabledButton: {
+    backgroundColor: 'var(--card-bg)',
+    color: 'var(--text-secondary)',
+    cursor: 'not-allowed',
+    opacity: 0.5,
+  },
+  pageInfo: {
+    fontSize: '16px',
+    color: 'var(--text-secondary)',
   },
 };
