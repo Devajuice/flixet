@@ -15,6 +15,15 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - ⚡ **Fast Performance** - Built with Next.js 15 for optimal speed
 - 🎯 **Genre Filtering** - Browse by action, comedy, drama, and more
 
+## To Do
+
+- [x] ~~Continue Watching~~
+- [x] ~~Infinite Scroll~~
+- [x] ~~Coming Soon Section~~
+- [ ] Performance Optimizations
+- [ ] Random Movie Picker
+- [x] ~~Advanced Filters~~
+
 ## 🛠️ Tech Stack
 
 - **Framework:** Next.js 15 (App Router)
