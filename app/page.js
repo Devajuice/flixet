@@ -235,7 +235,7 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              Unlimited Movies & TV Shows
+              Unlimited Movies, TV Shows & Anime
             </motion.h1>
 
             <motion.p
@@ -301,7 +301,7 @@ export default function HomePage() {
           <h2 className="info-title">What is Flixet ?</h2>
           <p className="info-text">
             Flixet is a free streaming aggregator that brings you unlimited
-            access to thousands of movies and TV shows. We search and compile
+            access to thousands of Movies, TV shows and Anime. We search and compile
             content from various third-party streaming sources, making it easy
             for you to find and watch your favorite entertainment in one place.
           </p>
@@ -345,7 +345,7 @@ export default function HomePage() {
             </div>
             <h3 className="feature-title">Huge Library</h3>
             <p className="feature-description">
-              Access thousands of movies and TV shows from various genres. New
+              Access thousands of Movies,TV Shows and Anime from various genres. New
               content added regularly.
             </p>
           </motion.div>
@@ -452,8 +452,8 @@ export default function HomePage() {
             switch to another server.
           </p>
           <p className="info-text">
-            <strong>4. Enjoy:</strong> Sit back and enjoy your movie or TV show.
-            For TV shows, you can easily select different seasons and episodes.
+            <strong>4. Enjoy:</strong> Sit back and enjoy your Movie, TV show or Anime.
+            For TV shows and Anime, you can easily select different seasons and episodes.
           </p>
         </div>
       </motion.section>
@@ -536,7 +536,7 @@ export default function HomePage() {
       >
         <h2 className="cta-title">Ready to Start Watching?</h2>
         <p className="cta-text">
-          Thousands of movies and TV shows are waiting for you. No signup
+          Thousands of Movies, TV shows and Anime are waiting for you. No signup
           required.
         </p>
         <div

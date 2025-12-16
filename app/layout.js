@@ -7,14 +7,14 @@ import { WatchlistProvider } from '@/context/WatchlistContext'; // ADD THIS IMPO
 
 export const metadata = {
   metadataBase: new URL('https://flixet.vercel.app'),
-  title: 'Flixet - Watch Movies Free',
+  title: 'Flixet - Watch Movies, TV Shows and Anime Free',
   description:
-    'Stream movies and TV shows for free. No subscription required. Watch thousands of movies and series online.',
+    'Stream Movies, TV shows and Anime for free. No subscription required. Watch thousands of movies and series online.',
   keywords:
-    'free movies, watch movies online, stream tv shows, free streaming, movies online',
-  authors: [{ name: 'Flixet' }],
-  creator: 'Flixet',
-  publisher: 'Flixet',
+    'free movies, watch movies online, stream tv shows, free streaming, movies online, anime streaming', 
+  authors: [{ name: 'Devajuice' }],
+  creator: 'Devajuice',
+  publisher: 'Devajuice',
   robots: {
     index: true,
     follow: true,
@@ -32,23 +32,23 @@ export const metadata = {
     locale: 'en_US',
     url: 'https://flixet.vercel.app',
     siteName: 'Flixet',
-    title: 'Flixet - Watch Movies & TV Shows Free',
+    title: 'Flixet - Watch Movies, TV Shows and Anime',
     description:
-      'Stream thousands of movies and TV shows for free. No subscription required.',
+      'Stream thousands of Movies, TV shows and Anime for free. No subscription required.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Flixet - Free Movie Streaming',
+        alt: 'Flixet - Free Movies, TV Shows and Anime',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Flixet - Watch Movies Free',
+    title: 'Flixet - Watch Movies, TV Shows & Anime',
     description:
-      'Stream movies and TV shows for free. No subscription required.',
+      'Stream Movies, TV shows and Anime for free. No subscription required.',
     images: ['/og-image.png'],
   },
 };
@@ -78,7 +78,6 @@ export default function RootLayout({ children }) {
       <body style={{ paddingBottom: 0 }}>
         <WatchlistProvider>
           {' '}
-          {/* WRAP EVERYTHING IN WATCHLIST PROVIDER */}
           <Header />
           <main
             className="container"
@@ -94,7 +93,6 @@ export default function RootLayout({ children }) {
           <SpeedInsights />
           <Analytics />
         </WatchlistProvider>{' '}
-        {/* CLOSE THE PROVIDER */}
       </body>
     </html>
   );
