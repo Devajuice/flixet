@@ -5,11 +5,11 @@ import { getImageUrl } from '@/lib/tmdb';
 export default function CastSection({ cast }) {
   if (!cast || cast.length === 0) return null;
 
-  // Show top 12 cast members
-  const displayCast = cast.slice(0, 12);
+  // Show all cast members
+  const displayCast = cast;
 
   return (
-    <motion.section 
+    <motion.section
       style={styles.section}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -24,9 +24,9 @@ export default function CastSection({ cast }) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.8 + index * 0.05 }}
-            whileHover={{ 
+            whileHover={{
               scale: 1.05,
-              transition: { duration: 0.2 }
+              transition: { duration: 0.2 },
             }}
           >
             <div style={styles.imageContainer}>
@@ -45,7 +45,9 @@ export default function CastSection({ cast }) {
             <div style={styles.info}>
               <h3 style={styles.name}>{member.name}</h3>
               <p style={styles.character}>
-                {member.character || member.roles?.[0]?.character || 'Unknown Role'}
+                {member.character ||
+                  member.roles?.[0]?.character ||
+                  'Unknown Role'}
               </p>
             </div>
           </motion.div>

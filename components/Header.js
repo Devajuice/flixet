@@ -8,6 +8,7 @@ import {
   Home,
   Tv,
   ChevronDown,
+  Sparkles, // For Anime icon
 } from 'lucide-react';
 import SearchBar from './SearchBar';
 
@@ -408,6 +409,12 @@ export default function Header() {
                 <ChevronDown size={16} />
               </Link>
             </div>
+
+            {/* NEW: Anime Link */}
+            <Link href="/anime" style={styles.navLink}>
+              Anime
+            </Link>
+
             <motion.button
               onClick={() => setShowSearch(!showSearch)}
               style={styles.searchBtn}
@@ -543,6 +550,15 @@ export default function Header() {
           <Film size={24} color="#ffffff" />
         </Link>
 
+        {/* NEW: Anime Icon for Mobile */}
+        <Link href="/anime" className="bottom-nav-item" aria-label="Anime">
+          <Sparkles size={24} color="#ffffff" />
+        </Link>
+
+        <Link href="/tv" className="bottom-nav-item" aria-label="TV Shows">
+          <Tv size={24} color="#ffffff" />
+        </Link>
+
         <button
           onClick={() => setShowSearch(!showSearch)}
           className="bottom-nav-item"
@@ -552,10 +568,6 @@ export default function Header() {
             <SearchIcon size={22} color="#ffffff" strokeWidth={2.2} />
           </span>
         </button>
-
-        <Link href="/tv" className="bottom-nav-item" aria-label="TV Shows">
-          <Tv size={24} color="#ffffff" />
-        </Link>
       </nav>
     </>
   );
@@ -588,6 +600,7 @@ const styles = {
     fontSize: '16px',
     transition: 'var(--transition)',
     textDecoration: 'none',
+    color: 'var(--text-primary)',
   },
   searchBtn: {
     background: 'var(--accent)',

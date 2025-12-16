@@ -171,36 +171,6 @@ export default function TVShowDetails({ params }) {
           flex-wrap: wrap;
         }
 
-        .episode-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-          gap: 10px;
-          margin-top: 15px;
-        }
-
-        .episode-button {
-          padding: 10px;
-          background-color: var(--card-bg);
-          border: 2px solid transparent;
-          border-radius: 8px;
-          color: var(--text-primary);
-          cursor: pointer;
-          transition: all 0.3s ease;
-          font-size: 14px;
-          font-weight: 600;
-        }
-
-        .episode-button:hover {
-          border-color: var(--accent);
-          transform: translateY(-2px);
-        }
-
-        .episode-button.active {
-          background-color: var(--accent);
-          border-color: var(--accent);
-          color: white;
-        }
-
         .tip-box {
           background: #1a1a1a !important;
           border: 2px solid var(--accent) !important;
@@ -249,27 +219,12 @@ export default function TVShowDetails({ params }) {
           .season-selector {
             gap: 8px;
           }
-
-          .episode-grid {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-          }
-
-          .episode-button {
-            padding: 8px;
-            font-size: 12px;
-          }
         }
 
         @media (max-width: 480px) {
           .cast-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
-          }
-
-          .episode-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
           }
         }
       `}</style>
@@ -446,25 +401,57 @@ export default function TVShowDetails({ params }) {
               </div>
             )}
 
-            {/* Episode Selector */}
+            {/* Episode List */}
             {seasonData && seasonData.episodes && (
               <div style={styles.section}>
                 <h2 style={styles.sectionTitle}>
                   Episodes ({seasonData.episodes.length})
                 </h2>
-                <div className="episode-grid">
-                  {seasonData.episodes.map((episode) => (
-                    <button
+                <div style={styles.episodeList}>
+                  {seasonData.episodes.map((episode, index) => (
+                    <motion.div
                       key={episode.id}
-                      className={`episode-button ${
-                        selectedEpisode === episode.episode_number
-                          ? 'active'
-                          : ''
-                      }`}
                       onClick={() => setSelectedEpisode(episode.episode_number)}
+                      style={{
+                        ...styles.episodeCard,
+                        ...(selectedEpisode === episode.episode_number
+                          ? styles.episodeCardActive
+                          : {}),
+                      }}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      whileHover={{
+                        scale: 1.02,
+                        transition: { duration: 0.2 },
+                      }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      E{episode.episode_number}
-                    </button>
+                      <div style={styles.episodeHeader}>
+                        <h4 style={styles.episodeTitle}>
+                          <span style={styles.episodeNumber}>
+                            Episode {episode.episode_number}
+                          </span>
+                          <span style={styles.episodeSeparator}>·</span>
+                          <span style={styles.episodeName}>
+                            {episode.name || 'Untitled'}
+                          </span>
+                        </h4>
+                        {episode.air_date && (
+                          <span style={styles.episodeAirDate}>
+                            {episode.air_date}
+                          </span>
+                        )}
+                      </div>
+                      {episode.overview && (
+                        <p style={styles.episodeOverview}>{episode.overview}</p>
+                      )}
+                      {!episode.overview && (
+                        <p style={styles.episodeNoOverview}>
+                          No description available
+                        </p>
+                      )}
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -819,6 +806,75 @@ const styles = {
     fontWeight: 'bold',
     marginBottom: '15px',
     color: 'var(--text-primary)',
+  },
+  // Episode List Styles - FIXED
+  episodeList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '15px',
+  },
+  episodeCard: {
+    padding: '20px',
+    backgroundColor: 'var(--card-bg)',
+    borderRadius: '12px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: 'transparent',
+  },
+  episodeCardActive: {
+    backgroundColor: 'var(--accent)',
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: 'var(--accent)',
+    boxShadow: '0 4px 12px rgba(229, 9, 20, 0.4)',
+  },
+  episodeHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '12px',
+    gap: '15px',
+    flexWrap: 'wrap',
+  },
+  episodeTitle: {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    margin: 0,
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '8px',
+    flex: 1,
+  },
+  episodeNumber: {
+    color: 'var(--text-primary)',
+  },
+  episodeSeparator: {
+    color: 'var(--text-secondary)',
+    opacity: 0.5,
+  },
+  episodeName: {
+    color: 'var(--text-primary)',
+  },
+  episodeAirDate: {
+    fontSize: '14px',
+    color: 'var(--text-secondary)',
+    whiteSpace: 'nowrap',
+  },
+  episodeOverview: {
+    fontSize: '14px',
+    lineHeight: '1.6',
+    color: 'var(--text-secondary)',
+    margin: 0,
+  },
+  episodeNoOverview: {
+    fontSize: '14px',
+    color: 'var(--text-secondary)',
+    fontStyle: 'italic',
+    opacity: 0.6,
+    margin: 0,
   },
   overview: {
     fontSize: '16px',
