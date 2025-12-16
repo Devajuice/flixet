@@ -11,6 +11,7 @@ import {
   Check,
 } from 'lucide-react';
 import Link from 'next/link';
+import WatchlistButton from '@/components/WatchlistButton';
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 
@@ -270,6 +271,18 @@ export default function MovieDetails({ params }) {
                   Watch Trailer
                 </motion.a>
               )}
+              <WatchlistButton
+                item={{
+                  id: movie.id,
+                  type: 'movie',
+                  title: movie.title,
+                  name: movie.title,
+                  poster_path: movie.poster_path,
+                  vote_average: movie.vote_average,
+                  release_date: movie.release_date,
+                }}
+                variant="large"
+              />
             </div>
 
             {/* Detailed Viewing Tips */}

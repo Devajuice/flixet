@@ -1,75 +1,89 @@
 'use client';
-import { motion } from 'framer-motion';
-import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { useWatchlist } from '@/context/WatchlistContext';
+import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function WatchlistButton({ item, variant = 'default' }) {
-  const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
-  const inWatchlist = isInWatchlist(item.id, item.type);
+  const { watchlist, addToWatchlist, removeFromWatchlist } = useWatchlist();
+
+  const isInWatchlist = watchlist.some(
+    (w) => w.id === item.id && w.type === item.type
+  );
 
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (inWatchlist) {
+    if (isInWatchlist) {
       removeFromWatchlist(item.id, item.type);
     } else {
       addToWatchlist(item);
     }
   };
 
-  // Variant styles
-  const styles = {
-    default: {
-      padding: '8px',
-      backgroundColor: inWatchlist ? 'var(--accent)' : 'rgba(0, 0, 0, 0.7)',
-      color: 'white',
-      border: 'none',
-      borderRadius: '50%',
-      width: '40px',
-      height: '40px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-    },
-    large: {
-      padding: '12px 24px',
-      backgroundColor: inWatchlist ? 'var(--accent)' : 'transparent',
-      color: 'white',
-      border: '2px solid var(--accent)',
-      borderRadius: '8px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '8px',
-      cursor: 'pointer',
-      fontSize: '16px',
-      fontWeight: '600',
-      transition: 'all 0.3s ease',
-    },
-  };
+  // Large variant for detail pages
+  if (variant === 'large') {
+    return (
+      <motion.button
+        onClick={handleClick}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        style={{
+          width: '100%',
+          padding: '15px',
+          backgroundColor: isInWatchlist ? 'var(--accent)' : 'transparent',
+          color: isInWatchlist ? 'white' : 'var(--accent)',
+          borderWidth: '2px',
+          borderStyle: 'solid',
+          borderColor: 'var(--accent)',
+          borderRadius: '10px',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        {isInWatchlist ? (
+          <>
+            <BookmarkCheck size={20} />
+            In Watchlist
+          </>
+        ) : (
+          <>
+            <Bookmark size={20} />
+            Add to Watchlist
+          </>
+        )}
+      </motion.button>
+    );
+  }
 
+  // Default small variant for grid cards
   return (
     <motion.button
-      style={styles[variant]}
       onClick={handleClick}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
-      title={inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+      style={{
+        width: '36px',
+        height: '36px',
+        borderRadius: '50%',
+        backgroundColor: isInWatchlist ? 'var(--accent)' : 'rgba(0, 0, 0, 0.7)',
+        border: isInWatchlist ? 'none' : '2px solid rgba(255, 255, 255, 0.3)',
+        color: 'white',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'all 0.3s ease',
+      }}
+      title={isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
     >
-      {inWatchlist ? (
-        <>
-          <BookmarkCheck size={variant === 'large' ? 20 : 24} />
-          {variant === 'large' && <span>In Watchlist</span>}
-        </>
-      ) : (
-        <>
-          <Bookmark size={variant === 'large' ? 20 : 24} />
-          {variant === 'large' && <span>Add to Watchlist</span>}
-        </>
-      )}
+      {isInWatchlist ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
     </motion.button>
   );
 }

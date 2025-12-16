@@ -12,6 +12,7 @@ import {
   Tv,
 } from 'lucide-react';
 import Link from 'next/link';
+import WatchlistButton from '@/components/WatchlistButton';
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 
@@ -309,6 +310,18 @@ export default function TVShowDetails({ params }) {
                 </motion.a>
               )}
             </div>
+            <WatchlistButton
+              item={{
+                id: show.id,
+                type: 'tv',
+                name: show.name,
+                title: show.name,
+                poster_path: show.poster_path,
+                vote_average: show.vote_average,
+                first_air_date: show.first_air_date,
+              }}
+              variant="large"
+            />
 
             {/* Tip Box */}
             <div style={styles.tipBox} className="tip-box">
