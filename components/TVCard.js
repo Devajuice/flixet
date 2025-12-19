@@ -12,6 +12,10 @@ export default function TVCard({ show }) {
     router.push(`/tv/${show.id}`);
   };
 
+  // Handle both 'name' and 'title' for compatibility
+  const title = show.name || show.title;
+  const releaseDate = show.first_air_date || show.release_date;
+
   return (
     <>
       <style jsx>{`
@@ -73,7 +77,6 @@ export default function TVCard({ show }) {
           opacity: 1;
         }
 
-        /* Mobile: always show on tap */
         @media (hover: none) {
           .watchlist-overlay {
             opacity: 1;
@@ -234,23 +237,22 @@ export default function TVCard({ show }) {
           <div className="image-container">
             <img
               src={getImageUrl(show.poster_path)}
-              alt={show.name}
+              alt={title}
               className="poster-image"
               loading="lazy"
               draggable="false"
             />
 
-            {/* UPDATED: Watchlist Button with both name and title */}
             <div className="watchlist-overlay">
               <WatchlistButton
                 item={{
                   id: show.id,
                   type: 'tv',
-                  name: show.name,
-                  title: show.name, // ADDED THIS LINE - ensures consistency
+                  name: title,
+                  title: title,
                   poster_path: show.poster_path,
                   vote_average: show.vote_average,
-                  first_air_date: show.first_air_date,
+                  first_air_date: releaseDate,
                 }}
                 variant="default"
               />
@@ -262,15 +264,13 @@ export default function TVCard({ show }) {
           </div>
 
           <div className="info">
-            <h3 className="title">{show.name}</h3>
+            <h3 className="title">{title}</h3>
             <div className="meta">
               <span className="rating">
                 ⭐ {show.vote_average?.toFixed(1) || 'N/A'}
               </span>
               <span className="year">
-                {show.first_air_date
-                  ? new Date(show.first_air_date).getFullYear()
-                  : 'TBA'}
+                {releaseDate ? new Date(releaseDate).getFullYear() : 'TBA'}
               </span>
             </div>
           </div>

@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { getImageUrl } from '@/lib/tmdb';
-import WatchlistButton from './WatchlistButton'; // ADD THIS IMPORT
+import WatchlistButton from './WatchlistButton';
 
 export default function MovieCard({ movie }) {
   const router = useRouter();
@@ -9,8 +9,19 @@ export default function MovieCard({ movie }) {
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/movie/${movie.id}`);
+
+    // Handle both movie and TV show routing from search results
+    const mediaType = movie.media_type || 'movie';
+    const path = mediaType === 'tv' ? `/tv/${movie.id}` : `/movie/${movie.id}`;
+
+    router.push(path);
   };
+
+  // Get title - could be 'title' (movie) or 'name' (TV)
+  const title = movie.title || movie.name;
+
+  // Get release date - could be 'release_date' (movie) or 'first_air_date' (TV)
+  const releaseDate = movie.release_date || movie.first_air_date;
 
   return (
     <>
@@ -60,7 +71,6 @@ export default function MovieCard({ movie }) {
           -webkit-user-drag: none;
         }
 
-        /* ADD THIS: Watchlist button overlay */
         .watchlist-overlay {
           position: absolute;
           top: 8px;
@@ -74,7 +84,6 @@ export default function MovieCard({ movie }) {
           opacity: 1;
         }
 
-        /* Mobile: always show on tap */
         @media (hover: none) {
           .watchlist-overlay {
             opacity: 1;
@@ -235,23 +244,23 @@ export default function MovieCard({ movie }) {
           <div className="image-container">
             <img
               src={getImageUrl(movie.poster_path)}
-              alt={movie.title}
+              alt={title}
               className="poster-image"
               loading="lazy"
               draggable="false"
             />
 
-            {/* ADD THIS: Watchlist Button */}
             <div className="watchlist-overlay">
               <WatchlistButton
                 item={{
                   id: movie.id,
-                  type: 'movie',
-                  title: movie.title,
-                  name: movie.title, // ADD THIS LINE for consistency
+                  type: movie.media_type || 'movie',
+                  title: title,
+                  name: title,
                   poster_path: movie.poster_path,
                   vote_average: movie.vote_average,
-                  release_date: movie.release_date,
+                  release_date: releaseDate,
+                  first_air_date: releaseDate,
                 }}
                 variant="default"
               />
@@ -263,15 +272,13 @@ export default function MovieCard({ movie }) {
           </div>
 
           <div className="info">
-            <h3 className="title">{movie.title}</h3>
+            <h3 className="title">{title}</h3>
             <div className="meta">
               <span className="rating">
                 ⭐ {movie.vote_average?.toFixed(1) || 'N/A'}
               </span>
               <span className="year">
-                {movie.release_date
-                  ? new Date(movie.release_date).getFullYear()
-                  : 'TBA'}
+                {releaseDate ? new Date(releaseDate).getFullYear() : 'TBA'}
               </span>
             </div>
           </div>

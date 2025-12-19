@@ -72,6 +72,15 @@ export default function SearchBar() {
     setIsOpen(false);
   };
 
+  // NEW: Handle Enter key press to navigate to full search results
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (query.trim().length >= 2) {
+      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+      setIsOpen(false);
+    }
+  };
+
   const clearSearch = () => {
     setQuery('');
     setResults([]);
@@ -96,6 +105,11 @@ export default function SearchBar() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => {
             if (results.length > 0) setIsOpen(true);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSubmit(e);
+            }
           }}
         />
         {query && (
