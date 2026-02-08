@@ -2,129 +2,185 @@
 import { useState } from 'react';
 import AdBlockerNotice from './AdBlockerNotice';
 
-export default function VideoPlayer({ movieId }) {
+export default function VideoPlayer({ movieId, tmdbId }) {
   const [selectedServer, setSelectedServer] = useState('server1');
 
-  const servers = {
-    server1: `https://www.2embed.cc/embed/${movieId}`,
-    server2: `https://multiembed.mov/?video_id=${movieId}&tmdb=1`,
-    server3: `https://vidsrc.me/embed/movie?tmdb=${movieId}`,
-    server4: `https://vidsrc.xyz/embed/movie/${movieId}`,
+  const id = tmdbId || movieId;
+
+  const servers = [
+    {
+      id: 'server1',
+      name: 'Server 1',
+      url: `https://vidsrc.pro/embed/movie/${id}`,
+      color: '#10b981'
+    },
+    {
+      id: 'server2',
+      name: 'Server 2',
+      url: `https://vidsrc.net/embed/movie/${id}`,
+      color: '#3b82f6'
+    },
+    {
+      id: 'server3',
+      name: 'Server 3',
+      url: `https://vidsrc.to/embed/movie/${id}`,
+      color: '#8b5cf6'
+    },
+    {
+      id: 'server4',
+      name: 'Server 4',
+      url: `https://vidsrc.xyz/embed/movie/${id}`,
+      color: '#ec4899'
+    },
+    {
+      id: 'server5',
+      name: 'Server 5',
+      url: `https://www.2embed.cc/embed/${id}`,
+      color: '#f59e0b'
+    },
+  ];
+
+  const currentServer = servers.find(s => s.id === selectedServer);
+
+  const handleServerChange = (serverId) => {
+    setSelectedServer(serverId);
+  };
+
+  const openInNewWindow = () => {
+    const width = 1280;
+    const height = 720;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+    
+    window.open(currentServer.url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
   };
 
   return (
-    <>
-      <style jsx>{`
-        .player-wrapper {
-          width: 100%;
-          margin-top: 20px;
-        }
+    <div style={styles.wrapper}>
+      <AdBlockerNotice />
 
-        .server-buttons {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 15px;
-          flex-wrap: wrap;
-        }
-
-        .server-btn {
-          padding: 10px 20px;
-          background-color: var(--card-bg);
-          color: var(--text-primary);
-          border: 2px solid transparent;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
-
-        .server-btn:hover {
-          background-color: var(--secondary-bg);
-          transform: translateY(-2px);
-        }
-
-        .server-btn.active {
-          background-color: var(--accent);
-          border-color: var(--accent);
-        }
-
-        .video-container {
-          position: relative;
-          width: 100%;
-          padding-bottom: 56.25%;
-          background-color: #000;
-          border-radius: 10px;
-          overflow: hidden;
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .video-iframe {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          border: none;
-        }
-
-        @media (max-width: 640px) {
-          .server-btn {
-            padding: 8px 15px;
-            font-size: 12px;
-          }
-        }
-      `}</style>
-
-      <div className="player-wrapper">
-        <AdBlockerNotice />
-
-        <div className="server-buttons">
-          <button
-            onClick={() => setSelectedServer('server1')}
-            className={`server-btn ${
-              selectedServer === 'server1' ? 'active' : ''
-            }`}
-          >
-            Server 1
-          </button>
-          <button
-            onClick={() => setSelectedServer('server2')}
-            className={`server-btn ${
-              selectedServer === 'server2' ? 'active' : ''
-            }`}
-          >
-            Server 2
-          </button>
-          <button
-            onClick={() => setSelectedServer('server3')}
-            className={`server-btn ${
-              selectedServer === 'server3' ? 'active' : ''
-            }`}
-          >
-            Server 3
-          </button>
-          <button
-            onClick={() => setSelectedServer('server4')}
-            className={`server-btn ${
-              selectedServer === 'server4' ? 'active' : ''
-            }`}
-          >
-            Server 4
-          </button>
-        </div>
-
-        <div className="video-container">
-          <iframe
-            key={selectedServer}
-            className="video-iframe"
-            src={servers[selectedServer]}
-            allowFullScreen
-            allow="autoplay; fullscreen; picture-in-picture"
-            referrerPolicy="origin"
-          />
-        </div>
+      <div style={styles.infoBanner}>
+        <span style={{marginRight: '8px'}}>💡</span>
+        <span>If video doesn't load, try switching servers or open in a new window.</span>
       </div>
-    </>
+
+      <div style={styles.controls}>
+        <div style={styles.serverGrid}>
+          {servers.map((server) => (
+            <button
+              key={server.id}
+              onClick={() => handleServerChange(server.id)}
+              style={{
+                ...styles.serverBtn,
+                borderColor: selectedServer === server.id ? server.color : '#334155',
+                background: selectedServer === server.id 
+                  ? `linear-gradient(135deg, ${server.color}22 0%, ${server.color}11 100%)`
+                  : '#1e293b'
+              }}
+            >
+              <div style={{
+                ...styles.serverDot,
+                backgroundColor: server.color
+              }} />
+              {server.name}
+            </button>
+          ))}
+        </div>
+
+        <button style={styles.openBtn} onClick={openInNewWindow}>
+          🚀 Open in New Window
+        </button>
+      </div>
+
+      <div style={styles.videoContainer}>
+        <iframe
+          key={selectedServer}
+          style={styles.iframe}
+          src={currentServer.url}
+          allowFullScreen
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="no-referrer-when-downgrade"
+          loading="lazy"
+        />
+      </div>
+    </div>
   );
 }
+
+const styles = {
+  wrapper: {
+    width: '100%',
+    marginTop: '20px',
+  },
+  infoBanner: {
+    background: 'rgba(59, 130, 246, 0.1)',
+    border: '1px solid rgba(59, 130, 246, 0.3)',
+    borderRadius: '8px',
+    padding: '12px 15px',
+    marginBottom: '15px',
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: '13px',
+    color: '#60a5fa',
+  },
+  controls: {
+    background: 'rgba(30, 41, 59, 0.5)',
+    padding: '15px',
+    borderRadius: '10px',
+    marginBottom: '15px',
+    backdropFilter: 'blur(10px)',
+  },
+  serverGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+    gap: '10px',
+    marginBottom: '12px',
+  },
+  serverBtn: {
+    padding: '12px 16px',
+    border: '2px solid',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '13px',
+    fontWeight: '600',
+    color: '#e2e8f0',
+    transition: 'all 0.2s ease',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  serverDot: {
+    width: '8px',
+    height: '8px',
+    borderRadius: '50%',
+  },
+  openBtn: {
+    width: '100%',
+    padding: '10px 20px',
+    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.2s ease',
+  },
+  videoContainer: {
+    position: 'relative',
+    width: '100%',
+    paddingBottom: '56.25%',
+    background: '#000',
+    borderRadius: '10px',
+    overflow: 'hidden',
+    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.6)',
+  },
+  iframe: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    border: 'none',
+  },
+};

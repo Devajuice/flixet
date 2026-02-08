@@ -63,7 +63,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -76,7 +76,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body style={{ paddingBottom: 0 }}>
+      <body style={{ paddingBottom: 0 }} suppressHydrationWarning>
         <WatchlistProvider>
           <ContinueWatchingProvider>
             <Header />
