@@ -29,6 +29,8 @@ export default function MovieDetails({ params }) {
   const { addToContinueWatching } = useContinueWatching();
   const hasAddedToWatching = useRef(false);
 
+  const [movieServer, setMovieServer] = useState('2embed');
+
   useEffect(() => {
     fetchMovieDetails();
   }, [movieId]);
@@ -39,7 +41,7 @@ export default function MovieDetails({ params }) {
 
     try {
       const response = await fetch(
-        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations`
+        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations`,
       );
 
       if (!response.ok) {
@@ -138,7 +140,7 @@ export default function MovieDetails({ params }) {
 
   // Get trailer
   const trailer = movie.videos?.results?.find(
-    (video) => video.type === 'Trailer' && video.site === 'YouTube'
+    (video) => video.type === 'Trailer' && video.site === 'YouTube',
   );
 
   // Get top cast members
@@ -150,7 +152,7 @@ export default function MovieDetails({ params }) {
   const writers =
     movie.credits?.crew
       ?.filter(
-        (person) => person.job === 'Writer' || person.job === 'Screenplay'
+        (person) => person.job === 'Writer' || person.job === 'Screenplay',
       )
       .slice(0, 3) || [];
 
@@ -278,6 +280,7 @@ export default function MovieDetails({ params }) {
         </Link>
 
         {/* Video Player Modal */}
+        {/* Video Player Modal */}
         <AnimatePresence>
           {showPlayer && (
             <motion.div
@@ -303,9 +306,89 @@ export default function MovieDetails({ params }) {
                 >
                   <X size={24} />
                 </button>
+
+                {/* Server Switcher */}
+                <div style={styles.serverBar}>
+                  {[
+                    {
+                      id: '2embed',
+                      label: 'Server 1',
+                      color: '#f59e0b',
+                      url: `https://www.2embed.cc/embed/${movieId}`,
+                    },
+                    {
+                      id: 'vidsrcme',
+                      label: 'Server 2',
+                      color: '#10b981',
+                      url: `https://vidsrc.me/embed/movie?tmdb=${movieId}`,
+                    },
+                    {
+                      id: 'vidsrcnet',
+                      label: 'Server 3',
+                      color: '#3b82f6',
+                      url: `https://vidsrc.net/embed/movie/${movieId}`,
+                    },
+                    {
+                      id: 'vidsrcto',
+                      label: 'Server 4',
+                      color: '#8b5cf6',
+                      url: `https://vidsrc.to/embed/movie/${movieId}`,
+                    },
+                  ].map((server) => (
+                    <button
+                      key={server.id}
+                      onClick={() => setMovieServer(server.id)}
+                      style={{
+                        ...styles.serverBarBtn,
+                        borderColor:
+                          movieServer === server.id
+                            ? server.color
+                            : 'transparent',
+                        background:
+                          movieServer === server.id
+                            ? `${server.color}22`
+                            : 'rgba(255,255,255,0.05)',
+                        color:
+                          movieServer === server.id ? server.color : '#94a3b8',
+                      }}
+                    >
+                      <span
+                        style={{
+                          ...styles.serverBarDot,
+                          backgroundColor: server.color,
+                        }}
+                      />
+                      {server.label}
+                      {server.id === '2embed' && (
+                        <span style={styles.defaultBadge}>Default</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
                 <iframe
+                  key={movieServer}
                   style={styles.iframe}
-                  src={`https://vidsrc.xyz/embed/movie/${movieId}`}
+                  src={
+                    [
+                      {
+                        id: '2embed',
+                        url: `https://www.2embed.cc/embed/${movieId}`,
+                      },
+                      {
+                        id: 'vidsrcme',
+                        url: `https://vidsrc.me/embed/movie?tmdb=${movieId}`,
+                      },
+                      {
+                        id: 'vidsrcnet',
+                        url: `https://vidsrc.net/embed/movie/${movieId}`,
+                      },
+                      {
+                        id: 'vidsrcto',
+                        url: `https://vidsrc.to/embed/movie/${movieId}`,
+                      },
+                    ].find((s) => s.id === movieServer)?.url
+                  }
                   frameBorder="0"
                   allowFullScreen
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -885,5 +968,41 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  serverBar: {
+    position: 'absolute',
+    top: '15px',
+    left: '15px',
+    right: '65px',
+    display: 'flex',
+    gap: '8px',
+    zIndex: 10,
+    flexWrap: 'wrap',
+  },
+  serverBarBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    border: '1px solid',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '12px',
+    fontWeight: '600',
+    transition: 'all 0.2s ease',
+  },
+  serverBarDot: {
+    width: '6px',
+    height: '6px',
+    borderRadius: '50%',
+    flexShrink: 0,
+  },
+  defaultBadge: {
+    fontSize: '9px',
+    fontWeight: '700',
+    background: '#f59e0b',
+    color: '#000',
+    borderRadius: '4px',
+    padding: '2px 5px',
   },
 };

@@ -37,6 +37,8 @@ export default function TVShowDetails({ params }) {
   const { addToContinueWatching } = useContinueWatching();
   const hasAddedToWatching = useRef(false);
 
+  const [tvServer, setTvServer] = useState('2embed');
+
   // Fetch show details
   useEffect(() => {
     fetchShowDetails();
@@ -53,7 +55,7 @@ export default function TVShowDetails({ params }) {
         const episodeNum = parseInt(urlEpisode);
 
         const seasonExists = show.seasons?.some(
-          (s) => s.season_number === seasonNum
+          (s) => s.season_number === seasonNum,
         );
 
         if (seasonExists) {
@@ -81,7 +83,7 @@ export default function TVShowDetails({ params }) {
   useEffect(() => {
     if (showPlayer && show && !hasAddedToWatching.current) {
       const currentEpisode = seasonData?.episodes?.find(
-        (ep) => ep.episode_number === selectedEpisode
+        (ep) => ep.episode_number === selectedEpisode,
       );
       const episodeRuntime =
         currentEpisode?.runtime || show.episode_run_time?.[0] || 45;
@@ -139,7 +141,7 @@ export default function TVShowDetails({ params }) {
 
     try {
       const response = await fetch(
-        `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos`
+        `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos`,
       );
 
       if (!response.ok) {
@@ -161,7 +163,7 @@ export default function TVShowDetails({ params }) {
 
     try {
       const response = await fetch(
-        `https://api.themoviedb.org/3/tv/${showId}/season/${seasonNumber}?api_key=${API_KEY}`
+        `https://api.themoviedb.org/3/tv/${showId}/season/${seasonNumber}?api_key=${API_KEY}`,
       );
 
       if (!response.ok) {
@@ -191,20 +193,20 @@ export default function TVShowDetails({ params }) {
     if (!seasonData?.episodes) return;
 
     const currentEpisodeIndex = seasonData.episodes.findIndex(
-      (ep) => ep.episode_number === selectedEpisode
+      (ep) => ep.episode_number === selectedEpisode,
     );
 
     if (currentEpisodeIndex < seasonData.episodes.length - 1) {
       // Next episode in current season
       setSelectedEpisode(
-        seasonData.episodes[currentEpisodeIndex + 1].episode_number
+        seasonData.episodes[currentEpisodeIndex + 1].episode_number,
       );
     } else {
       // Move to next season
       const validSeasons =
         show.seasons?.filter((s) => s.season_number > 0) || [];
       const currentSeasonIndex = validSeasons.findIndex(
-        (s) => s.season_number === selectedSeason
+        (s) => s.season_number === selectedSeason,
       );
 
       if (currentSeasonIndex < validSeasons.length - 1) {
@@ -264,7 +266,7 @@ export default function TVShowDetails({ params }) {
     : '/placeholder.png';
 
   const trailer = show.videos?.results?.find(
-    (video) => video.type === 'Trailer' && video.site === 'YouTube'
+    (video) => video.type === 'Trailer' && video.site === 'YouTube',
   );
 
   const cast = show.credits?.cast?.slice(0, 12) || [];
@@ -397,6 +399,7 @@ export default function TVShowDetails({ params }) {
         </Link>
 
         {/* Video Player Modal */}
+        {/* Video Player Modal */}
         <AnimatePresence>
           {showPlayer && (
             <motion.div
@@ -422,9 +425,87 @@ export default function TVShowDetails({ params }) {
                 >
                   <X size={24} />
                 </button>
+
+                {/* Server Switcher */}
+                <div style={styles.serverBar}>
+                  {[
+                    {
+                      id: '2embed',
+                      label: 'Server 1',
+                      color: '#f59e0b',
+                      url: `https://www.2embed.cc/embedtv/${showId}&s=${selectedSeason}&e=${selectedEpisode}`,
+                    },
+                    {
+                      id: 'vidsrcme',
+                      label: 'Server 2',
+                      color: '#10b981',
+                      url: `https://vidsrc.me/embed/tv?tmdb=${showId}&season=${selectedSeason}&episode=${selectedEpisode}`,
+                    },
+                    {
+                      id: 'vidsrcnet',
+                      label: 'Server 3',
+                      color: '#3b82f6',
+                      url: `https://vidsrc.net/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
+                    },
+                    {
+                      id: 'vidsrcto',
+                      label: 'Server 4',
+                      color: '#8b5cf6',
+                      url: `https://vidsrc.to/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
+                    },
+                  ].map((server) => (
+                    <button
+                      key={server.id}
+                      onClick={() => setTvServer(server.id)}
+                      style={{
+                        ...styles.serverBarBtn,
+                        borderColor:
+                          tvServer === server.id ? server.color : 'transparent',
+                        background:
+                          tvServer === server.id
+                            ? `${server.color}22`
+                            : 'rgba(255,255,255,0.05)',
+                        color:
+                          tvServer === server.id ? server.color : '#94a3b8',
+                      }}
+                    >
+                      <span
+                        style={{
+                          ...styles.serverBarDot,
+                          backgroundColor: server.color,
+                        }}
+                      />
+                      {server.label}
+                      {server.id === '2embed' && (
+                        <span style={styles.defaultBadge}>Default</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
                 <iframe
+                  key={`${tvServer}-${selectedSeason}-${selectedEpisode}`}
                   style={styles.iframe}
-                  src={`https://vidsrc.xyz/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`}
+                  src={
+                    [
+                      {
+                        id: '2embed',
+                        url: `https://www.2embed.cc/embedtv/${showId}&s=${selectedSeason}&e=${selectedEpisode}`,
+                      },
+                      {
+                        id: 'vidsrcme',
+                        url: `https://vidsrc.me/embed/tv?tmdb=${showId}&season=${selectedSeason}&episode=${selectedEpisode}`,
+                      },
+                      {
+                        id: 'vidsrcnet',
+                        url: `https://vidsrc.net/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
+                      },
+                      {
+                        id: 'vidsrcto',
+                        url: `https://vidsrc.to/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
+                      },
+                    ].find((s) => s.id === tvServer)?.url
+                  }
                   frameBorder="0"
                   allowFullScreen
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -640,7 +721,7 @@ export default function TVShowDetails({ params }) {
                                 month: 'short',
                                 day: 'numeric',
                                 year: 'numeric',
-                              }
+                              },
                             )}
                           </span>
                         )}
@@ -1181,5 +1262,41 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  serverBar: {
+    position: 'absolute',
+    top: '15px',
+    left: '15px',
+    right: '65px',
+    display: 'flex',
+    gap: '8px',
+    zIndex: 10,
+    flexWrap: 'wrap',
+  },
+  serverBarBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    border: '1px solid',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '12px',
+    fontWeight: '600',
+    transition: 'all 0.2s ease',
+  },
+  serverBarDot: {
+    width: '6px',
+    height: '6px',
+    borderRadius: '50%',
+    flexShrink: 0,
+  },
+  defaultBadge: {
+    fontSize: '9px',
+    fontWeight: '700',
+    background: '#f59e0b',
+    color: '#000',
+    borderRadius: '4px',
+    padding: '2px 5px',
   },
 };

@@ -3,47 +3,55 @@ import { useState } from 'react';
 import AdBlockerNotice from './AdBlockerNotice';
 
 export default function VideoPlayer({ movieId, tmdbId }) {
-  const [selectedServer, setSelectedServer] = useState('server1');
-
   const id = tmdbId || movieId;
 
   const servers = [
     {
-      id: 'server1',
+      id: '2embed',
       name: 'Server 1',
-      url: `https://vidsrc.pro/embed/movie/${id}`,
-      color: '#10b981'
-    },
-    {
-      id: 'server2',
-      name: 'Server 2',
-      url: `https://vidsrc.net/embed/movie/${id}`,
-      color: '#3b82f6'
-    },
-    {
-      id: 'server3',
-      name: 'Server 3',
-      url: `https://vidsrc.to/embed/movie/${id}`,
-      color: '#8b5cf6'
-    },
-    {
-      id: 'server4',
-      name: 'Server 4',
-      url: `https://vidsrc.xyz/embed/movie/${id}`,
-      color: '#ec4899'
-    },
-    {
-      id: 'server5',
-      name: 'Server 5',
       url: `https://www.2embed.cc/embed/${id}`,
-      color: '#f59e0b'
+      color: '#f59e0b',
+    },
+    {
+      id: 'vidsrcme',
+      name: 'Server 2',
+      url: `https://vidsrc.me/embed/movie?tmdb=${id}`,
+      color: '#10b981',
+    },
+    {
+      id: 'vidsrcnet',
+      name: 'Server 3',
+      url: `https://vidsrc.net/embed/movie/${id}`,
+      color: '#3b82f6',
+    },
+    {
+      id: 'vidsrcto',
+      name: 'Server 4',
+      url: `https://vidsrc.to/embed/movie/${id}`,
+      color: '#8b5cf6',
+    },
+    {
+      id: 'vidsrcxyz',
+      name: 'Server 5',
+      url: `https://vidsrc.xyz/embed/movie/${id}`,
+      color: '#ec4899',
     },
   ];
 
-  const currentServer = servers.find(s => s.id === selectedServer);
+  const [selectedServer, setSelectedServer] = useState(servers[0].id);
+
+  const currentServer = servers.find((s) => s.id === selectedServer);
 
   const handleServerChange = (serverId) => {
     setSelectedServer(serverId);
+  };
+
+  const handleIframeError = () => {
+    const currentIndex = servers.findIndex((s) => s.id === selectedServer);
+    const nextServer = servers[currentIndex + 1];
+    if (nextServer) {
+      setSelectedServer(nextServer.id);
+    }
   };
 
   const openInNewWindow = () => {
@@ -51,8 +59,11 @@ export default function VideoPlayer({ movieId, tmdbId }) {
     const height = 720;
     const left = (window.screen.width - width) / 2;
     const top = (window.screen.height - height) / 2;
-    
-    window.open(currentServer.url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
+    window.open(
+      currentServer.url,
+      '_blank',
+      `width=${width},height=${height},left=${left},top=${top}`,
+    );
   };
 
   return (
@@ -60,8 +71,10 @@ export default function VideoPlayer({ movieId, tmdbId }) {
       <AdBlockerNotice />
 
       <div style={styles.infoBanner}>
-        <span style={{marginRight: '8px'}}>💡</span>
-        <span>If video doesn't load, try switching servers or open in a new window.</span>
+        <span style={{ marginRight: '8px' }}>💡</span>
+        <span>
+          If video doesn't load within 15 seconds, try switching servers below.
+        </span>
       </div>
 
       <div style={styles.controls}>
@@ -72,17 +85,24 @@ export default function VideoPlayer({ movieId, tmdbId }) {
               onClick={() => handleServerChange(server.id)}
               style={{
                 ...styles.serverBtn,
-                borderColor: selectedServer === server.id ? server.color : '#334155',
-                background: selectedServer === server.id 
-                  ? `linear-gradient(135deg, ${server.color}22 0%, ${server.color}11 100%)`
-                  : '#1e293b'
+                borderColor:
+                  selectedServer === server.id ? server.color : '#334155',
+                background:
+                  selectedServer === server.id
+                    ? `linear-gradient(135deg, ${server.color}22 0%, ${server.color}11 100%)`
+                    : '#1e293b',
               }}
             >
-              <div style={{
-                ...styles.serverDot,
-                backgroundColor: server.color
-              }} />
+              <div
+                style={{
+                  ...styles.serverDot,
+                  backgroundColor: server.color,
+                }}
+              />
               {server.name}
+              {server.id === '2embed' && (
+                <span style={styles.defaultBadge}>Default</span>
+              )}
             </button>
           ))}
         </div>
@@ -101,6 +121,7 @@ export default function VideoPlayer({ movieId, tmdbId }) {
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="no-referrer-when-downgrade"
           loading="lazy"
+          onError={handleIframeError}
         />
       </div>
     </div>
@@ -108,10 +129,7 @@ export default function VideoPlayer({ movieId, tmdbId }) {
 }
 
 const styles = {
-  wrapper: {
-    width: '100%',
-    marginTop: '20px',
-  },
+  wrapper: { width: '100%', marginTop: '20px' },
   infoBanner: {
     background: 'rgba(59, 130, 246, 0.1)',
     border: '1px solid rgba(59, 130, 246, 0.3)',
@@ -148,11 +166,22 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
+    position: 'relative',
   },
   serverDot: {
     width: '8px',
     height: '8px',
     borderRadius: '50%',
+    flexShrink: 0,
+  },
+  defaultBadge: {
+    fontSize: '9px',
+    fontWeight: '700',
+    background: '#f59e0b',
+    color: '#000',
+    borderRadius: '4px',
+    padding: '2px 5px',
+    marginLeft: 'auto',
   },
   openBtn: {
     width: '100%',
