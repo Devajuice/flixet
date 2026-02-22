@@ -38,6 +38,7 @@ export default function TVShowDetails({ params }) {
   const hasAddedToWatching = useRef(false);
 
   const [tvServer, setTvServer] = useState('2embed');
+  const [externalIds, setExternalIds] = useState(null);
 
   // Fetch show details
   useEffect(() => {
@@ -140,16 +141,22 @@ export default function TVShowDetails({ params }) {
     setError(null);
 
     try {
-      const response = await fetch(
-        `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos`,
-      );
+      const [showRes, externalRes] = await Promise.all([
+        fetch(
+          `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos`,
+        ),
+        fetch(
+          `https://api.themoviedb.org/3/tv/${showId}/external_ids?api_key=${API_KEY}`,
+        ),
+      ]);
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch TV show details');
-      }
+      if (!showRes.ok) throw new Error('Failed to fetch TV show details');
 
-      const data = await response.json();
-      setShow(data);
+      const showData = await showRes.json();
+      const externalData = await externalRes.json();
+
+      setShow(showData);
+      setExternalIds(externalData);
     } catch (error) {
       console.error('Error fetching TV show details:', error);
       setError(error.message);
@@ -433,7 +440,7 @@ export default function TVShowDetails({ params }) {
                       id: '2embed',
                       label: 'Server 1',
                       color: '#f59e0b',
-                      url: `https://www.2embed.cc/embedtv/${showId}&s=${selectedSeason}&e=${selectedEpisode}`,
+                      url: `https://www.2embed.cc/embedtv/${externalIds?.imdb_id || showId}&s=${selectedSeason}&e=${selectedEpisode}`,
                     },
                     {
                       id: 'vidsrcme',
@@ -490,7 +497,7 @@ export default function TVShowDetails({ params }) {
                     [
                       {
                         id: '2embed',
-                        url: `https://www.2embed.cc/embedtv/${showId}&s=${selectedSeason}&e=${selectedEpisode}`,
+                        url: `https://www.2embed.cc/embedtv/${externalIds?.imdb_id || showId}&s=${selectedSeason}&e=${selectedEpisode}`,
                       },
                       {
                         id: 'vidsrcme',
