@@ -2,7 +2,6 @@
 import { useState, useEffect, use, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Star,
   Calendar,
   Clock,
   ArrowLeft,
@@ -16,6 +15,7 @@ import WatchlistButton from '@/components/WatchlistButton';
 import { useContinueWatching } from '@/context/ContinueWatchingContext';
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
 
 export default function MovieDetails({ params }) {
   const unwrappedParams = use(params);
@@ -25,10 +25,11 @@ export default function MovieDetails({ params }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showPlayer, setShowPlayer] = useState(false);
+  // undefined = loading, null = unavailable, { rating, votes } = loaded
+  const [imdbRating, setImdbRating] = useState(undefined);
 
   const { addToContinueWatching } = useContinueWatching();
   const hasAddedToWatching = useRef(false);
-
   const [movieServer, setMovieServer] = useState('2embed');
 
   useEffect(() => {
@@ -38,16 +39,41 @@ export default function MovieDetails({ params }) {
   const fetchMovieDetails = async () => {
     setLoading(true);
     setError(null);
+    setImdbRating(undefined);
     try {
-      const response = await fetch(
-        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations`,
-      );
-      if (!response.ok) throw new Error('Failed to fetch movie details');
-      const data = await response.json();
-      setMovie(data);
-    } catch (error) {
-      console.error('Error fetching movie details:', error);
-      setError(error.message);
+      const [movieRes, externalRes] = await Promise.all([
+        fetch(
+          `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations`,
+        ),
+        fetch(
+          `https://api.themoviedb.org/3/movie/${movieId}/external_ids?api_key=${API_KEY}`,
+        ),
+      ]);
+      if (!movieRes.ok) throw new Error('Failed to fetch movie details');
+      const movieData = await movieRes.json();
+      const externalData = await externalRes.json();
+      setMovie(movieData);
+
+      // Fetch IMDb rating from OMDb using the IMDb ID
+      if (OMDB_KEY && externalData?.imdb_id) {
+        fetch(
+          `https://www.omdbapi.com/?i=${externalData.imdb_id}&apikey=${OMDB_KEY}`,
+        )
+          .then((r) => r.json())
+          .then((d) =>
+            setImdbRating(
+              d.imdbRating && d.imdbRating !== 'N/A'
+                ? { rating: d.imdbRating, votes: d.imdbVotes }
+                : null,
+            ),
+          )
+          .catch(() => setImdbRating(null));
+      } else {
+        setImdbRating(null);
+      }
+    } catch (err) {
+      console.error('Error fetching movie details:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -80,7 +106,7 @@ export default function MovieDetails({ params }) {
   if (loading) {
     return (
       <>
-        <style jsx>{`
+        <style jsx global>{`
           @keyframes spin {
             to {
               transform: rotate(360deg);
@@ -168,20 +194,21 @@ export default function MovieDetails({ params }) {
 
   return (
     <>
-      <style jsx>{`
+      <style jsx global>{`
         @keyframes spin {
           to {
             transform: rotate(360deg);
           }
         }
-        @keyframes fadeUp {
-          from {
-            opacity: 0;
-            transform: translateY(14px);
+        @keyframes shimmer {
+          0% {
+            opacity: 0.4;
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+          50% {
+            opacity: 0.8;
+          }
+          100% {
+            opacity: 0.4;
           }
         }
 
@@ -189,14 +216,12 @@ export default function MovieDetails({ params }) {
           font-family: 'DM Sans', sans-serif;
         }
 
-        /* ── Layout ──────────────────────────────────── */
         .page-container {
           padding: 20px;
           padding-bottom: 100px;
           max-width: 1600px;
           margin: 0 auto;
         }
-
         .content-grid {
           display: grid;
           grid-template-columns: 280px 1fr;
@@ -204,7 +229,6 @@ export default function MovieDetails({ params }) {
           margin-top: 28px;
         }
 
-        /* ── Back link ───────────────────────────────── */
         .back-link {
           display: inline-flex;
           align-items: center;
@@ -221,7 +245,6 @@ export default function MovieDetails({ params }) {
           color: #ffc13c;
         }
 
-        /* ── Backdrop ────────────────────────────────── */
         .backdrop {
           position: relative;
           width: 100%;
@@ -242,7 +265,6 @@ export default function MovieDetails({ params }) {
           background: linear-gradient(to bottom, transparent 30%, #0d0d0f 100%);
         }
 
-        /* ── Poster sidebar ──────────────────────────── */
         .poster-section {
           position: sticky;
           top: 80px;
@@ -258,58 +280,6 @@ export default function MovieDetails({ params }) {
           display: block;
         }
 
-        /* ── Sidebar buttons ─────────────────────────── */
-        .watch-btn {
-          width: 100%;
-          padding: 14px;
-          background: #ffc13c;
-          color: #0d0d0f;
-          border: none;
-          border-radius: 10px;
-          font-size: 15px;
-          font-weight: 700;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 9px;
-          letter-spacing: 0.02em;
-          transition:
-            opacity 0.2s,
-            transform 0.15s;
-          margin-bottom: 10px;
-        }
-        .watch-btn:hover {
-          opacity: 0.9;
-        }
-
-        .trailer-btn {
-          width: 100%;
-          padding: 13px;
-          background: transparent;
-          color: rgba(255, 255, 255, 0.8);
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          border-radius: 10px;
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          text-decoration: none;
-          letter-spacing: 0.02em;
-          transition:
-            border-color 0.2s,
-            color 0.2s;
-          margin-bottom: 10px;
-        }
-        .trailer-btn:hover {
-          border-color: rgba(255, 193, 60, 0.45);
-          color: #ffc13c;
-        }
-
-        /* ── Tip box ─────────────────────────────────── */
         .tip-box {
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.07);
@@ -350,13 +320,7 @@ export default function MovieDetails({ params }) {
           color: rgba(255, 255, 255, 0.5);
           line-height: 1.4;
         }
-        .check-icon {
-          color: #4ade80;
-          flex-shrink: 0;
-          margin-top: 1px;
-        }
 
-        /* ── Details panel ───────────────────────────── */
         .details {
           padding-bottom: 40px;
         }
@@ -372,7 +336,6 @@ export default function MovieDetails({ params }) {
         .movie-title span {
           color: #ffc13c;
         }
-
         .tagline {
           font-size: 16px;
           font-style: italic;
@@ -381,12 +344,12 @@ export default function MovieDetails({ params }) {
           letter-spacing: 0.01em;
         }
 
-        /* ── Metadata row ────────────────────────────── */
         .metadata {
           display: flex;
           gap: 18px;
           flex-wrap: wrap;
           margin-bottom: 20px;
+          align-items: center;
         }
         .meta-item {
           display: flex;
@@ -397,12 +360,46 @@ export default function MovieDetails({ params }) {
           color: rgba(255, 255, 255, 0.55);
           letter-spacing: 0.01em;
         }
-        .meta-item .rating-val {
-          color: #ffc13c;
-          font-weight: 700;
+
+        /* ── IMDb badge in header ─────────────────────── */
+        .imdb-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(245, 197, 24, 0.08);
+          border: 1px solid rgba(245, 197, 24, 0.22);
+          border-radius: 8px;
+          padding: 5px 10px;
+        }
+        .imdb-logo {
+          background: #f5c518;
+          color: #000;
+          font-size: 10px;
+          font-weight: 900;
+          padding: 1px 5px;
+          border-radius: 3px;
+          letter-spacing: 0.03em;
+          line-height: 1.4;
+        }
+        .imdb-score {
+          font-size: 15px;
+          font-weight: 800;
+          color: #f5c518;
+          letter-spacing: 0.01em;
+        }
+        .imdb-votes {
+          font-size: 11px;
+          color: rgba(245, 197, 24, 0.45);
+          font-weight: 500;
+        }
+        .imdb-shimmer {
+          width: 110px;
+          height: 32px;
+          background: rgba(255, 255, 255, 0.04);
+          border-radius: 8px;
+          animation: shimmer 1.5s ease-in-out infinite;
         }
 
-        /* ── Genres ──────────────────────────────────── */
         .genres {
           display: flex;
           gap: 8px;
@@ -420,17 +417,16 @@ export default function MovieDetails({ params }) {
           letter-spacing: 0.03em;
         }
 
-        /* ── Sections ────────────────────────────────── */
         .section {
           margin-bottom: 36px;
         }
-
         .section-title {
-          font-size: 18px;
+          font-size: 15px;
           font-weight: 700;
-          color: rgba(255, 255, 255, 0.9);
+          color: rgba(255, 255, 255, 0.88);
           margin: 0 0 14px;
-          letter-spacing: -0.01em;
+          letter-spacing: 0.09em;
+          text-transform: uppercase;
           display: flex;
           align-items: center;
           gap: 8px;
@@ -441,7 +437,6 @@ export default function MovieDetails({ params }) {
           height: 1px;
           background: rgba(255, 255, 255, 0.06);
         }
-
         .overview-text {
           font-size: 15px;
           line-height: 1.85;
@@ -453,211 +448,6 @@ export default function MovieDetails({ params }) {
           font-weight: 500;
         }
 
-        /* ── Cast grid ───────────────────────────────── */
-        .cast-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-          gap: 16px;
-          margin-top: 4px;
-        }
-
-        .cast-card {
-          background: #0d0d0f;
-          border-radius: 10px;
-          overflow: hidden;
-          box-shadow:
-            0 2px 8px rgba(0, 0, 0, 0.5),
-            0 0 0 1px rgba(255, 255, 255, 0.04);
-          transition:
-            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-            box-shadow 0.3s ease;
-          cursor: pointer;
-        }
-        .cast-card:hover {
-          transform: translateY(-5px) scale(1.02);
-          box-shadow:
-            0 14px 30px rgba(0, 0, 0, 0.65),
-            0 0 0 1px rgba(255, 193, 60, 0.2);
-        }
-
-        .cast-image-wrap {
-          width: 100%;
-          padding-bottom: 150%;
-          position: relative;
-          overflow: hidden;
-          background: #111114;
-        }
-        .cast-image-wrap img {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition:
-            transform 0.4s ease,
-            filter 0.3s ease;
-        }
-        .cast-card:hover .cast-image-wrap img {
-          transform: scale(1.06);
-          filter: brightness(0.55);
-        }
-        .cast-image-wrap::before {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 50%;
-          background: linear-gradient(
-            to top,
-            rgba(13, 13, 15, 0.9) 0%,
-            transparent 100%
-          );
-          z-index: 1;
-          pointer-events: none;
-        }
-        .cast-overlay {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          padding: 10px 8px;
-          z-index: 2;
-          opacity: 0;
-          transition: opacity 0.25s ease;
-        }
-        .cast-card:hover .cast-overlay {
-          opacity: 1;
-        }
-        .cast-overlay p {
-          font-size: 10px;
-          color: #ffc13c;
-          font-weight: 600;
-          text-align: center;
-          margin: 0;
-          line-height: 1.3;
-        }
-
-        .cast-info {
-          padding: 10px 8px 11px;
-          text-align: center;
-        }
-        .cast-name {
-          font-size: 12px;
-          font-weight: 700;
-          color: rgba(255, 255, 255, 0.9);
-          margin: 0 0 3px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          transition: color 0.2s;
-        }
-        .cast-card:hover .cast-name {
-          color: #ffc13c;
-        }
-        .cast-character {
-          font-size: 10px;
-          color: rgba(255, 255, 255, 0.35);
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          margin: 0;
-        }
-
-        /* ── Player overlay ──────────────────────────── */
-        .player-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.96);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 10000;
-          padding: 20px;
-        }
-        .player-container {
-          position: relative;
-          width: 100%;
-          max-width: 1400px;
-          aspect-ratio: 16/9;
-          background: #000;
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow:
-            0 24px 80px rgba(0, 0, 0, 0.9),
-            0 0 0 1px rgba(255, 255, 255, 0.06);
-        }
-        .close-btn {
-          position: absolute;
-          top: 14px;
-          right: 14px;
-          background: rgba(0, 0, 0, 0.75);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          color: white;
-          z-index: 10;
-          transition: background 0.2s;
-          backdrop-filter: blur(4px);
-        }
-        .close-btn:hover {
-          background: rgba(220, 50, 50, 0.8);
-          border-color: transparent;
-        }
-
-        /* ── Server bar ──────────────────────────────── */
-        .server-bar {
-          position: absolute;
-          top: 14px;
-          left: 14px;
-          right: 64px;
-          display: flex;
-          gap: 7px;
-          z-index: 10;
-          flex-wrap: wrap;
-        }
-        .server-btn {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 12px;
-          border: 1px solid;
-          border-radius: 6px;
-          cursor: pointer;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 12px;
-          font-weight: 600;
-          transition: all 0.2s ease;
-          letter-spacing: 0.02em;
-        }
-        .server-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          flex-shrink: 0;
-        }
-        .default-badge {
-          font-size: 9px;
-          font-weight: 700;
-          background: #ffc13c;
-          color: #0d0d0f;
-          border-radius: 4px;
-          padding: 2px 5px;
-          letter-spacing: 0.02em;
-        }
-
-        .player-iframe {
-          width: 100%;
-          height: 100%;
-          border: none;
-        }
-
-        /* ── Responsive ──────────────────────────────── */
         @media (max-width: 968px) {
           .content-grid {
             grid-template-columns: 230px 1fr;
@@ -667,7 +457,6 @@ export default function MovieDetails({ params }) {
             font-size: 34px;
           }
         }
-
         @media (max-width: 768px) {
           .backdrop {
             display: none;
@@ -689,19 +478,10 @@ export default function MovieDetails({ params }) {
           .movie-title {
             font-size: 26px;
           }
-          .cast-grid {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-          }
         }
-
         @media (max-width: 480px) {
           .poster-section {
             grid-template-columns: 1fr;
-          }
-          .cast-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
           }
           .movie-title {
             font-size: 24px;
@@ -758,7 +538,6 @@ export default function MovieDetails({ params }) {
                     '0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)',
                 }}
               >
-                {/* Close button */}
                 <button
                   onClick={() => setShowPlayer(false)}
                   aria-label="Close player"
@@ -783,7 +562,6 @@ export default function MovieDetails({ params }) {
                   <X size={20} />
                 </button>
 
-                {/* Server bar */}
                 <div
                   style={{
                     position: 'absolute',
@@ -866,7 +644,6 @@ export default function MovieDetails({ params }) {
           )}
         </AnimatePresence>
 
-        {/* Backdrop */}
         {backdropUrl && (
           <div className="backdrop">
             <img src={backdropUrl} alt={`${movie.title} backdrop`} />
@@ -884,7 +661,6 @@ export default function MovieDetails({ params }) {
             />
 
             <div
-              className="mobile-actions"
               style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
             >
               <motion.button
@@ -978,7 +754,6 @@ export default function MovieDetails({ params }) {
                     <div className="tip-item" key={tip}>
                       <Check
                         size={12}
-                        className="check-icon"
                         style={{
                           color: '#4ade80',
                           flexShrink: 0,
@@ -1007,13 +782,23 @@ export default function MovieDetails({ params }) {
               {movie.tagline && <p className="tagline">"{movie.tagline}"</p>}
 
               <div className="metadata">
-                <div className="meta-item">
-                  <Star size={15} fill="#ffc13c" color="#ffc13c" />
-                  <span className="rating-val">
-                    {movie.vote_average?.toFixed(1)}
-                  </span>
-                  <span>/10</span>
-                </div>
+                {/* ── IMDb Rating Badge ── */}
+                {imdbRating === undefined && OMDB_KEY ? (
+                  <div className="imdb-shimmer" />
+                ) : imdbRating ? (
+                  <div className="imdb-badge">
+                    <span className="imdb-logo">IMDb</span>
+                    <span className="imdb-score">{imdbRating.rating}</span>
+                    <span className="imdb-votes">
+                      / 10 ·{' '}
+                      {Number(
+                        imdbRating.votes?.replace(/,/g, ''),
+                      ).toLocaleString()}{' '}
+                      votes
+                    </span>
+                  </div>
+                ) : null}
+
                 <div className="meta-item">
                   <Calendar size={15} />
                   <span>
@@ -1039,7 +824,6 @@ export default function MovieDetails({ params }) {
               )}
             </motion.div>
 
-            {/* Overview */}
             <div className="section">
               <h2 className="section-title">Overview</h2>
               <p className="overview-text">
@@ -1108,7 +892,6 @@ export default function MovieDetails({ params }) {
 
 function CastCard({ actor }) {
   const [hovered, setHovered] = useState(false);
-
   return (
     <motion.div
       onHoverStart={() => setHovered(true)}
@@ -1126,7 +909,6 @@ function CastCard({ actor }) {
         transition: 'box-shadow 0.3s ease',
       }}
     >
-      {/* Image */}
       <div
         style={{
           width: '100%',
@@ -1159,7 +941,6 @@ function CastCard({ actor }) {
             transition: 'transform 0.45s ease, filter 0.35s ease',
           }}
         />
-        {/* Bottom vignette */}
         <div
           style={{
             position: 'absolute',
@@ -1173,7 +954,6 @@ function CastCard({ actor }) {
             zIndex: 1,
           }}
         />
-        {/* Character overlay on hover */}
         <div
           style={{
             position: 'absolute',
@@ -1201,8 +981,6 @@ function CastCard({ actor }) {
           </p>
         </div>
       </div>
-
-      {/* Info */}
       <div
         style={{
           padding: '10px 8px 11px',

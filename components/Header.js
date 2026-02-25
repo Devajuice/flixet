@@ -600,7 +600,7 @@ export default function Header() {
         /* ── Expandable search bar ─── */
         .search-expand {
           border-top: 1px solid rgba(255, 255, 255, 0.06);
-          overflow: hidden;
+          overflow: visible;
           background: rgba(13, 13, 15, 0.98);
         }
 

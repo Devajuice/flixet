@@ -3,9 +3,7 @@ import { useState, useEffect, use, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Star,
   Calendar,
-  Clock,
   ArrowLeft,
   Play,
   Lightbulb,
@@ -40,6 +38,10 @@ export default function TVShowDetails({ params }) {
 
   const [tvServer, setTvServer] = useState('2embed');
   const [externalIds, setExternalIds] = useState(null);
+
+  // Show-level IMDb: undefined = loading, null = unavailable, { rating, votes } = loaded
+  const [showImdbRating, setShowImdbRating] = useState(undefined);
+  // Episode-level IMDb cache: "S1E3" → { rating, votes } | null
   const [omdbCache, setOmdbCache] = useState({});
 
   useEffect(() => {
@@ -69,6 +71,24 @@ export default function TVShowDetails({ params }) {
     if (selectedSeason !== null) fetchSeasonDetails(selectedSeason);
   }, [selectedSeason]);
 
+  // Fetch show-level IMDb rating
+  useEffect(() => {
+    if (!OMDB_KEY || !externalIds?.imdb_id) return;
+    fetch(
+      `https://www.omdbapi.com/?i=${externalIds.imdb_id}&apikey=${OMDB_KEY}`,
+    )
+      .then((r) => r.json())
+      .then((d) =>
+        setShowImdbRating(
+          d.imdbRating && d.imdbRating !== 'N/A'
+            ? { rating: d.imdbRating, votes: d.imdbVotes }
+            : null,
+        ),
+      )
+      .catch(() => setShowImdbRating(null));
+  }, [externalIds]);
+
+  // Pre-fetch episode IMDb ratings when season loads
   useEffect(() => {
     if (!OMDB_KEY || !externalIds?.imdb_id || !seasonData?.episodes) return;
     seasonData.episodes.forEach((ep) => {
@@ -128,6 +148,7 @@ export default function TVShowDetails({ params }) {
   const fetchShowDetails = async () => {
     setLoading(true);
     setError(null);
+    setShowImdbRating(undefined);
     try {
       const [showRes, externalRes] = await Promise.all([
         fetch(
@@ -138,13 +159,15 @@ export default function TVShowDetails({ params }) {
         ),
       ]);
       if (!showRes.ok) throw new Error('Failed to fetch TV show details');
-      const showData = await showRes.json();
-      const externalData = await externalRes.json();
+      const [showData, externalData] = await Promise.all([
+        showRes.json(),
+        externalRes.json(),
+      ]);
       setShow(showData);
       setExternalIds(externalData);
-    } catch (error) {
-      console.error('Error fetching TV show details:', error);
-      setError(error.message);
+    } catch (err) {
+      console.error('Error fetching TV show details:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -160,8 +183,8 @@ export default function TVShowDetails({ params }) {
       const data = await response.json();
       setSeasonData(data);
       if (selectedEpisode === null) setSelectedEpisode(1);
-    } catch (error) {
-      console.error('Error fetching season details:', error);
+    } catch (err) {
+      console.error('Error fetching season details:', err);
     } finally {
       setLoadingSeason(false);
     }
@@ -194,22 +217,19 @@ export default function TVShowDetails({ params }) {
 
   const handleNextEpisode = () => {
     if (!seasonData?.episodes) return;
-    const currentEpisodeIndex = seasonData.episodes.findIndex(
+    const idx = seasonData.episodes.findIndex(
       (ep) => ep.episode_number === selectedEpisode,
     );
-    if (currentEpisodeIndex < seasonData.episodes.length - 1) {
-      setSelectedEpisode(
-        seasonData.episodes[currentEpisodeIndex + 1].episode_number,
-      );
+    if (idx < seasonData.episodes.length - 1) {
+      setSelectedEpisode(seasonData.episodes[idx + 1].episode_number);
     } else {
       const validSeasons =
         show.seasons?.filter((s) => s.season_number > 0) || [];
-      const currentSeasonIndex = validSeasons.findIndex(
+      const sIdx = validSeasons.findIndex(
         (s) => s.season_number === selectedSeason,
       );
-      if (currentSeasonIndex < validSeasons.length - 1) {
-        const nextSeason = validSeasons[currentSeasonIndex + 1];
-        setSelectedSeason(nextSeason.season_number);
+      if (sIdx < validSeasons.length - 1) {
+        setSelectedSeason(validSeasons[sIdx + 1].season_number);
         setSelectedEpisode(1);
       }
     }
@@ -259,7 +279,7 @@ export default function TVShowDetails({ params }) {
     ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
     : '/placeholder.png';
   const trailer = show.videos?.results?.find(
-    (video) => video.type === 'Trailer' && video.site === 'YouTube',
+    (v) => v.type === 'Trailer' && v.site === 'YouTube',
   );
   const cast = show.credits?.cast?.slice(0, 12) || [];
   const validSeasons = show.seasons?.filter((s) => s.season_number > 0) || [];
@@ -445,6 +465,7 @@ export default function TVShowDetails({ params }) {
           gap: 18px;
           flex-wrap: wrap;
           margin-bottom: 20px;
+          align-items: center;
         }
         .meta-item {
           display: flex;
@@ -454,9 +475,44 @@ export default function TVShowDetails({ params }) {
           font-weight: 500;
           color: rgba(255, 255, 255, 0.5);
         }
-        .rating-val {
-          color: #ffc13c;
-          font-weight: 700;
+
+        /* ── IMDb badge (header) ─────────────── */
+        .imdb-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(245, 197, 24, 0.08);
+          border: 1px solid rgba(245, 197, 24, 0.22);
+          border-radius: 8px;
+          padding: 5px 10px;
+        }
+        .imdb-logo {
+          background: #f5c518;
+          color: #000;
+          font-size: 10px;
+          font-weight: 900;
+          padding: 1px 5px;
+          border-radius: 3px;
+          letter-spacing: 0.03em;
+          line-height: 1.4;
+        }
+        .imdb-score {
+          font-size: 15px;
+          font-weight: 800;
+          color: #f5c518;
+          letter-spacing: 0.01em;
+        }
+        .imdb-votes {
+          font-size: 11px;
+          color: rgba(245, 197, 24, 0.45);
+          font-weight: 500;
+        }
+        .imdb-shimmer {
+          width: 110px;
+          height: 32px;
+          background: rgba(255, 255, 255, 0.04);
+          border-radius: 8px;
+          animation: shimmer 1.5s ease-in-out infinite;
         }
 
         .genres {
@@ -507,58 +563,42 @@ export default function TVShowDetails({ params }) {
           font-weight: 500;
         }
 
-        /* ── Rating badges ───────────────────────────────── */
+        /* ── Episode IMDb badge ──────────────── */
         .ep-ratings {
           display: flex;
           align-items: center;
           gap: 8px;
           margin-bottom: 8px;
-          flex-wrap: wrap;
         }
-        .rating-badge {
+        .ep-imdb-badge {
           display: inline-flex;
           align-items: center;
-          gap: 4px;
-          border-radius: 6px;
-          padding: 3px 8px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.02em;
-        }
-        .badge-tmdb {
-          background: rgba(255, 193, 60, 0.08);
-          border: 1px solid rgba(255, 193, 60, 0.18);
-          color: #ffc13c;
-        }
-        .badge-tmdb-label {
-          font-size: 10px;
-          font-weight: 600;
-          color: rgba(255, 193, 60, 0.5);
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-        .badge-imdb {
+          gap: 5px;
           background: rgba(245, 197, 24, 0.08);
           border: 1px solid rgba(245, 197, 24, 0.2);
-          color: #f5c518;
+          border-radius: 6px;
+          padding: 3px 8px;
         }
-        .badge-imdb-logo {
+        .ep-imdb-logo {
           background: #f5c518;
           color: #000;
-          font-family: 'DM Sans', sans-serif;
           font-size: 9px;
           font-weight: 900;
           padding: 1px 4px;
           border-radius: 3px;
           letter-spacing: 0.03em;
         }
-        .badge-imdb-votes {
-          font-size: 10px;
-          color: rgba(245, 197, 24, 0.4);
+        .ep-imdb-score {
+          font-size: 11px;
+          font-weight: 700;
+          color: #f5c518;
           letter-spacing: 0.02em;
         }
-        .badge-loading {
+        .ep-imdb-votes {
+          font-size: 10px;
+          color: rgba(245, 197, 24, 0.4);
+        }
+        .ep-imdb-loading {
           width: 64px;
           height: 22px;
           background: rgba(255, 255, 255, 0.04);
@@ -618,7 +658,6 @@ export default function TVShowDetails({ params }) {
           Back to TV Shows
         </Link>
 
-        {/* ── Player modal ──────────────────────────── */}
         <AnimatePresence>
           {showPlayer && (
             <motion.div
@@ -760,7 +799,6 @@ export default function TVShowDetails({ params }) {
           )}
         </AnimatePresence>
 
-        {/* Backdrop */}
         {backdropUrl && (
           <div className="backdrop">
             <img src={backdropUrl} alt={`${show.name} backdrop`} />
@@ -768,7 +806,6 @@ export default function TVShowDetails({ params }) {
         )}
 
         <div className="content-grid">
-          {/* Poster sidebar */}
           <div className="poster-section">
             <img
               src={posterUrl}
@@ -808,7 +845,6 @@ export default function TVShowDetails({ params }) {
                 <Play size={18} fill="#0d0d0f" color="#0d0d0f" />
                 Watch S{selectedSeason}E{selectedEpisode}
               </motion.button>
-
               {trailer && (
                 <motion.a
                   href={`https://www.youtube.com/watch?v=${trailer.key}`}
@@ -844,7 +880,6 @@ export default function TVShowDetails({ params }) {
                   Watch Trailer
                 </motion.a>
               )}
-
               <WatchlistButton
                 item={{
                   id: show.id,
@@ -857,7 +892,6 @@ export default function TVShowDetails({ params }) {
                 }}
                 variant="large"
               />
-
               <div className="tip-box">
                 <div className="tip-header">
                   <Lightbulb size={14} color="#ffc13c" />
@@ -888,7 +922,6 @@ export default function TVShowDetails({ params }) {
             </div>
           </div>
 
-          {/* Details */}
           <div className="details">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -900,14 +933,25 @@ export default function TVShowDetails({ params }) {
                 <span>{show.name.split(' ').slice(-1)}</span>
               </h1>
               {show.tagline && <p className="tagline">"{show.tagline}"</p>}
+
               <div className="metadata">
-                <div className="meta-item">
-                  <Star size={15} fill="#ffc13c" color="#ffc13c" />
-                  <span className="rating-val">
-                    {show.vote_average?.toFixed(1)}
-                  </span>
-                  <span>/10</span>
-                </div>
+                {/* ── IMDb Rating Badge ── */}
+                {showImdbRating === undefined && OMDB_KEY ? (
+                  <div className="imdb-shimmer" />
+                ) : showImdbRating ? (
+                  <div className="imdb-badge">
+                    <span className="imdb-logo">IMDb</span>
+                    <span className="imdb-score">{showImdbRating.rating}</span>
+                    <span className="imdb-votes">
+                      / 10 ·{' '}
+                      {Number(
+                        showImdbRating.votes?.replace(/,/g, ''),
+                      ).toLocaleString()}{' '}
+                      votes
+                    </span>
+                  </div>
+                ) : null}
+
                 <div className="meta-item">
                   <Calendar size={15} />
                   <span>
@@ -922,6 +966,7 @@ export default function TVShowDetails({ params }) {
                   </span>
                 </div>
               </div>
+
               {show.genres?.length > 0 && (
                 <div className="genres">
                   {show.genres.map((genre) => (
@@ -933,7 +978,6 @@ export default function TVShowDetails({ params }) {
               )}
             </motion.div>
 
-            {/* Season selector */}
             {validSeasons.length > 0 && (
               <div className="section">
                 <h2 className="section-title">Select Season</h2>
@@ -950,7 +994,6 @@ export default function TVShowDetails({ params }) {
               </div>
             )}
 
-            {/* Episodes */}
             {loadingSeason ? (
               <div
                 style={{
@@ -1024,7 +1067,6 @@ export default function TVShowDetails({ params }) {
               </div>
             ) : null}
 
-            {/* Overview */}
             <div className="section">
               <h2 className="section-title">Overview</h2>
               <p className="overview-text">
@@ -1117,7 +1159,7 @@ function TVSeasonBtn({ season, isActive, onClick }) {
   );
 }
 
-/* ── Episode card ──────────────────────────────────── */
+/* ── Episode card — IMDb only ──────────────────────── */
 function TVEpisodeCard({
   episode,
   isActive,
@@ -1127,8 +1169,8 @@ function TVEpisodeCard({
   hasOmdbKey,
 }) {
   const [hovered, setHovered] = useState(false);
+  const F = { fontFamily: "'DM Sans', sans-serif" };
 
-  // ── Runtime ──
   const formatRuntime = (mins) => {
     if (!mins) return null;
     const h = Math.floor(mins / 60);
@@ -1136,8 +1178,6 @@ function TVEpisodeCard({
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
   };
   const runtime = formatRuntime(episode.runtime);
-
-  // ── Air date ──
   const airDate = episode.air_date
     ? new Date(episode.air_date).toLocaleDateString('en-US', {
         month: 'short',
@@ -1146,14 +1186,7 @@ function TVEpisodeCard({
       })
     : null;
 
-  // ── Ratings ──
-  const tmdbRating = episode.vote_average
-    ? parseFloat(episode.vote_average).toFixed(1)
-    : null;
-  const showTmdb = tmdbRating && parseFloat(tmdbRating) > 0;
-  const showRatings = showTmdb || omdb || (hasOmdbKey && omdb === undefined);
-
-  const F = { fontFamily: "'DM Sans', sans-serif" };
+  const showRatingRow = omdb || (hasOmdbKey && omdb === undefined);
 
   return (
     <motion.div
@@ -1180,14 +1213,14 @@ function TVEpisodeCard({
           'background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
       }}
     >
-      {/* ── Row 1: title + runtime chip + date ──── */}
+      {/* Row 1: title + runtime + date */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: '12px',
-          marginBottom: showRatings || episode.overview ? '8px' : 0,
+          marginBottom: showRatingRow || episode.overview ? '8px' : 0,
         }}
       >
         <h4
@@ -1230,8 +1263,6 @@ function TVEpisodeCard({
             {episode.name || 'Untitled'}
           </span>
         </h4>
-
-        {/* Right: runtime + date */}
         <div
           style={{
             display: 'flex',
@@ -1275,34 +1306,26 @@ function TVEpisodeCard({
         </div>
       </div>
 
-      {/* ── Row 2: TMDb + OMDb ratings ──────────── */}
-      {showRatings && (
+      {/* Row 2: IMDb only */}
+      {showRatingRow && (
         <div className="ep-ratings">
-          {showTmdb && (
-            <div className="rating-badge badge-tmdb">
-              <Star size={11} fill="#ffc13c" color="#ffc13c" />
-              {tmdbRating}
-              <span className="badge-tmdb-label">TMDb</span>
-            </div>
-          )}
-          {omdb && (
-            <div className="rating-badge badge-imdb">
-              <span className="badge-imdb-logo">IMDb</span>
-              {omdb.rating}
+          {omdb ? (
+            <div className="ep-imdb-badge">
+              <span className="ep-imdb-logo">IMDb</span>
+              <span className="ep-imdb-score">{omdb.rating}</span>
               {omdb.votes && (
-                <span className="badge-imdb-votes">
+                <span className="ep-imdb-votes">
                   ({Number(omdb.votes.replace(/,/g, '')).toLocaleString()})
                 </span>
               )}
             </div>
-          )}
-          {hasOmdbKey && omdb === undefined && (
-            <div className="badge-loading" />
+          ) : (
+            <div className="ep-imdb-loading" />
           )}
         </div>
       )}
 
-      {/* ── Row 3: overview ─────────────────────── */}
+      {/* Row 3: overview */}
       {episode.overview ? (
         <p
           style={{
