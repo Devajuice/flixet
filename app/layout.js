@@ -5,7 +5,6 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
 import { WatchlistProvider } from '@/context/WatchlistContext';
 import { ContinueWatchingProvider } from '@/context/ContinueWatchingContext';
-
 export const metadata = {
   metadataBase: new URL('https://flixet.vercel.app'),
   title: 'Flixet - Watch Movies, TV Shows and Anime Free',
@@ -53,14 +52,12 @@ export const metadata = {
     images: ['/og-image.png'],
   },
 };
-
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   themeColor: '#e50914',
 };
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -72,11 +69,14 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body style={{ paddingBottom: 0 }} suppressHydrationWarning>
+      <body
+        style={{ paddingBottom: 0, fontFamily: "'DM Sans', sans-serif" }}
+        suppressHydrationWarning
+      >
         <WatchlistProvider>
           <ContinueWatchingProvider>
             <Header />

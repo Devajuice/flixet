@@ -5,26 +5,26 @@ a,
 }
 
 :root {
-  --primary-bg: #0f0f0f;
-  --secondary-bg: #1a1a1a;
-  --card-bg: #252525;
+  --primary-bg: #0d0d0f;
+  --secondary-bg: #111113;
+  --card-bg: #1a1a1c;
   --text-primary: #ffffff;
-  --text-secondary: #b3b3b3;
-  --accent: #e50914;
-  --transition: all 0.3s ease;
+  --text-secondary: rgba(255, 255, 255, 0.5);
+  --accent: #ffc13c;
+  --transition: all 0.2s ease;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "DM Sans", sans-serif;
 }
 
 body {
   background-color: var(--primary-bg);
   color: var(--text-primary);
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "DM Sans", sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -61,28 +61,24 @@ button {
 
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--secondary-bg);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 5px;
+  background: rgba(255, 193, 60, 0.4);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b70710;
+  background: #ffc13c;
 }
 
 /* Animation for loading spinner */
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }

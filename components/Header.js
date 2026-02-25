@@ -14,7 +14,6 @@ import {
   Menu,
   X,
   TrendingUp,
-  Clock,
   ArrowLeft,
 } from 'lucide-react';
 import SearchBar from './SearchBar';
@@ -35,19 +34,13 @@ export default function Header() {
   const moviesButtonRef = useRef(null);
   const tvButtonRef = useRef(null);
 
-  // Detect mobile on mount and resize
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
-
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Close mobile search on route change
   useEffect(() => {
     setShowMobileSearch(false);
     setShowMobileMenu(false);
@@ -71,11 +64,9 @@ export default function Header() {
         }));
       }
     };
-
     updatePositions();
     window.addEventListener('resize', updatePositions);
     window.addEventListener('scroll', updatePositions);
-
     return () => {
       window.removeEventListener('resize', updatePositions);
       window.removeEventListener('scroll', updatePositions);
@@ -106,7 +97,11 @@ export default function Header() {
 
   return (
     <>
+      {/* ── Global styles ─────────────────────────────────── */}
       <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+        /* ── Dropdown portal ──────────────────────────────── */
         .dropdown-portal {
           position: fixed;
           top: 0;
@@ -123,101 +118,123 @@ export default function Header() {
         }
 
         .dropdown-menu {
-          background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-          border: 1px solid rgba(229, 9, 20, 0.3);
-          border-radius: 10px;
-          padding: 15px;
+          background: rgba(13, 13, 15, 0.98);
+          border: 1px solid rgba(255, 193, 60, 0.18);
+          border-top: 2px solid #ffc13c;
+          border-radius: 12px;
+          padding: 18px;
           min-width: 220px;
           max-height: 400px;
           overflow-y: auto;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
-          backdrop-filter: blur(10px);
+          box-shadow:
+            0 16px 48px rgba(0, 0, 0, 0.7),
+            0 0 0 1px rgba(255, 193, 60, 0.06);
+          backdrop-filter: blur(16px);
+          font-family: 'DM Sans', sans-serif;
         }
 
         .dropdown-menu::-webkit-scrollbar {
-          width: 6px;
+          width: 4px;
         }
-
         .dropdown-menu::-webkit-scrollbar-track {
-          background: rgba(37, 37, 37, 0.5);
-          border-radius: 3px;
+          background: rgba(255, 255, 255, 0.03);
+          border-radius: 2px;
         }
-
         .dropdown-menu::-webkit-scrollbar-thumb {
-          background: #e50914;
-          border-radius: 3px;
+          background: rgba(255, 193, 60, 0.4);
+          border-radius: 2px;
         }
 
         .dropdown-title {
-          font-size: 12px;
-          font-weight: bold;
-          color: #e50914;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
+          font-weight: 700;
+          color: #ffc13c;
           margin-bottom: 12px;
           text-transform: uppercase;
-          letter-spacing: 1px;
+          letter-spacing: 0.09em;
           padding-bottom: 10px;
-          border-bottom: 1px solid rgba(229, 9, 20, 0.2);
+          border-bottom: 1px solid rgba(255, 193, 60, 0.12);
         }
 
         .dropdown-items {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 3px;
         }
 
         .dropdown-all-link {
-          padding: 10px 15px;
-          background-color: rgba(229, 9, 20, 0.2);
-          border-radius: 5px;
-          font-size: 14px;
-          font-weight: bold;
-          transition: all 0.3s ease;
-          cursor: pointer;
+          padding: 9px 14px;
+          background: rgba(255, 193, 60, 0.08);
+          border: 1px solid rgba(255, 193, 60, 0.2);
+          border-radius: 8px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          color: #ffc13c;
           display: block;
           text-decoration: none;
-          color: #e50914;
-          white-space: nowrap;
           margin-bottom: 8px;
-          border: 1px solid rgba(229, 9, 20, 0.3);
+          transition:
+            background 0.2s ease,
+            padding-left 0.2s ease;
         }
 
         .dropdown-all-link:hover {
-          background-color: #e50914;
-          color: white;
-          transform: translateX(5px);
+          background: rgba(255, 193, 60, 0.18);
+          padding-left: 18px;
         }
 
         .dropdown-item {
-          padding: 10px 15px;
-          background-color: rgba(37, 37, 37, 0.5);
-          border-radius: 5px;
-          font-size: 14px;
-          transition: all 0.3s ease;
-          cursor: pointer;
+          position: relative;
+          padding: 9px 14px 9px 24px;
+          border-radius: 8px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.5);
           display: block;
           text-decoration: none;
-          color: #ffffff;
-          white-space: nowrap;
+          transition:
+            color 0.2s ease,
+            padding-left 0.2s ease;
+        }
+
+        .dropdown-item::before {
+          content: '';
+          position: absolute;
+          left: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: rgba(255, 193, 60, 0.3);
+          transition: background 0.2s ease;
         }
 
         .dropdown-item:hover {
-          background-color: #e50914;
-          transform: translateX(5px);
-          color: white;
+          color: #ffc13c;
+          padding-left: 28px;
         }
 
-        /* ========== MOBILE SEARCH OVERLAY ========== */
+        .dropdown-item:hover::before {
+          background: #ffc13c;
+        }
+
+        /* ── Mobile search overlay ─────────────────────────── */
         .mobile-search-overlay {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.95);
+          background: rgba(0, 0, 0, 0.97);
           z-index: 99999;
-          backdrop-filter: blur(8px);
+          backdrop-filter: blur(12px);
           display: flex;
           flex-direction: column;
+          font-family: 'DM Sans', sans-serif;
         }
 
         .mobile-search-header {
@@ -225,12 +242,8 @@ export default function Header() {
           align-items: center;
           gap: 12px;
           padding: 16px;
-          background: linear-gradient(
-            180deg,
-            rgba(26, 26, 26, 0.98) 0%,
-            rgba(18, 18, 18, 0.95) 100%
-          );
-          border-bottom: 1px solid rgba(229, 9, 20, 0.3);
+          background: rgba(13, 13, 15, 0.98);
+          border-bottom: 1px solid rgba(255, 193, 60, 0.12);
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
@@ -240,18 +253,18 @@ export default function Header() {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(229, 9, 20, 0.1);
-          border: 1px solid rgba(229, 9, 20, 0.3);
+          background: rgba(255, 193, 60, 0.08);
+          border: 1px solid rgba(255, 193, 60, 0.2);
           border-radius: 50%;
-          color: #e50914;
+          color: #ffc13c;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease;
           flex-shrink: 0;
         }
 
         .mobile-search-back-btn:active {
           transform: scale(0.9);
-          background: rgba(229, 9, 20, 0.2);
+          background: rgba(255, 193, 60, 0.15);
         }
 
         .mobile-search-input-wrapper {
@@ -261,8 +274,7 @@ export default function Header() {
         .mobile-search-content {
           flex: 1;
           overflow-y: auto;
-          padding: 20px 16px;
-          padding-bottom: 30px;
+          padding: 24px 16px 30px;
         }
 
         .mobile-search-suggestions {
@@ -270,11 +282,12 @@ export default function Header() {
         }
 
         .mobile-search-section-title {
-          font-size: 12px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
           font-weight: 700;
-          color: #e50914;
+          color: #ffc13c;
           text-transform: uppercase;
-          letter-spacing: 1.2px;
+          letter-spacing: 0.09em;
           margin-bottom: 12px;
           display: flex;
           align-items: center;
@@ -285,36 +298,38 @@ export default function Header() {
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 14px;
-          background: rgba(26, 26, 26, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          padding: 13px 14px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.06);
           border-radius: 10px;
-          margin-bottom: 8px;
+          margin-bottom: 6px;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease;
           text-decoration: none;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(255, 255, 255, 0.5);
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 500;
         }
 
         .mobile-search-suggestion-item:active {
-          background: rgba(229, 9, 20, 0.15);
-          border-color: rgba(229, 9, 20, 0.3);
-          transform: scale(0.98);
+          background: rgba(255, 193, 60, 0.08);
+          border-color: rgba(255, 193, 60, 0.2);
+          color: #ffc13c;
         }
 
-        /* Mobile Menu Overlay */
+        /* ── Mobile menu ───────────────────────────────────── */
         .mobile-menu-overlay {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.85);
+          background: rgba(0, 0, 0, 0.75);
           z-index: 99998;
           backdrop-filter: blur(4px);
         }
 
-        /* Mobile Menu Drawer */
         .mobile-menu-drawer {
           position: fixed;
           top: 0;
@@ -322,11 +337,16 @@ export default function Header() {
           bottom: 0;
           width: 85%;
           max-width: 340px;
-          background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+          background: linear-gradient(
+            180deg,
+            rgba(18, 18, 20, 0.99) 0%,
+            rgba(13, 13, 15, 0.98) 100%
+          );
           z-index: 99999;
           overflow-y: auto;
-          box-shadow: -4px 0 30px rgba(0, 0, 0, 0.7);
-          border-left: 1px solid rgba(229, 9, 20, 0.3);
+          box-shadow: -4px 0 40px rgba(0, 0, 0, 0.8);
+          border-left: 1px solid rgba(255, 193, 60, 0.1);
+          font-family: 'DM Sans', sans-serif;
         }
 
         .mobile-menu-header {
@@ -334,35 +354,35 @@ export default function Header() {
           justify-content: space-between;
           align-items: center;
           padding: 20px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(229, 9, 20, 0.05);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          background: rgba(255, 193, 60, 0.03);
         }
 
         .mobile-menu-title {
-          font-size: 20px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 18px;
           font-weight: 800;
-          background: linear-gradient(135deg, #ffffff 0%, #e50914 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: rgba(255, 255, 255, 0.88);
+          letter-spacing: -0.01em;
         }
 
         .mobile-menu-close {
-          width: 40px;
-          height: 40px;
+          width: 38px;
+          height: 38px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(229, 9, 20, 0.15);
-          border: none;
+          background: rgba(255, 193, 60, 0.06);
+          border: 1px solid rgba(255, 193, 60, 0.15);
           border-radius: 50%;
-          color: #e50914;
+          color: #ffc13c;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease;
         }
 
         .mobile-menu-close:active {
           transform: scale(0.9);
-          background: rgba(229, 9, 20, 0.25);
+          background: rgba(255, 193, 60, 0.12);
         }
 
         .mobile-menu-content {
@@ -370,17 +390,18 @@ export default function Header() {
         }
 
         .mobile-menu-section {
-          margin-bottom: 30px;
+          margin-bottom: 28px;
         }
 
         .mobile-menu-section-title {
-          font-size: 11px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
           font-weight: 700;
-          color: #e50914;
+          color: #ffc13c;
           text-transform: uppercase;
-          letter-spacing: 1.2px;
-          margin-bottom: 12px;
-          padding-left: 4px;
+          letter-spacing: 0.09em;
+          margin-bottom: 10px;
+          padding-left: 2px;
           display: flex;
           align-items: center;
           gap: 6px;
@@ -390,37 +411,41 @@ export default function Header() {
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 13px 12px;
-          color: rgba(255, 255, 255, 0.85);
+          padding: 11px 14px;
+          color: rgba(255, 255, 255, 0.5);
           text-decoration: none;
           border-radius: 10px;
-          transition: all 0.3s ease;
-          font-size: 15px;
+          transition:
+            color 0.2s ease,
+            padding-left 0.2s ease,
+            background 0.2s ease;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
           font-weight: 500;
-          margin-bottom: 4px;
-          background: rgba(255, 255, 255, 0.02);
+          margin-bottom: 2px;
+          background: transparent;
+          border: none;
+          width: 100%;
+          cursor: pointer;
+          text-align: left;
         }
 
-        .mobile-menu-item:active {
-          background: rgba(229, 9, 20, 0.15);
-          color: #e50914;
-          transform: translateX(4px);
+        .mobile-menu-item:active,
+        .mobile-menu-item:hover {
+          color: #ffc13c;
+          padding-left: 18px;
+          background: rgba(255, 193, 60, 0.05);
         }
 
         .mobile-menu-item svg {
           flex-shrink: 0;
-          opacity: 0.8;
+          opacity: 0.7;
         }
 
         .mobile-menu-divider {
           height: 1px;
-          background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(229, 9, 20, 0.3) 50%,
-            transparent 100%
-          );
-          margin: 25px 0;
+          background: rgba(255, 255, 255, 0.06);
+          margin: 22px 0;
         }
 
         body.menu-open {
@@ -428,187 +453,259 @@ export default function Header() {
         }
       `}</style>
 
-      <style jsx>{`
-        .logo-icon {
+      {/* ── Header styles (global required for App Router) ── */}
+      <style jsx global>{`
+        .header {
+          background: linear-gradient(
+            180deg,
+            rgba(13, 13, 15, 0.99) 0%,
+            rgba(13, 13, 15, 0.96) 100%
+          );
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          padding: 0;
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+          font-family: 'DM Sans', sans-serif;
+          backdrop-filter: blur(16px);
+        }
+
+        .header-inner {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 24px;
+          height: 68px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+        }
+
+        /* ── Logo ─── */
+        .logo-link {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 10px;
+          text-decoration: none;
+          color: #ffc13c;
+          flex-shrink: 0;
         }
 
         .logo-text {
-          font-size: 22px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 20px;
           font-weight: 800;
-          letter-spacing: -0.5px;
-          line-height: 1;
-          display: inline-flex;
-          align-items: center;
-          position: relative;
-          top: -5.5px;
+          letter-spacing: -0.03em;
+          color: rgba(255, 255, 255, 0.92);
         }
 
-        .search-btn-content {
-          display: inline-flex;
+        /* ── Desktop nav ─── */
+        .desktop-nav {
+          display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 4px;
+        }
+
+        .nav-link {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.5) !important;
+          text-decoration: none;
+          padding: 8px 14px;
+          border-radius: 8px;
+          letter-spacing: 0.01em;
+          transition:
+            color 0.2s ease,
+            background 0.2s ease;
+        }
+
+        .nav-link:hover {
+          color: #ffc13c !important;
+          background: rgba(255, 193, 60, 0.06);
         }
 
         .dropdown-trigger {
           display: flex;
           align-items: center;
           gap: 5px;
-          cursor: pointer;
-          padding: 10px 15px;
-          border-radius: 5px;
-          transition: all 0.3s ease;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.5) !important;
+          text-decoration: none;
+          padding: 8px 14px;
+          border-radius: 8px;
+          letter-spacing: 0.01em;
+          transition:
+            color 0.2s ease,
+            background 0.2s ease;
           background: transparent;
           border: none;
-          color: var(--text-primary);
-          font-size: 16px;
-          font-family: inherit;
-          text-decoration: none;
+          cursor: pointer;
         }
 
         .dropdown-trigger:hover {
-          background-color: rgba(229, 9, 20, 0.1);
+          color: #ffc13c !important;
+          background: rgba(255, 193, 60, 0.06);
         }
 
-        .search-bar-wrapper {
-          max-width: 600px;
-          width: 100%;
+        /* ── Search button ─── */
+        .search-btn {
+          display: inline-flex !important;
+          align-items: center;
+          gap: 7px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          color: #0d0d0f !important;
+          background: #ffc13c !important;
+          border: none;
+          padding: 9px 18px;
+          border-radius: 8px;
+          cursor: pointer;
+          letter-spacing: 0.01em;
+          transition:
+            opacity 0.2s ease,
+            transform 0.15s ease;
+          margin-left: 8px;
+        }
+
+        .search-btn:hover {
+          opacity: 0.88;
+          color: #0d0d0f !important;
+        }
+
+        /* ── Mobile hamburger ─── */
+        .hamburger-btn {
+          display: flex;
+          width: 42px;
+          height: 42px;
+          background: rgba(255, 193, 60, 0.06);
+          border: 1px solid rgba(255, 193, 60, 0.18);
+          border-radius: 10px;
+          align-items: center;
+          justify-content: center;
+          color: #ffc13c;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+
+        .hamburger-btn:hover {
+          background: rgba(255, 193, 60, 0.12);
+        }
+
+        /* ── Expandable search bar ─── */
+        .search-expand {
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          overflow: hidden;
+          background: rgba(13, 13, 15, 0.98);
+        }
+
+        .search-expand-inner {
+          max-width: 640px;
           margin: 0 auto;
+          padding: 14px 24px 18px;
         }
 
         @media (max-width: 768px) {
+          .header-inner {
+            padding: 0 16px;
+            height: 60px;
+          }
           .logo-text {
             font-size: 18px;
-          }
-
-          .search-bar-wrapper {
-            max-width: 100%;
-            padding: 0 15px;
           }
         }
       `}</style>
 
+      {/* ── Header shell ──────────────────────────────────── */}
       <motion.header
-        style={styles.header}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="header"
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.45, ease: 'easeOut' }}
       >
-        <div className="container" style={styles.container}>
-          <Link href="/" style={styles.logo}>
-            <motion.span
-              className="logo-icon"
-              animate={{
-                textShadow: [
-                  '0 0 5px #e50914',
-                  '0 0 20px #e50914',
-                  '0 0 5px #e50914',
-                ],
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Film size={28} strokeWidth={2.5} style={{ flexShrink: 0 }} />
-              <span className="logo-text">Flixet</span>
-            </motion.span>
+        <div className="header-inner">
+          {/* Logo */}
+          <Link href="/" className="logo-link">
+            <Film size={26} strokeWidth={2.5} />
+            <span className="logo-text">Flixet</span>
           </Link>
 
-          {/* Mobile Hamburger Menu Button - ONLY SHOW ON MOBILE */}
+          {/* Mobile hamburger */}
           {isMobile && (
-            <motion.button
-              style={{
-                display: 'flex',
-                width: '44px',
-                height: '44px',
-                background: 'transparent',
-                border: '1px solid rgba(229, 9, 20, 0.3)',
-                borderRadius: '8px',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#e50914',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                flexShrink: 0,
-              }}
+            <button
+              className="hamburger-btn"
               onClick={() => {
                 setShowMobileMenu(true);
                 document.body.classList.add('menu-open');
               }}
-              whileHover={{ scale: 1.05, background: 'rgba(229, 9, 20, 0.1)' }}
-              whileTap={{ scale: 0.95 }}
               aria-label="Open menu"
             >
-              <Menu size={24} strokeWidth={2.5} />
-            </motion.button>
+              <Menu size={22} strokeWidth={2.5} />
+            </button>
           )}
 
-          {/* Desktop Navigation - ONLY SHOW ON DESKTOP */}
+          {/* Desktop nav */}
           {!isMobile && (
-            <nav style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
-              <Link href="/" style={styles.navLink}>
+            <nav className="desktop-nav">
+              <Link href="/" className="nav-link">
                 Home
               </Link>
 
-              <div>
-                <Link
-                  href="/movies"
-                  ref={moviesButtonRef}
-                  className="dropdown-trigger"
-                  onMouseEnter={() => setShowMoviesMenu(true)}
-                  onMouseLeave={() => setShowMoviesMenu(false)}
-                >
-                  <span>Movies</span>
-                  <ChevronDown size={16} />
-                </Link>
-              </div>
-
-              <div>
-                <Link
-                  href="/tv"
-                  ref={tvButtonRef}
-                  className="dropdown-trigger"
-                  onMouseEnter={() => setShowTVMenu(true)}
-                  onMouseLeave={() => setShowTVMenu(false)}
-                >
-                  <span>TV Shows</span>
-                  <ChevronDown size={16} />
-                </Link>
-              </div>
-
-              <Link href="/anime" style={styles.navLink}>
-                Anime
+              <Link
+                href="/movies"
+                ref={moviesButtonRef}
+                className="dropdown-trigger"
+                onMouseEnter={() => setShowMoviesMenu(true)}
+                onMouseLeave={() => setShowMoviesMenu(false)}
+              >
+                Movies <ChevronDown size={14} />
               </Link>
 
-              <Link href="/watchlist" style={styles.navLink}>
+              <Link
+                href="/tv"
+                ref={tvButtonRef}
+                className="dropdown-trigger"
+                onMouseEnter={() => setShowTVMenu(true)}
+                onMouseLeave={() => setShowTVMenu(false)}
+              >
+                TV Shows <ChevronDown size={14} />
+              </Link>
+
+              <Link href="/anime" className="nav-link">
+                Anime
+              </Link>
+              <Link href="/watchlist" className="nav-link">
                 Watchlist
               </Link>
 
               <motion.button
+                className="search-btn"
                 onClick={() => setShowSearch(!showSearch)}
-                style={styles.searchBtn}
-                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="search-btn-content">
-                  <SearchIcon size={18} /> Search
-                </span>
+                <SearchIcon size={15} />
+                Search
               </motion.button>
             </nav>
           )}
         </div>
 
-        {/* Desktop Search */}
+        {/* Desktop expandable search */}
         <AnimatePresence>
           {showSearch && !isMobile && (
             <motion.div
-              style={styles.searchContainer}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
+              className="search-expand"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
             >
-              <div className="search-bar-wrapper">
+              <div className="search-expand-inner">
                 <SearchBar />
               </div>
             </motion.div>
@@ -616,7 +713,7 @@ export default function Header() {
         </AnimatePresence>
       </motion.header>
 
-      {/* Dropdown Portal - DESKTOP ONLY */}
+      {/* ── Dropdown portal (desktop) ──────────────────────── */}
       {!isMobile && (
         <div className="dropdown-portal">
           <AnimatePresence>
@@ -625,12 +722,12 @@ export default function Header() {
                 className="dropdown-menu-container"
                 style={{
                   left: `${dropdownPositions.movies.left}px`,
-                  top: `${dropdownPositions.movies.top + 15}px`,
+                  top: `${dropdownPositions.movies.top + 12}px`,
                 }}
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.18 }}
                 onMouseEnter={() => setShowMoviesMenu(true)}
                 onMouseLeave={() => setShowMoviesMenu(false)}
               >
@@ -666,12 +763,12 @@ export default function Header() {
                 className="dropdown-menu-container"
                 style={{
                   left: `${dropdownPositions.tv.left}px`,
-                  top: `${dropdownPositions.tv.top + 15}px`,
+                  top: `${dropdownPositions.tv.top + 12}px`,
                 }}
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.18 }}
                 onMouseEnter={() => setShowTVMenu(true)}
                 onMouseLeave={() => setShowTVMenu(false)}
               >
@@ -690,7 +787,6 @@ export default function Header() {
                         .toLowerCase()
                         .replace(/ & /g, '-')
                         .replace(/ /g, '-');
-
                       return (
                         <Link
                           key={genre}
@@ -710,7 +806,7 @@ export default function Header() {
         </div>
       )}
 
-      {/* ========== MOBILE SEARCH OVERLAY ========== */}
+      {/* ── Mobile search overlay ──────────────────────────── */}
       <AnimatePresence>
         {showMobileSearch && isMobile && (
           <motion.div
@@ -718,7 +814,7 @@ export default function Header() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
           >
             <div className="mobile-search-header">
               <button
@@ -737,11 +833,9 @@ export default function Header() {
             </div>
 
             <div className="mobile-search-content">
-              {/* Trending Searches */}
               <div className="mobile-search-suggestions">
                 <div className="mobile-search-section-title">
-                  <TrendingUp size={14} />
-                  Trending Searches
+                  <TrendingUp size={13} /> Trending Searches
                 </div>
                 {[
                   'Deadpool & Wolverine',
@@ -758,17 +852,15 @@ export default function Header() {
                       document.body.classList.remove('menu-open');
                     }}
                   >
-                    <SearchIcon size={18} opacity={0.6} />
+                    <SearchIcon size={16} opacity={0.5} />
                     <span>{item}</span>
                   </Link>
                 ))}
               </div>
 
-              {/* Quick Categories */}
               <div className="mobile-search-suggestions">
                 <div className="mobile-search-section-title">
-                  <Sparkles size={14} />
-                  Browse by Genre
+                  <Sparkles size={13} /> Browse by Genre
                 </div>
                 {['Action', 'Comedy', 'Horror', 'Sci-Fi'].map((genre) => (
                   <Link
@@ -780,7 +872,7 @@ export default function Header() {
                       document.body.classList.remove('menu-open');
                     }}
                   >
-                    <Film size={18} opacity={0.6} />
+                    <Film size={16} opacity={0.5} />
                     <span>{genre} Movies</span>
                   </Link>
                 ))}
@@ -790,7 +882,7 @@ export default function Header() {
         )}
       </AnimatePresence>
 
-      {/* Mobile Slide-out Menu */}
+      {/* ── Mobile drawer menu ─────────────────────────────── */}
       <AnimatePresence>
         {showMobileMenu && isMobile && (
           <>
@@ -809,10 +901,10 @@ export default function Header() {
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 220 }}
             >
               <div className="mobile-menu-header">
-                <div className="mobile-menu-title">Explore</div>
+                <span className="mobile-menu-title">Explore</span>
                 <button
                   className="mobile-menu-close"
                   onClick={() => {
@@ -821,16 +913,15 @@ export default function Header() {
                   }}
                   aria-label="Close menu"
                 >
-                  <X size={22} />
+                  <X size={20} />
                 </button>
               </div>
 
               <div className="mobile-menu-content">
-                {/* Quick Links */}
+                {/* Quick access */}
                 <div className="mobile-menu-section">
                   <div className="mobile-menu-section-title">
-                    <TrendingUp size={12} />
-                    Quick Access
+                    <TrendingUp size={11} /> Quick Access
                   </div>
                   <Link
                     href="/"
@@ -840,7 +931,7 @@ export default function Header() {
                       document.body.classList.remove('menu-open');
                     }}
                   >
-                    <Home size={20} />
+                    <Home size={18} />
                     <span>Home</span>
                   </Link>
                   <button
@@ -850,7 +941,7 @@ export default function Header() {
                       setShowMobileSearch(true);
                     }}
                   >
-                    <SearchIcon size={20} />
+                    <SearchIcon size={18} />
                     <span>Search Movies & TV</span>
                   </button>
                   <Link
@@ -861,18 +952,17 @@ export default function Header() {
                       document.body.classList.remove('menu-open');
                     }}
                   >
-                    <Bookmark size={20} />
+                    <Bookmark size={18} />
                     <span>My Watchlist</span>
                   </Link>
                 </div>
 
                 <div className="mobile-menu-divider" />
 
-                {/* Movie Genres */}
+                {/* Movies */}
                 <div className="mobile-menu-section">
                   <div className="mobile-menu-section-title">
-                    <Film size={12} />
-                    Movie Genres
+                    <Film size={11} /> Movie Genres
                   </div>
                   <Link
                     href="/movies"
@@ -881,9 +971,9 @@ export default function Header() {
                       setShowMobileMenu(false);
                       document.body.classList.remove('menu-open');
                     }}
-                    style={{ fontWeight: '700', color: '#e50914' }}
+                    style={{ color: '#ffc13c', fontWeight: 700 }}
                   >
-                    <Film size={20} />
+                    <Film size={18} />
                     <span>All Movies</span>
                   </Link>
                   {movieGenres.slice(0, 6).map((genre) => (
@@ -903,11 +993,10 @@ export default function Header() {
 
                 <div className="mobile-menu-divider" />
 
-                {/* TV Genres */}
+                {/* TV */}
                 <div className="mobile-menu-section">
                   <div className="mobile-menu-section-title">
-                    <Tv size={12} />
-                    TV Shows
+                    <Tv size={11} /> TV Shows
                   </div>
                   <Link
                     href="/tv"
@@ -916,9 +1005,9 @@ export default function Header() {
                       setShowMobileMenu(false);
                       document.body.classList.remove('menu-open');
                     }}
-                    style={{ fontWeight: '700', color: '#e50914' }}
+                    style={{ color: '#ffc13c', fontWeight: 700 }}
                   >
-                    <Tv size={20} />
+                    <Tv size={18} />
                     <span>All TV Shows</span>
                   </Link>
                   {tvGenres.slice(0, 6).map((genre) => {
@@ -947,8 +1036,7 @@ export default function Header() {
                 {/* Anime */}
                 <div className="mobile-menu-section">
                   <div className="mobile-menu-section-title">
-                    <Sparkles size={12} />
-                    Anime
+                    <Sparkles size={11} /> Anime
                   </div>
                   <Link
                     href="/anime"
@@ -957,9 +1045,9 @@ export default function Header() {
                       setShowMobileMenu(false);
                       document.body.classList.remove('menu-open');
                     }}
-                    style={{ fontWeight: '700', color: '#e50914' }}
+                    style={{ color: '#ffc13c', fontWeight: 700 }}
                   >
-                    <Sparkles size={20} />
+                    <Sparkles size={18} />
                     <span>Browse Anime</span>
                   </Link>
                 </div>
@@ -971,50 +1059,3 @@ export default function Header() {
     </>
   );
 }
-
-const styles = {
-  header: {
-    backgroundColor: 'var(--secondary-bg)',
-    padding: '15px 0',
-    position: 'sticky',
-    top: 0,
-    zIndex: 1000,
-    boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-  },
-  container: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    maxWidth: '1400px',
-    margin: '0 auto',
-    padding: '0 20px',
-  },
-  logo: {
-    color: 'var(--accent)',
-    textDecoration: 'none',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  navLink: {
-    fontSize: '16px',
-    transition: 'var(--transition)',
-    textDecoration: 'none',
-    color: 'var(--text-primary)',
-  },
-  searchBtn: {
-    background: 'var(--accent)',
-    color: 'white',
-    padding: '10px 20px',
-    borderRadius: '5px',
-    fontSize: '16px',
-    transition: 'var(--transition)',
-    cursor: 'pointer',
-    border: 'none',
-    touchAction: 'none',
-  },
-  searchContainer: {
-    marginTop: '20px',
-    overflow: 'visible',
-    paddingBottom: '15px',
-  },
-};

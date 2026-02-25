@@ -10,16 +10,16 @@ export default function AdBlockerNotice() {
 
   return (
     <>
-      <style jsx>{`
-        .notice-container {
+      <style jsx global>{`
+        .abn-container {
           margin-bottom: 30px;
-          animation: slideDown 0.4s ease-out;
+          animation: abn-slideDown 0.4s ease-out;
         }
 
-        @keyframes slideDown {
+        @keyframes abn-slideDown {
           from {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translateY(-16px);
           }
           to {
             opacity: 1;
@@ -27,267 +27,242 @@ export default function AdBlockerNotice() {
           }
         }
 
-        .notice {
-          background: linear-gradient(
-            135deg,
-            rgba(229, 9, 20, 0.1) 0%,
-            rgba(26, 26, 26, 0.8) 100%
-          );
-          border: 2px solid rgba(229, 9, 20, 0.3);
-          border-radius: 16px;
-          padding: 25px;
+        /* ── Shell ─────────────────────────────────────── */
+        .abn-notice {
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-left: 3px solid #ffc13c;
+          border-radius: 12px;
+          padding: 22px 24px;
           position: relative;
           backdrop-filter: blur(10px);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          font-family: 'DM Sans', sans-serif;
         }
 
-        .notice-header {
+        /* ── Header ────────────────────────────────────── */
+        .abn-header {
           display: flex;
           align-items: flex-start;
           justify-content: space-between;
-          margin-bottom: 20px;
+          margin-bottom: 16px;
         }
 
-        .notice-title-wrapper {
+        .abn-title-wrapper {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 9px;
           flex: 1;
         }
 
-        .notice-icon {
-          width: 40px;
-          height: 40px;
-          background: rgba(229, 9, 20, 0.15);
-          border: 2px solid rgba(229, 9, 20, 0.4);
-          border-radius: 12px;
+        .abn-icon {
+          width: 36px;
+          height: 36px;
+          background: rgba(255, 193, 60, 0.08);
+          border: 1px solid rgba(255, 193, 60, 0.2);
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
         }
 
-        .notice-title {
-          font-size: 18px;
+        .abn-title {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 12px;
           font-weight: 700;
-          background: linear-gradient(135deg, #e50914 0%, #f40612 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: #ffc13c;
           margin: 0;
+          text-transform: uppercase;
+          letter-spacing: 0.07em;
         }
 
-        .close-button {
-          width: 32px;
-          height: 32px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+        .abn-close {
+          width: 30px;
+          height: 30px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.07);
           border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: all 0.3s ease;
-          color: var(--text-secondary);
+          transition: all 0.2s ease;
+          color: rgba(255, 255, 255, 0.35);
           flex-shrink: 0;
         }
 
-        .close-button:hover {
-          background: rgba(229, 9, 20, 0.2);
-          border-color: var(--accent);
-          color: white;
+        .abn-close:hover {
+          background: rgba(255, 193, 60, 0.08);
+          border-color: rgba(255, 193, 60, 0.2);
+          color: #ffc13c;
           transform: rotate(90deg);
         }
 
-        .notice-text {
-          font-size: 15px;
-          color: var(--text-secondary);
-          line-height: 1.7;
-          margin-bottom: 20px;
+        /* ── Body text ─────────────────────────────────── */
+        .abn-text {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.35);
+          line-height: 1.85;
+          margin-bottom: 18px;
         }
 
-        .tips-grid {
+        /* ── Tips grid ─────────────────────────────────── */
+        .abn-tips-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 12px;
-          margin-bottom: 20px;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 8px;
+          margin-bottom: 16px;
         }
 
-        .tip-item {
+        .abn-tip {
           display: flex;
           align-items: flex-start;
-          gap: 12px;
-          padding: 12px;
-          background: rgba(26, 26, 26, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          gap: 10px;
+          padding: 11px 13px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.06);
           border-radius: 10px;
-          transition: all 0.3s ease;
+          transition:
+            border-color 0.2s ease,
+            padding-left 0.2s ease;
         }
 
-        .tip-item:hover {
-          background: rgba(26, 26, 26, 0.8);
-          border-color: rgba(229, 9, 20, 0.3);
-          transform: translateX(4px);
+        .abn-tip:hover {
+          border-color: rgba(255, 193, 60, 0.15);
+          padding-left: 17px;
         }
 
-        .tip-icon {
+        .abn-tip-icon {
           flex-shrink: 0;
-          margin-top: 2px;
+          margin-top: 1px;
         }
 
-        .tip-text {
-          font-size: 14px;
-          color: var(--text-secondary);
-          line-height: 1.6;
+        .abn-tip-text {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.38);
+          line-height: 1.7;
           margin: 0;
         }
 
-        .warning-box {
+        /* ── Warning box ───────────────────────────────── */
+        .abn-warning {
           display: flex;
           align-items: flex-start;
-          gap: 12px;
-          background: rgba(255, 152, 0, 0.1);
-          border: 1px solid rgba(255, 152, 0, 0.3);
+          gap: 10px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-left: 3px solid rgba(255, 193, 60, 0.5);
           border-radius: 10px;
-          padding: 15px;
-          margin-top: 15px;
+          padding: 13px 14px;
+          margin-top: 14px;
         }
 
-        .warning-icon {
-          flex-shrink: 0;
-          color: #ff9800;
-        }
-
-        .warning-text {
-          font-size: 14px;
-          color: var(--text-secondary);
+        .abn-warning-text {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.35);
           margin: 0;
-          line-height: 1.6;
+          line-height: 1.85;
         }
 
-        .warning-text strong {
-          color: #ff9800;
+        .abn-warning-text strong {
+          color: #ffc13c;
           font-weight: 700;
         }
 
-        .recommendation-badge {
+        /* ── Badge ─────────────────────────────────────── */
+        .abn-badge {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: rgba(76, 175, 80, 0.15);
-          border: 1px solid rgba(76, 175, 80, 0.3);
-          color: #4caf50;
-          padding: 6px 12px;
+          background: rgba(255, 193, 60, 0.06);
+          border: 1px solid rgba(255, 193, 60, 0.18);
+          color: #ffc13c;
+          padding: 6px 13px;
           border-radius: 20px;
-          font-size: 13px;
-          font-weight: 600;
-          margin-top: 15px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 12px;
+          font-weight: 700;
+          margin-top: 14px;
+          letter-spacing: 0.01em;
         }
 
+        /* ── Responsive ────────────────────────────────── */
         @media (max-width: 768px) {
-          .notice {
-            padding: 20px;
+          .abn-notice {
+            padding: 18px 16px;
           }
-
-          .notice-title {
-            font-size: 16px;
-          }
-
-          .notice-text {
-            font-size: 14px;
-          }
-
-          .tips-grid {
+          .abn-tips-grid {
             grid-template-columns: 1fr;
-            gap: 10px;
-          }
-
-          .tip-item {
-            padding: 10px;
-          }
-
-          .tip-text {
-            font-size: 13px;
-          }
-
-          .warning-box {
-            padding: 12px;
-          }
-
-          .warning-text {
-            font-size: 13px;
+            gap: 6px;
           }
         }
       `}</style>
 
-      <div className="notice-container">
-        <div className="notice">
+      <div className="abn-container">
+        <div className="abn-notice">
           {/* Header */}
-          <div className="notice-header">
-            <div className="notice-title-wrapper">
-              <div className="notice-icon">
-                <Shield size={24} color="#e50914" />
+          <div className="abn-header">
+            <div className="abn-title-wrapper">
+              <div className="abn-icon">
+                <Shield size={18} color="#ffc13c" />
               </div>
-              <h3 className="notice-title">Safe Viewing Tips</h3>
+              <h3 className="abn-title">Safe Viewing Tips</h3>
             </div>
             <button
-              className="close-button"
+              className="abn-close"
               onClick={() => setIsVisible(false)}
               aria-label="Close notice"
             >
-              <X size={18} />
+              <X size={16} />
             </button>
           </div>
 
-          {/* Main Text */}
-          <p className="notice-text">
+          {/* Body */}
+          <p className="abn-text">
             We use free streaming services which may show ads. Follow these tips
             for a better and safer viewing experience:
           </p>
 
-          {/* Tips Grid */}
-          <div className="tips-grid">
-            <div className="tip-item">
-              <CheckCircle size={20} className="tip-icon" color="#4caf50" />
-              <p className="tip-text">
-                Use an ad-blocker browser extension (uBlock Origin recommended)
-              </p>
-            </div>
-
-            <div className="tip-item">
-              <CheckCircle size={20} className="tip-icon" color="#4caf50" />
-              <p className="tip-text">
-                Try different servers if one has too many ads
-              </p>
-            </div>
-
-            <div className="tip-item">
-              <CheckCircle size={20} className="tip-icon" color="#4caf50" />
-              <p className="tip-text">
-                Close any pop-ups that may appear immediately
-              </p>
-            </div>
-
-            <div className="tip-item">
-              <CheckCircle size={20} className="tip-icon" color="#4caf50" />
-              <p className="tip-text">
-                Never enter personal information on pop-ups
-              </p>
-            </div>
+          {/* Tips */}
+          <div className="abn-tips-grid">
+            {[
+              'Use an ad-blocker browser extension (uBlock Origin recommended)',
+              'Try different servers if one has too many ads',
+              'Close any pop-ups that may appear immediately',
+              'Never enter personal information on pop-ups',
+            ].map((tip, i) => (
+              <div key={i} className="abn-tip">
+                <CheckCircle
+                  size={16}
+                  className="abn-tip-icon"
+                  color="#ffc13c"
+                />
+                <p className="abn-tip-text">{tip}</p>
+              </div>
+            ))}
           </div>
 
-          {/* Warning Box */}
-          <div className="warning-box">
-            <AlertTriangle size={22} className="warning-icon" />
-            <p className="warning-text">
+          {/* Warning */}
+          <div className="abn-warning">
+            <AlertTriangle
+              size={16}
+              color="#ffc13c"
+              style={{ flexShrink: 0, marginTop: 1 }}
+            />
+            <p className="abn-warning-text">
               <strong>Important:</strong> Never download anything from pop-ups
               or provide credit card information. Our service is completely
               free.
             </p>
           </div>
 
-          {/* Recommendation Badge */}
-          <div className="recommendation-badge">
-            <Zap size={16} />
+          {/* Badge */}
+          <div className="abn-badge">
+            <Zap size={13} />
             Recommended: Use Brave Browser or uBlock Origin
           </div>
         </div>

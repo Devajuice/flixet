@@ -11,6 +11,7 @@ export default function SearchBar() {
   const [results, setResults] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [focused, setFocused] = useState(false);
   const searchRef = useRef(null);
   const router = useRouter();
 
@@ -23,7 +24,6 @@ export default function SearchBar() {
         setIsOpen(false);
       }
     }, 300);
-
     return () => clearTimeout(timer);
   }, [query]);
 
@@ -31,9 +31,9 @@ export default function SearchBar() {
     function handleClickOutside(event) {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setIsOpen(false);
+        setFocused(false);
       }
     }
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -42,18 +42,14 @@ export default function SearchBar() {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(
-          searchQuery
-        )}&page=1`
+        `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`,
       );
       const data = await response.json();
-
       const filtered = data.results
         .filter(
-          (item) => item.media_type === 'movie' || item.media_type === 'tv'
+          (item) => item.media_type === 'movie' || item.media_type === 'tv',
         )
         .slice(0, 6);
-
       setResults(filtered);
       setIsOpen(true);
     } catch (error) {
@@ -70,9 +66,9 @@ export default function SearchBar() {
     setQuery('');
     setResults([]);
     setIsOpen(false);
+    setFocused(false);
   };
 
-  // NEW: Handle Enter key press to navigate to full search results
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim().length >= 2) {
@@ -87,89 +83,153 @@ export default function SearchBar() {
     setIsOpen(false);
   };
 
-  const getImageUrl = (path) => {
-    return path
+  const getImageUrl = (path) =>
+    path
       ? `https://image.tmdb.org/t/p/w92${path}`
-      : 'https://via.placeholder.com/92x138/1a1a1a/666?text=No+Image';
-  };
+      : 'https://via.placeholder.com/92x138/111114/444?text=No+Image';
 
   return (
-    <div ref={searchRef} style={styles.searchContainer}>
-      <div style={styles.searchWrapper}>
-        <Search size={18} style={styles.searchIcon} />
+    <div ref={searchRef} style={{ position: 'relative', width: '100%' }}>
+      {/* ── Input wrapper ────────────────────────────── */}
+      <div
+        style={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+        }}
+      >
+        <Search
+          size={16}
+          style={{
+            position: 'absolute',
+            left: 14,
+            color: focused ? '#ffc13c' : 'rgba(255,255,255,0.35)',
+            pointerEvents: 'none',
+            zIndex: 1,
+            transition: 'color 0.2s ease',
+            flexShrink: 0,
+          }}
+        />
         <input
           type="text"
-          style={styles.searchInput}
           placeholder="Search movies & TV shows..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => {
+            setFocused(true);
             if (results.length > 0) setIsOpen(true);
           }}
+          onBlur={() => setFocused(false)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleSubmit(e);
-            }
+            if (e.key === 'Enter') handleSubmit(e);
+          }}
+          style={{
+            width: '100%',
+            padding: '10px 40px 10px 40px',
+            background: focused
+              ? 'rgba(255,255,255,0.07)'
+              : 'rgba(255,255,255,0.04)',
+            border: `1px solid ${focused ? 'rgba(255,193,60,0.35)' : 'rgba(255,255,255,0.08)'}`,
+            borderRadius: '10px',
+            color: 'rgba(255,255,255,0.9)',
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: '14px',
+            fontWeight: '400',
+            outline: 'none',
+            transition: 'background 0.2s ease, border-color 0.2s ease',
+            letterSpacing: '0.01em',
           }}
         />
         {query && (
           <button
-            style={styles.clearButton}
             onClick={clearSearch}
             aria-label="Clear search"
+            style={{
+              position: 'absolute',
+              right: 12,
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255,255,255,0.3)',
+              cursor: 'pointer',
+              padding: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1,
+              transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')
+            }
           >
-            <X size={18} />
+            <X size={14} />
           </button>
         )}
       </div>
 
+      {/* ── Dropdown ─────────────────────────────────── */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            style={styles.dropdown}
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
+            initial={{ opacity: 0, y: -6, scale: 0.99 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.99 }}
             transition={{ duration: 0.15 }}
+            style={{
+              position: 'absolute',
+              top: 'calc(100% + 8px)',
+              left: 0,
+              right: 0,
+              background: '#0d0d0f',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '12px',
+              maxHeight: '400px',
+              overflowY: 'auto',
+              zIndex: 1000,
+              boxShadow:
+                '0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,193,60,0.08)',
+            }}
           >
             {loading ? (
-              <div style={styles.loadingText}>Searching...</div>
+              <div
+                style={{
+                  padding: '20px',
+                  textAlign: 'center',
+                  color: 'rgba(255,255,255,0.35)',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '13px',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                Searching...
+              </div>
             ) : results.length > 0 ? (
-              results.map((item) => (
-                <div
+              results.map((item, index) => (
+                <SearchResult
                   key={`${item.media_type}-${item.id}`}
-                  style={styles.resultItem}
+                  item={item}
                   onClick={() => handleResultClick(item)}
-                >
-                  <img
-                    src={getImageUrl(item.poster_path)}
-                    alt={item.title || item.name}
-                    style={styles.resultImage}
-                  />
-                  <div style={styles.resultInfo}>
-                    <div style={styles.resultTitle}>
-                      {item.title || item.name}
-                    </div>
-                    <div style={styles.resultMeta}>
-                      <span style={styles.mediaBadge}>
-                        {item.media_type === 'movie' ? 'MOVIE' : 'TV'}
-                      </span>
-                      {(item.release_date || item.first_air_date) && (
-                        <span>
-                          {new Date(
-                            item.release_date || item.first_air_date
-                          ).getFullYear()}
-                        </span>
-                      )}
-                      {item.vote_average > 0 && (
-                        <span>⭐ {item.vote_average.toFixed(1)}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  isLast={index === results.length - 1}
+                  getImageUrl={getImageUrl}
+                />
               ))
             ) : (
-              <div style={styles.noResults}>No results found</div>
+              <div
+                style={{
+                  padding: '20px',
+                  textAlign: 'center',
+                  color: 'rgba(255,255,255,0.28)',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '13px',
+                }}
+              >
+                No results found
+              </div>
             )}
           </motion.div>
         )}
@@ -178,121 +238,137 @@ export default function SearchBar() {
   );
 }
 
-const styles = {
-  searchContainer: {
-    position: 'relative',
-    width: '100%',
-  },
-  searchWrapper: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-  },
-  searchInput: {
-    width: '100%',
-    padding: '10px 45px',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    borderRadius: '25px',
-    color: 'white',
-    fontSize: '15px',
-    outline: 'none',
-    transition: 'all 0.3s ease',
-  },
-  searchIcon: {
-    position: 'absolute',
-    left: '15px',
-    color: 'rgba(255, 255, 255, 0.6)',
-    pointerEvents: 'none',
-    zIndex: 1,
-  },
-  clearButton: {
-    position: 'absolute',
-    right: '15px',
-    background: 'none',
-    border: 'none',
-    color: 'rgba(255, 255, 255, 0.6)',
-    cursor: 'pointer',
-    padding: '5px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'color 0.3s ease',
-    zIndex: 1,
-  },
-  dropdown: {
-    position: 'absolute',
-    top: 'calc(100% + 12px)',
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(26, 26, 26, 0.98)',
-    backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(229, 9, 20, 0.3)',
-    borderRadius: '12px',
-    maxHeight: '400px',
-    overflowY: 'auto',
-    zIndex: 1000,
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
-  },
-  resultItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '10px 12px',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s ease',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-  },
-  resultImage: {
-    width: '45px',
-    height: '68px',
-    objectFit: 'cover',
-    borderRadius: '6px',
-    flexShrink: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-  },
-  resultInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-  resultTitle: {
-    fontSize: '15px',
-    fontWeight: '600',
-    color: 'white',
-    marginBottom: '4px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  resultMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '13px',
-    color: 'var(--text-secondary)',
-    flexWrap: 'wrap',
-  },
-  mediaBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    backgroundColor: 'var(--accent)',
-    color: 'white',
-    borderRadius: '10px',
-    fontSize: '10px',
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-  },
-  loadingText: {
-    padding: '20px',
-    textAlign: 'center',
-    color: 'var(--text-secondary)',
-    fontSize: '14px',
-  },
-  noResults: {
-    padding: '20px',
-    textAlign: 'center',
-    color: 'var(--text-secondary)',
-    fontSize: '14px',
-  },
-};
+/* ── Search result row ─────────────────────────────── */
+function SearchResult({ item, onClick, isLast, getImageUrl }) {
+  const [hovered, setHovered] = useState(false);
+  const isTV = item.media_type === 'tv';
+
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '10px 12px',
+        cursor: 'pointer',
+        background: hovered ? 'rgba(255,255,255,0.05)' : 'transparent',
+        borderBottom: isLast ? 'none' : '1px solid rgba(255,255,255,0.04)',
+        transition: 'background 0.15s ease',
+      }}
+    >
+      {/* Poster */}
+      <img
+        src={getImageUrl(item.poster_path)}
+        alt={item.title || item.name}
+        style={{
+          width: 40,
+          height: 60,
+          objectFit: 'cover',
+          borderRadius: '6px',
+          flexShrink: 0,
+          background: '#111114',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+          transform: hovered ? 'scale(1.04)' : 'scale(1)',
+          transition: 'transform 0.2s ease',
+        }}
+      />
+
+      {/* Info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: '14px',
+            fontWeight: '600',
+            color: hovered
+              ? 'rgba(255,255,255,0.98)'
+              : 'rgba(255,255,255,0.85)',
+            marginBottom: '5px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            transition: 'color 0.15s ease',
+          }}
+        >
+          {item.title || item.name}
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '7px',
+            flexWrap: 'wrap',
+          }}
+        >
+          {/* Type badge */}
+          <span
+            style={{
+              display: 'inline-block',
+              padding: '2px 7px',
+              background: isTV
+                ? 'rgba(96,165,250,0.15)'
+                : 'rgba(255,193,60,0.12)',
+              border: `1px solid ${isTV ? 'rgba(96,165,250,0.3)' : 'rgba(255,193,60,0.25)'}`,
+              borderRadius: '4px',
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '9px',
+              fontWeight: '700',
+              color: isTV ? '#60a5fa' : '#ffc13c',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {isTV ? 'TV' : 'Movie'}
+          </span>
+
+          {/* Year */}
+          {(item.release_date || item.first_air_date) && (
+            <span
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '12px',
+                fontWeight: '500',
+                color: 'rgba(255,255,255,0.3)',
+                letterSpacing: '0.02em',
+              }}
+            >
+              {new Date(item.release_date || item.first_air_date).getFullYear()}
+            </span>
+          )}
+
+          {/* Rating */}
+          {item.vote_average > 0 && (
+            <span
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#ffc13c',
+                letterSpacing: '0.02em',
+              }}
+            >
+              ★ {item.vote_average.toFixed(1)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Arrow hint on hover */}
+      <div
+        style={{
+          opacity: hovered ? 1 : 0,
+          transition: 'opacity 0.15s ease',
+          color: 'rgba(255,193,60,0.6)',
+          flexShrink: 0,
+          fontSize: '16px',
+        }}
+      >
+        →
+      </div>
+    </div>
+  );
+}

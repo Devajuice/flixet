@@ -71,9 +71,7 @@ export default function ComingSoon({ type = 'movie' }) {
     );
   }
 
-  if (items.length === 0) {
-    return null;
-  }
+  if (items.length === 0) return null;
 
   return (
     <div style={styles.container}>
@@ -87,51 +85,250 @@ export default function ComingSoon({ type = 'movie' }) {
           }
         }
 
-        @keyframes shimmer {
-          0% {
-            opacity: 0.6;
-          }
-          50% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0.6;
-          }
-        }
-
         .coming-soon-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
           gap: 20px;
         }
 
+        /* ── Card ────────────────────────────────────── */
         .coming-soon-card {
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          background: #0d0d0f;
+          border-radius: 12px;
+          overflow: hidden;
+          cursor: pointer;
+          box-shadow:
+            0 2px 8px rgba(0, 0, 0, 0.55),
+            0 0 0 1px rgba(255, 255, 255, 0.04);
+          transition:
+            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+            box-shadow 0.3s ease;
+          isolation: isolate;
         }
 
         .coming-soon-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 12px 28px rgba(229, 9, 20, 0.5);
+          transform: translateY(-6px) scale(1.02);
+          box-shadow:
+            0 18px 40px rgba(0, 0, 0, 0.7),
+            0 0 0 1px rgba(255, 193, 60, 0.25),
+            0 0 30px rgba(255, 193, 60, 0.08);
+        }
+
+        .coming-soon-card:active {
+          transform: scale(0.97);
+          transition-duration: 0.1s;
+        }
+
+        /* ── Poster ──────────────────────────────────── */
+        .poster-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition:
+            transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+            filter 0.4s ease;
         }
 
         .coming-soon-card:hover .poster-image {
-          transform: scale(1.08);
+          transform: scale(1.06);
+          filter: brightness(0.5) saturate(1.1);
+        }
+
+        /* ── Bottom vignette ─────────────────────────── */
+        .poster-container::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 55%;
+          background: linear-gradient(
+            to top,
+            rgba(13, 13, 15, 0.92) 0%,
+            rgba(13, 13, 15, 0.3) 55%,
+            transparent 100%
+          );
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        /* ── Badge ───────────────────────────────────── */
+        .badge {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          background: rgba(255, 193, 60, 0.15);
+          border: 1px solid rgba(255, 193, 60, 0.4);
+          color: #ffc13c;
+          padding: 4px 9px;
+          border-radius: 6px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 9px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          backdrop-filter: blur(6px);
+          transition:
+            background 0.3s ease,
+            border-color 0.3s ease;
+        }
+
+        .coming-soon-card:hover .badge {
+          background: rgba(255, 193, 60, 0.28);
+          border-color: rgba(255, 193, 60, 0.7);
+        }
+
+        /* ── Play overlay ────────────────────────────── */
+        .hover-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          z-index: 1;
         }
 
         .coming-soon-card:hover .hover-overlay {
           opacity: 1;
         }
 
-        .coming-soon-card:hover .badge {
-          background: linear-gradient(135deg, #e50914 0%, #f40612 100%);
-          animation: shimmer 1.5s ease-in-out infinite;
+        .play-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(255, 193, 60, 0.92);
+          color: #0d0d0f;
+          padding: 11px 22px;
+          border-radius: 50px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 0.03em;
+          text-transform: uppercase;
+          box-shadow: 0 4px 20px rgba(255, 193, 60, 0.45);
+          transform: scale(0.88);
+          transition: transform 0.2s ease;
+          white-space: nowrap;
         }
 
+        .coming-soon-card:hover .play-btn {
+          transform: scale(1);
+        }
+
+        .play-icon {
+          width: 0;
+          height: 0;
+          border-style: solid;
+          border-width: 5px 0 5px 9px;
+          border-color: transparent transparent transparent #0d0d0f;
+          flex-shrink: 0;
+        }
+
+        /* ── Info panel ──────────────────────────────── */
+        .card-info {
+          padding: 12px 14px 14px;
+          background: #0d0d0f;
+          border-top: 1px solid rgba(255, 255, 255, 0.045);
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .item-title {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          line-height: 1.35;
+          color: rgba(255, 255, 255, 0.92);
+          margin: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          min-height: 36px;
+          letter-spacing: 0.01em;
+          transition: color 0.2s;
+        }
+
+        .coming-soon-card:hover .item-title {
+          color: #ffc13c;
+        }
+
+        .meta {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .meta-item {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 11px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.4);
+          letter-spacing: 0.02em;
+        }
+
+        .meta-item svg {
+          flex-shrink: 0;
+          opacity: 0.7;
+        }
+
+        .rating-value {
+          color: #ffc13c;
+          font-weight: 600;
+        }
+
+        /* ── Section header ──────────────────────────── */
+        .section-title {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 26px;
+          font-weight: 800;
+          color: rgba(255, 255, 255, 0.92);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          letter-spacing: -0.02em;
+        }
+
+        .title-accent {
+          color: #ffc13c;
+        }
+
+        .view-all {
+          font-family: 'DM Sans', sans-serif;
+          color: #ffc13c;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          letter-spacing: 0.02em;
+          opacity: 0.85;
+          transition: opacity 0.2s ease;
+          display: inline-block;
+        }
+
+        .view-all:hover {
+          opacity: 1;
+        }
+
+        /* ── Responsive ──────────────────────────────── */
         @media (max-width: 768px) {
           .coming-soon-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
+          }
+          .section-title {
+            font-size: 22px;
           }
         }
 
@@ -140,26 +337,24 @@ export default function ComingSoon({ type = 'movie' }) {
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
           }
+          .section-title {
+            font-size: 19px;
+          }
         }
       `}</style>
 
       <div style={styles.header}>
-        <h2 style={styles.title}>
-          <Sparkles
-            size={24}
-            style={{
-              display: 'inline',
-              marginRight: '8px',
-              verticalAlign: 'middle',
-            }}
-          />
-          Coming Soon • {type === 'movie' ? 'Movies' : 'TV Shows'}
+        <h2 className="section-title">
+          <Sparkles size={22} color="#ffc13c" />
+          Coming Soon
+          <span className="title-accent">•</span>
+          {type === 'movie' ? 'Movies' : 'TV Shows'}
         </h2>
         <Link
           href={type === 'movie' ? '/coming-soon/movies' : '/coming-soon/tv'}
         >
           <motion.span
-            style={styles.viewAll}
+            className="view-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -180,9 +375,12 @@ export default function ComingSoon({ type = 'movie' }) {
               href={type === 'movie' ? `/movie/${item.id}` : `/tv/${item.id}`}
               style={styles.cardLink}
             >
-              <div style={styles.card} className="coming-soon-card">
+              <div className="coming-soon-card">
                 {/* Poster */}
-                <div style={styles.posterContainer}>
+                <div
+                  style={styles.posterContainer}
+                  className="poster-container"
+                >
                   <img
                     src={
                       item.poster_path
@@ -190,48 +388,41 @@ export default function ComingSoon({ type = 'movie' }) {
                         : '/placeholder.png'
                     }
                     alt={item.title || item.name}
-                    style={styles.poster}
                     className="poster-image"
                     loading="lazy"
                   />
 
-                  {/* Coming Soon Badge */}
-                  <div style={styles.badge} className="badge">
-                    <Sparkles size={10} style={{ marginRight: '4px' }} />
+                  {/* Badge */}
+                  <div className="badge">
+                    <Sparkles size={9} />
                     Coming Soon
                   </div>
 
-                  {/* Hover Overlay */}
-                  <div style={styles.overlay} className="hover-overlay">
-                    <motion.div
-                      whileHover={{ scale: 1.2 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Play size={48} fill="white" strokeWidth={0} />
-                    </motion.div>
+                  {/* Play overlay */}
+                  <div className="hover-overlay">
+                    <div className="play-btn">
+                      <span className="play-icon" />
+                      Play
+                    </div>
                   </div>
                 </div>
 
                 {/* Info */}
-                <div style={styles.info}>
-                  <h3 style={styles.itemTitle}>{item.title || item.name}</h3>
-
-                  <div style={styles.meta}>
-                    <div style={styles.metaItem}>
-                      <Calendar size={13} style={{ flexShrink: 0 }} />
+                <div className="card-info">
+                  <h3 className="item-title">{item.title || item.name}</h3>
+                  <div className="meta">
+                    <div className="meta-item">
+                      <Calendar size={12} />
                       <span>
                         {formatDate(item.release_date || item.first_air_date)}
                       </span>
                     </div>
                     {item.vote_average > 0 && (
-                      <div style={styles.metaItem}>
-                        <Star
-                          size={13}
-                          fill="#ffd700"
-                          color="#ffd700"
-                          style={{ flexShrink: 0 }}
-                        />
-                        <span>{item.vote_average.toFixed(1)}</span>
+                      <div className="meta-item">
+                        <Star size={12} fill="#ffc13c" color="#ffc13c" />
+                        <span className="rating-value">
+                          {item.vote_average.toFixed(1)}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -255,23 +446,6 @@ const styles = {
     alignItems: 'center',
     marginBottom: '30px',
   },
-  title: {
-    fontSize: '32px',
-    fontWeight: '800',
-    background: 'linear-gradient(135deg, #e50914 0%, #f40612 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  viewAll: {
-    color: 'var(--accent)',
-    fontSize: '16px',
-    fontWeight: '700',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    display: 'inline-block',
-  },
   loading: {
     display: 'flex',
     justifyContent: 'center',
@@ -281,8 +455,8 @@ const styles = {
   spinner: {
     width: '40px',
     height: '40px',
-    border: '4px solid rgba(229, 9, 20, 0.1)',
-    borderTop: '4px solid var(--accent)',
+    border: '4px solid rgba(255, 193, 60, 0.1)',
+    borderTop: '4px solid #ffc13c',
     borderRadius: '50%',
     animation: 'spin 1s linear infinite',
   },
@@ -291,84 +465,10 @@ const styles = {
     color: 'inherit',
     display: 'block',
   },
-  card: {
-    backgroundColor: 'var(--card-bg)',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    cursor: 'pointer',
-  },
   posterContainer: {
     position: 'relative',
     aspectRatio: '2/3',
     overflow: 'hidden',
-    backgroundColor: '#1a1a1a',
-  },
-  poster: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    transition: 'transform 0.4s ease',
-  },
-  badge: {
-    position: 'absolute',
-    top: '10px',
-    left: '10px',
-    backgroundColor: 'var(--accent)',
-    color: 'white',
-    padding: '5px 10px',
-    borderRadius: '6px',
-    fontSize: '10px',
-    fontWeight: '800',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    zIndex: 2,
-    display: 'flex',
-    alignItems: 'center',
-    boxShadow: '0 2px 8px rgba(229, 9, 20, 0.6)',
-    transition: 'all 0.3s ease',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background:
-      'linear-gradient(135deg, rgba(229, 9, 20, 0.85) 0%, rgba(0, 0, 0, 0.85) 100%)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    opacity: 0,
-    transition: 'opacity 0.3s ease',
-    zIndex: 1,
-  },
-  info: {
-    padding: '14px',
-  },
-  itemTitle: {
-    fontSize: '14px',
-    fontWeight: '700',
-    marginBottom: '10px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    lineHeight: '1.4',
-    minHeight: '40px',
-    color: 'var(--text-primary)',
-  },
-  meta: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  metaItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    fontSize: '12px',
-    fontWeight: '500',
-    color: 'var(--text-secondary)',
+    backgroundColor: '#111114',
   },
 };

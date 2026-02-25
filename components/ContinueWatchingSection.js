@@ -1,71 +1,90 @@
 'use client';
-
 import { useContinueWatching } from '@/context/ContinueWatchingContext';
 import ContinueWatchingCard from './ContinueWatchingCard';
 
 export default function ContinueWatchingSection() {
   const { continueWatching } = useContinueWatching();
 
-  if (continueWatching.length === 0) {
-    return null; // Don't show section if empty
-  }
+  if (continueWatching.length === 0) return null;
 
   return (
-    <section className="continue-watching-section">
-      <div className="section-header">
-        <h2>Continue Watching</h2>
-        <p className="subtitle">Pick up where you left off</p>
-      </div>
-
-      <div className="cards-grid">
-        {continueWatching.map((item) => (
-          <ContinueWatchingCard 
-            key={`${item.type}-${item.id}-${item.season}-${item.episode}`} 
-            item={item} 
-          />
-        ))}
-      </div>
-
-      <style jsx>{`
-        .continue-watching-section {
+    <>
+      <style jsx global>{`
+        .cw-section {
           margin: 40px 0;
+          font-family: 'DM Sans', sans-serif;
         }
 
-        .section-header {
+        /* ── Header ────────────────────────────────────── */
+        .cw-header {
           margin-bottom: 20px;
         }
 
-        .section-header h2 {
-          font-size: 24px;
+        .cw-title {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 15px;
           font-weight: 700;
-          margin: 0 0 4px 0;
+          color: rgba(255, 255, 255, 0.88);
+          text-transform: uppercase;
+          letter-spacing: 0.09em;
+          margin: 0 0 4px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
 
-        .subtitle {
-          font-size: 14px;
-          color: #888;
+        .cw-title::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: rgba(255, 255, 255, 0.06);
+        }
+
+        .cw-subtitle {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 12px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.25);
           margin: 0;
+          letter-spacing: 0.05em;
         }
 
-        .cards-grid {
+        /* ── Grid ──────────────────────────────────────── */
+        .cw-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 20px;
+          gap: 16px;
         }
 
         @media (max-width: 768px) {
-          .cards-grid {
+          .cw-grid {
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 16px;
+            gap: 12px;
           }
         }
 
         @media (max-width: 480px) {
-          .cards-grid {
+          .cw-grid {
             grid-template-columns: 1fr;
           }
         }
       `}</style>
-    </section>
+
+      <section className="cw-section">
+        <div className="cw-header">
+          <h2 className="cw-title">Continue Watching</h2>
+          <p className="cw-subtitle">Pick up where you left off</p>
+        </div>
+
+        <div className="cw-grid">
+          {continueWatching.map((item) => (
+            <ContinueWatchingCard
+              key={`${item.type}-${item.id}-${item.season}-${item.episode}`}
+              item={item}
+            />
+          ))}
+        </div>
+      </section>
+    </>
   );
 }

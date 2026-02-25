@@ -15,211 +15,281 @@ import {
 export default function PrivacyPolicy() {
   return (
     <>
-      <style jsx>{`
-        .privacy-container {
+      <style jsx global>{`
+        /* ── Container ─────────────────────────────────── */
+        .prv-container {
           max-width: 1000px;
           margin: 0 auto;
           padding: 40px 20px 100px;
+          font-family: 'DM Sans', sans-serif;
         }
 
-        .privacy-header {
+        /* ── Header ────────────────────────────────────── */
+        .prv-header {
           text-align: center;
           margin-bottom: 50px;
         }
 
-        .privacy-title {
-          font-size: 48px;
-          font-weight: 800;
-          margin-bottom: 15px;
-          background: linear-gradient(135deg, #e50914 0%, #f40612 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+        .prv-title {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 42px;
+          font-weight: 900;
+          margin-bottom: 16px;
+          color: rgba(255, 255, 255, 0.88);
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 15px;
+          gap: 14px;
+          letter-spacing: -0.03em;
         }
 
-        .last-updated {
-          font-size: 14px;
-          color: var(--text-secondary);
-          background: rgba(229, 9, 20, 0.1);
-          padding: 8px 20px;
+        .prv-title svg {
+          color: #ffc13c;
+          flex-shrink: 0;
+        }
+
+        .prv-last-updated {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 11px;
+          font-weight: 700;
+          color: #ffc13c;
+          background: rgba(255, 193, 60, 0.08);
+          padding: 6px 16px;
           border-radius: 20px;
           display: inline-block;
-          border: 1px solid rgba(229, 9, 20, 0.2);
+          border: 1px solid rgba(255, 193, 60, 0.2);
+          text-transform: uppercase;
+          letter-spacing: 0.07em;
         }
 
-        .privacy-subtitle {
-          font-size: 18px;
-          color: var(--text-secondary);
-          max-width: 700px;
-          margin: 15px auto 0;
-          line-height: 1.6;
+        .prv-subtitle {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.38);
+          max-width: 680px;
+          margin: 14px auto 0;
+          line-height: 1.85;
         }
 
-        .section {
-          margin-bottom: 35px;
-          background: rgba(26, 26, 26, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+        /* ── Section cards ─────────────────────────────── */
+        .prv-section {
+          margin-bottom: 16px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.06);
           border-radius: 12px;
-          padding: 30px;
+          padding: 28px 30px;
           backdrop-filter: blur(10px);
+          transition: border-color 0.2s ease;
         }
 
-        .section-header {
+        .prv-section:hover {
+          border-color: rgba(255, 193, 60, 0.1);
+        }
+
+        .prv-section-header {
           display: flex;
           align-items: center;
           gap: 12px;
-          margin-bottom: 20px;
+          margin-bottom: 18px;
+          padding-bottom: 14px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        .section-number {
-          width: 35px;
-          height: 35px;
-          background: var(--accent);
-          border-radius: 50%;
+        .prv-section-number {
+          width: 32px;
+          height: 32px;
+          background: rgba(255, 193, 60, 0.1);
+          border: 1px solid rgba(255, 193, 60, 0.25);
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
+          font-family: 'DM Sans', sans-serif;
           font-weight: 800;
-          font-size: 16px;
+          font-size: 13px;
+          color: #ffc13c;
           flex-shrink: 0;
         }
 
-        .section-title {
-          font-size: 22px;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin: 0;
+        .prv-section-header svg {
+          color: #ffc13c;
+          flex-shrink: 0;
         }
 
-        .section-text {
+        .prv-section-title {
+          font-family: 'DM Sans', sans-serif;
           font-size: 16px;
-          line-height: 1.8;
-          color: var(--text-secondary);
-          margin-bottom: 15px;
+          font-weight: 700;
+          color: rgba(255, 255, 255, 0.88);
+          margin: 0;
+          letter-spacing: 0.01em;
         }
 
-        .list {
+        /* ── Body text ─────────────────────────────────── */
+        .prv-text {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          line-height: 1.85;
+          color: rgba(255, 255, 255, 0.38);
+          margin-bottom: 14px;
+        }
+
+        .prv-text:last-child {
+          margin-bottom: 0;
+        }
+
+        /* ── List ──────────────────────────────────────── */
+        .prv-list {
           list-style: none;
           padding-left: 0;
-          margin: 15px 0;
+          margin: 12px 0 0;
         }
 
-        .list li {
-          padding: 12px 0 12px 35px;
+        .prv-list li {
+          padding: 10px 0 10px 20px;
           position: relative;
-          color: var(--text-secondary);
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.38);
           line-height: 1.7;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        .list li:last-child {
+        .prv-list li:last-child {
           border-bottom: none;
         }
 
-        .list li:before {
-          content: '▸';
+        .prv-list li::before {
+          content: '';
           position: absolute;
           left: 0;
-          color: var(--accent);
-          font-weight: bold;
-          font-size: 18px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: rgba(255, 193, 60, 0.4);
         }
 
-        .highlight-box {
-          background: linear-gradient(
-            135deg,
-            rgba(229, 9, 20, 0.1) 0%,
-            rgba(26, 26, 26, 0.6) 100%
-          );
-          border: 1px solid rgba(229, 9, 20, 0.3);
+        /* ── Highlight box ─────────────────────────────── */
+        .prv-highlight {
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-left: 3px solid #ffc13c;
           border-radius: 10px;
-          padding: 20px;
-          margin: 20px 0;
+          padding: 14px 16px;
+          margin: 14px 0;
         }
 
-        .contact-card {
-          background: linear-gradient(
-            135deg,
-            rgba(229, 9, 20, 0.15) 0%,
-            rgba(26, 26, 26, 0.8) 100%
-          );
-          border: 1px solid rgba(229, 9, 20, 0.3);
-          border-radius: 12px;
-          padding: 25px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          margin-top: 15px;
-        }
-
-        .contact-icon {
-          flex-shrink: 0;
-        }
-
-        .contact-email {
-          color: var(--accent);
-          font-weight: 700;
-          font-size: 18px;
-        }
-
-        .service-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 15px;
-          margin: 15px 0;
-        }
-
-        .service-item {
-          background: rgba(229, 9, 20, 0.05);
-          border: 1px solid rgba(229, 9, 20, 0.2);
-          border-radius: 8px;
-          padding: 15px;
-        }
-
-        .service-name {
-          color: var(--accent);
-          font-weight: 700;
-          margin-bottom: 5px;
-        }
-
-        .service-desc {
-          color: var(--text-secondary);
-          font-size: 14px;
+        .prv-highlight p {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          line-height: 1.85;
+          color: rgba(255, 255, 255, 0.38);
           margin: 0;
         }
 
+        .prv-highlight strong {
+          color: #ffc13c;
+          font-weight: 700;
+        }
+
+        /* ── Service grid ──────────────────────────────── */
+        .prv-service-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+          gap: 10px;
+          margin: 14px 0;
+        }
+
+        .prv-service-item {
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 10px;
+          padding: 14px 16px;
+          transition: border-color 0.2s ease;
+        }
+
+        .prv-service-item:hover {
+          border-color: rgba(255, 193, 60, 0.15);
+        }
+
+        .prv-service-name {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          color: #ffc13c;
+          margin-bottom: 5px;
+          letter-spacing: 0.01em;
+        }
+
+        .prv-service-desc {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.35);
+          margin: 0;
+          line-height: 1.6;
+        }
+
+        /* ── Contact card ──────────────────────────────── */
+        .prv-contact-card {
+          background: rgba(255, 193, 60, 0.04);
+          border: 1px solid rgba(255, 193, 60, 0.15);
+          border-radius: 10px;
+          padding: 18px 20px;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          margin-top: 14px;
+        }
+
+        .prv-contact-card svg {
+          color: #ffc13c;
+          flex-shrink: 0;
+        }
+
+        .prv-contact-label {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 11px;
+          font-weight: 700;
+          color: rgba(255, 255, 255, 0.25);
+          text-transform: uppercase;
+          letter-spacing: 0.09em;
+          margin-bottom: 4px;
+        }
+
+        .prv-contact-email {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+          font-weight: 700;
+          color: #ffc13c;
+          letter-spacing: 0.01em;
+        }
+
+        /* ── Responsive ────────────────────────────────── */
         @media (max-width: 768px) {
-          .privacy-container {
-            padding: 30px 15px 80px;
+          .prv-container {
+            padding: 28px 16px 80px;
           }
-
-          .privacy-title {
-            font-size: 32px;
+          .prv-title {
+            font-size: 28px;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
           }
-
-          .privacy-subtitle {
-            font-size: 16px;
+          .prv-subtitle {
+            font-size: 13px;
           }
-
-          .section {
+          .prv-section {
             padding: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 12px;
           }
-
-          .section-title {
-            font-size: 18px;
+          .prv-section-title {
+            font-size: 15px;
           }
-
-          .service-grid {
+          .prv-service-grid {
             grid-template-columns: 1fr;
           }
-
-          .contact-card {
+          .prv-contact-card {
             flex-direction: column;
             text-align: center;
           }
@@ -227,239 +297,212 @@ export default function PrivacyPolicy() {
       `}</style>
 
       <motion.div
-        className="privacy-container"
+        className="prv-container"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
         {/* Header */}
-        <div className="privacy-header">
-          <h1 className="privacy-title">
-            <Shield size={48} />
+        <div className="prv-header">
+          <h1 className="prv-title">
+            <Shield size={40} />
             Privacy Policy
           </h1>
-          <p className="last-updated">Last Updated: December 16, 2025</p>
-          <p className="privacy-subtitle">
+          <p className="prv-last-updated">Last Updated: February 25, 2026</p>
+          <p className="prv-subtitle">
             Your privacy matters to us. Learn how we handle information and
             protect your data while using Flixet.
           </p>
         </div>
 
-        {/* Section 1 */}
-        <motion.div
-          className="section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <div className="section-header">
-            <div className="section-number">1</div>
-            <Eye size={24} color="#e50914" />
-            <h2 className="section-title">Information We Collect</h2>
-          </div>
-          <p className="section-text">
-            Flixet does not collect personal information from users. However, we
-            may collect:
-          </p>
-          <ul className="list">
-            <li>
-              Anonymous usage data (page views, browser type, device type)
-            </li>
-            <li>Non-personal technical information (IP address, cookies)</li>
-            <li>
-              Information from third-party embed services you interact with
-            </li>
-          </ul>
-        </motion.div>
-
-        {/* Section 2 */}
-        <motion.div
-          className="section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-        >
-          <div className="section-header">
-            <div className="section-number">2</div>
-            <FileText size={24} color="#e50914" />
-            <h2 className="section-title">How We Use Information</h2>
-          </div>
-          <p className="section-text">
-            Any non-personal information collected may be used to:
-          </p>
-          <ul className="list">
-            <li>Improve website functionality and user experience</li>
-            <li>Analyze website traffic and usage patterns</li>
-            <li>Maintain and optimize website performance</li>
-          </ul>
-        </motion.div>
-
-        {/* Section 3 */}
-        <motion.div
-          className="section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="section-header">
-            <div className="section-number">3</div>
-            <Users size={24} color="#e50914" />
-            <h2 className="section-title">Third-Party Services</h2>
-          </div>
-          <p className="section-text">
-            Our website uses third-party services including:
-          </p>
-          <div className="service-grid">
-            <div className="service-item">
-              <div className="service-name">TMDb API</div>
-              <p className="service-desc">For movie and TV show information</p>
-            </div>
-            <div className="service-item">
-              <div className="service-name">Video Embed Services</div>
-              <p className="service-desc">
-                For streaming content (VidSrc, 2Embed, etc.)
+        {[
+          {
+            num: 1,
+            icon: <Eye size={18} />,
+            title: 'Information We Collect',
+            content: (
+              <>
+                <p className="prv-text">
+                  Flixet does not collect personal information from users.
+                  However, we may collect:
+                </p>
+                <ul className="prv-list">
+                  <li>
+                    Anonymous usage data (page views, browser type, device type)
+                  </li>
+                  <li>
+                    Non-personal technical information (IP address, cookies)
+                  </li>
+                  <li>
+                    Information from third-party embed services you interact
+                    with
+                  </li>
+                </ul>
+              </>
+            ),
+          },
+          {
+            num: 2,
+            icon: <FileText size={18} />,
+            title: 'How We Use Information',
+            content: (
+              <>
+                <p className="prv-text">
+                  Any non-personal information collected may be used to:
+                </p>
+                <ul className="prv-list">
+                  <li>Improve website functionality and user experience</li>
+                  <li>Analyze website traffic and usage patterns</li>
+                  <li>Maintain and optimize website performance</li>
+                </ul>
+              </>
+            ),
+          },
+          {
+            num: 3,
+            icon: <Users size={18} />,
+            title: 'Third-Party Services',
+            content: (
+              <>
+                <p className="prv-text">
+                  Our website uses third-party services including:
+                </p>
+                <div className="prv-service-grid">
+                  <div className="prv-service-item">
+                    <div className="prv-service-name">TMDb API</div>
+                    <p className="prv-service-desc">
+                      For movie and TV show information
+                    </p>
+                  </div>
+                  <div className="prv-service-item">
+                    <div className="prv-service-name">Video Embed Services</div>
+                    <p className="prv-service-desc">
+                      For streaming content (VidSrc, 2Embed, etc.)
+                    </p>
+                  </div>
+                </div>
+                <div className="prv-highlight">
+                  <p>
+                    <strong>Important:</strong> These services may have their
+                    own privacy policies and cookies. We are not responsible for
+                    the privacy practices of these third-party services.
+                  </p>
+                </div>
+              </>
+            ),
+          },
+          {
+            num: 4,
+            icon: <Cookie size={18} />,
+            title: 'Cookies',
+            content: (
+              <p className="prv-text">
+                We may use cookies to enhance user experience. Third-party embed
+                services may also set their own cookies. You can disable cookies
+                in your browser settings, but this may affect website
+                functionality.
               </p>
-            </div>
-          </div>
-          <div className="highlight-box">
-            <p className="section-text" style={{ marginBottom: 0 }}>
-              <strong>⚠️ Important:</strong> These services may have their own
-              privacy policies and cookies. We are not responsible for the
-              privacy practices of these third-party services.
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Section 4 */}
-        <motion.div
-          className="section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-        >
-          <div className="section-header">
-            <div className="section-number">4</div>
-            <Cookie size={24} color="#e50914" />
-            <h2 className="section-title">Cookies</h2>
-          </div>
-          <p className="section-text">
-            We may use cookies to enhance user experience. Third-party embed
-            services may also set their own cookies. You can disable cookies in
-            your browser settings, but this may affect website functionality.
-          </p>
-        </motion.div>
-
-        {/* Section 5 */}
-        <motion.div
-          className="section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <div className="section-header">
-            <div className="section-number">5</div>
-            <Lock size={24} color="#e50914" />
-            <h2 className="section-title">Data Security</h2>
-          </div>
-          <p className="section-text">
-            Since we do not collect personal information, there is no personal
-            data stored on our servers. However, we cannot guarantee the
-            security of data transmitted to third-party services.
-          </p>
-        </motion.div>
-
-        {/* Section 6 */}
-        <motion.div
-          className="section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-        >
-          <div className="section-header">
-            <div className="section-number">6</div>
-            <AlertCircle size={24} color="#e50914" />
-            <h2 className="section-title">Children's Privacy</h2>
-          </div>
-          <div className="highlight-box">
-            <p className="section-text" style={{ marginBottom: 0 }}>
-              Our website is not intended for children under 18. We do not
-              knowingly collect information from minors. If you are under 18,
-              please do not use this website without parental supervision.
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Section 7 */}
-        <motion.div
-          className="section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <div className="section-header">
-            <div className="section-number">7</div>
-            <FileText size={24} color="#e50914" />
-            <h2 className="section-title">Changes to Privacy Policy</h2>
-          </div>
-          <p className="section-text">
-            We may update this Privacy Policy from time to time. Changes will be
-            posted on this page with an updated revision date. We encourage you
-            to review this policy periodically.
-          </p>
-        </motion.div>
-
-        {/* Section 8 */}
-        <motion.div
-          className="section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 }}
-        >
-          <div className="section-header">
-            <div className="section-number">8</div>
-            <Shield size={24} color="#e50914" />
-            <h2 className="section-title">Your Rights</h2>
-          </div>
-          <p className="section-text">
-            Since we don't collect personal data, there is no personal
-            information to access, modify, or delete. However, you can:
-          </p>
-          <ul className="list">
-            <li>Clear your browser cookies at any time</li>
-            <li>Use browser privacy modes (incognito/private browsing)</li>
-            <li>Use ad-blockers and privacy extensions</li>
-            <li>Opt-out of third-party tracking where available</li>
-          </ul>
-        </motion.div>
-
-        {/* Section 9 */}
-        <motion.div
-          className="section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <div className="section-header">
-            <div className="section-number">9</div>
-            <Mail size={24} color="#e50914" />
-            <h2 className="section-title">Contact Us</h2>
-          </div>
-          <p className="section-text">
-            If you have questions or concerns about this Privacy Policy, please
-            don't hesitate to reach out:
-          </p>
-          <div className="contact-card">
-            <div className="contact-icon">
-              <Mail size={32} color="#e50914" />
-            </div>
-            <div>
-              <p className="section-text" style={{ marginBottom: 5 }}>
-                Email us at:
+            ),
+          },
+          {
+            num: 5,
+            icon: <Lock size={18} />,
+            title: 'Data Security',
+            content: (
+              <p className="prv-text">
+                Since we do not collect personal information, there is no
+                personal data stored on our servers. However, we cannot
+                guarantee the security of data transmitted to third-party
+                services.
               </p>
-              <div className="contact-email">devajuice@zohomail.in</div>
+            ),
+          },
+          {
+            num: 6,
+            icon: <AlertCircle size={18} />,
+            title: "Children's Privacy",
+            content: (
+              <div className="prv-highlight">
+                <p>
+                  Our website is not intended for children under 18. We do not
+                  knowingly collect information from minors. If you are under
+                  18, please do not use this website without parental
+                  supervision.
+                </p>
+              </div>
+            ),
+          },
+          {
+            num: 7,
+            icon: <FileText size={18} />,
+            title: 'Changes to Privacy Policy',
+            content: (
+              <p className="prv-text">
+                We may update this Privacy Policy from time to time. Changes
+                will be posted on this page with an updated revision date. We
+                encourage you to review this policy periodically.
+              </p>
+            ),
+          },
+          {
+            num: 8,
+            icon: <Shield size={18} />,
+            title: 'Your Rights',
+            content: (
+              <>
+                <p className="prv-text">
+                  Since we don't collect personal data, there is no personal
+                  information to access, modify, or delete. However, you can:
+                </p>
+                <ul className="prv-list">
+                  <li>Clear your browser cookies at any time</li>
+                  <li>
+                    Use browser privacy modes (incognito/private browsing)
+                  </li>
+                  <li>Use ad-blockers and privacy extensions</li>
+                  <li>Opt-out of third-party tracking where available</li>
+                </ul>
+              </>
+            ),
+          },
+          {
+            num: 9,
+            icon: <Mail size={18} />,
+            title: 'Contact Us',
+            content: (
+              <>
+                <p className="prv-text">
+                  If you have questions or concerns about this Privacy Policy,
+                  please don't hesitate to reach out:
+                </p>
+                <div className="prv-contact-card">
+                  <Mail size={24} />
+                  <div>
+                    <div className="prv-contact-label">Email us at</div>
+                    <div className="prv-contact-email">
+                      devajuice@zohomail.in
+                    </div>
+                  </div>
+                </div>
+              </>
+            ),
+          },
+        ].map((s, i) => (
+          <motion.div
+            key={s.num}
+            className="prv-section"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08 + i * 0.05 }}
+          >
+            <div className="prv-section-header">
+              <div className="prv-section-number">{s.num}</div>
+              {s.icon}
+              <h2 className="prv-section-title">{s.title}</h2>
             </div>
-          </div>
-        </motion.div>
+            {s.content}
+          </motion.div>
+        ))}
       </motion.div>
     </>
   );

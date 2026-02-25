@@ -1,5 +1,4 @@
 'use client';
-
 import { motion } from 'framer-motion';
 import MovieCard from '@/components/MovieCard';
 
@@ -15,30 +14,30 @@ export default function SearchResults({ movies }) {
 
         .results-grid {
           display: grid;
-          grid-template-columns: repeat(6, minmax(0, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
           gap: 20px;
           margin-bottom: 60px;
           width: 100%;
         }
 
-        @media (max-width: 1200px) {
+        @media (min-width: 1024px) {
           .results-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+            gap: 24px;
           }
         }
 
         @media (max-width: 768px) {
           .results-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
           }
         }
 
         @media (max-width: 480px) {
           .results-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
           }
         }
       `}</style>
@@ -46,12 +45,19 @@ export default function SearchResults({ movies }) {
       <div className="search-results-container">
         <motion.div
           className="results-grid"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
         >
-          {movies.map((movie) => (
-            <MovieCard key={movie.id} movie={movie} />
+          {movies.map((movie, index) => (
+            <motion.div
+              key={movie.id}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.025, duration: 0.35 }}
+            >
+              <MovieCard movie={movie} />
+            </motion.div>
           ))}
         </motion.div>
       </div>

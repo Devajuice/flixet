@@ -7,99 +7,123 @@ export default function SearchPageWrapper({ query, data }) {
   return (
     <>
       <style jsx>{`
+        * {
+          font-family: 'DM Sans', sans-serif;
+        }
+
         .search-container {
           padding: 40px 20px 100px;
           max-width: 1400px;
           margin: 0 auto;
         }
 
+        /* ── Header ──────────────────────────────────── */
         .search-header {
           text-align: center;
-          margin-bottom: 50px;
+          margin-bottom: 48px;
         }
 
         .search-title {
-          font-size: 48px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 42px;
           font-weight: 800;
-          margin-bottom: 15px;
-          background: linear-gradient(135deg, #e50914 0%, #f40612 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          letter-spacing: -0.03em;
+          color: rgba(255, 255, 255, 0.95);
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 15px;
+          gap: 14px;
           flex-wrap: wrap;
+          margin: 0 0 12px;
         }
 
-        .search-query {
-          color: var(--text-primary);
-          font-weight: 800;
+        .search-title span {
+          color: #ffc13c;
         }
 
         .search-subtitle {
-          font-size: 18px;
-          color: var(--text-secondary);
-          margin-top: 10px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.4);
+          margin: 0 0 16px;
+          letter-spacing: 0.01em;
         }
 
-        .results-count {
-          background: rgba(229, 9, 20, 0.1);
-          border: 1px solid rgba(229, 9, 20, 0.3);
-          border-radius: 20px;
-          padding: 8px 20px;
-          display: inline-block;
-          margin-top: 15px;
+        .search-query {
+          color: rgba(255, 255, 255, 0.85);
           font-weight: 600;
         }
 
+        .results-count {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          background: rgba(255, 193, 60, 0.08);
+          border: 1px solid rgba(255, 193, 60, 0.22);
+          border-radius: 50px;
+          padding: 6px 16px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          color: #ffc13c;
+          letter-spacing: 0.02em;
+        }
+
+        /* ── Empty / no-results state ────────────────── */
         .empty-state {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           min-height: 50vh;
-          gap: 20px;
+          gap: 16px;
           text-align: center;
         }
 
         .empty-icon {
-          opacity: 0.3;
+          opacity: 0.18;
         }
 
         .empty-title {
-          font-size: 32px;
-          font-weight: 700;
-          color: var(--text-primary);
+          font-family: 'DM Sans', sans-serif;
+          font-size: 28px;
+          font-weight: 800;
+          color: rgba(255, 255, 255, 0.88);
           margin: 0;
+          letter-spacing: -0.02em;
         }
 
         .empty-text {
-          font-size: 18px;
-          color: var(--text-secondary);
-          max-width: 500px;
-          line-height: 1.6;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 15px;
+          color: rgba(255, 255, 255, 0.38);
+          max-width: 480px;
+          line-height: 1.7;
           margin: 0;
         }
 
+        /* ── Suggestions box ─────────────────────────── */
         .suggestions-box {
-          background: rgba(26, 26, 26, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.07);
           border-radius: 12px;
-          padding: 25px;
-          margin-top: 30px;
+          padding: 22px 24px;
+          margin-top: 16px;
           backdrop-filter: blur(10px);
-          max-width: 600px;
+          max-width: 520px;
+          width: 100%;
         }
 
         .suggestions-title {
           display: flex;
           align-items: center;
-          gap: 10px;
-          font-size: 18px;
+          gap: 9px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
           font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 15px;
+          color: rgba(255, 255, 255, 0.85);
+          margin-bottom: 14px;
+          letter-spacing: 0.01em;
         }
 
         .suggestions-list {
@@ -109,11 +133,14 @@ export default function SearchPageWrapper({ query, data }) {
         }
 
         .suggestions-list li {
-          padding: 10px 0 10px 25px;
+          padding: 9px 0 9px 22px;
           position: relative;
-          color: var(--text-secondary);
-          line-height: 1.6;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.45);
+          line-height: 1.5;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+          letter-spacing: 0.01em;
         }
 
         .suggestions-list li:last-child {
@@ -124,50 +151,49 @@ export default function SearchPageWrapper({ query, data }) {
           content: '→';
           position: absolute;
           left: 0;
-          color: var(--accent);
-          font-weight: bold;
+          color: #ffc13c;
+          font-weight: 700;
         }
 
+        /* ── No results tip box ──────────────────────── */
         .no-results-box {
-          background: linear-gradient(
-            135deg,
-            rgba(229, 9, 20, 0.1) 0%,
-            rgba(26, 26, 26, 0.6) 100%
-          );
-          border: 1px solid rgba(229, 9, 20, 0.3);
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-left: 3px solid #ffc13c;
           border-radius: 12px;
-          padding: 30px;
-          margin-top: 30px;
-          max-width: 600px;
+          padding: 22px 24px;
+          margin-top: 16px;
+          max-width: 520px;
+          width: 100%;
         }
 
         .no-results-title {
-          font-size: 20px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
           font-weight: 700;
-          color: var(--accent);
-          margin: 0 0 15px 0;
+          color: #ffc13c;
+          margin: 0 0 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
         }
 
+        /* ── Responsive ──────────────────────────────── */
         @media (max-width: 768px) {
           .search-container {
-            padding: 30px 15px 80px;
+            padding: 28px 15px 80px;
           }
-
           .search-title {
-            font-size: 28px;
+            font-size: 26px;
             gap: 10px;
           }
-
           .search-subtitle {
-            font-size: 16px;
+            font-size: 14px;
           }
-
           .empty-title {
-            font-size: 24px;
+            font-size: 22px;
           }
-
           .empty-text {
-            font-size: 16px;
+            font-size: 14px;
           }
         }
       `}</style>
@@ -177,8 +203,8 @@ export default function SearchPageWrapper({ query, data }) {
           <>
             <div className="search-header">
               <h1 className="search-title">
-                <Search size={40} />
-                Search Results
+                <Search size={32} color="#ffc13c" />
+                Search <span>Results</span>
               </h1>
               <p className="search-subtitle">
                 Showing results for:{' '}
@@ -186,14 +212,7 @@ export default function SearchPageWrapper({ query, data }) {
               </p>
               {data.results.length > 0 && (
                 <div className="results-count">
-                  <Film
-                    size={16}
-                    style={{
-                      display: 'inline',
-                      marginRight: '8px',
-                      verticalAlign: 'middle',
-                    }}
-                  />
+                  <Film size={13} />
                   {data.results.length}{' '}
                   {data.results.length === 1 ? 'result' : 'results'} found
                 </div>
@@ -205,23 +224,22 @@ export default function SearchPageWrapper({ query, data }) {
             ) : (
               <div className="empty-state">
                 <Search
-                  size={80}
+                  size={72}
                   className="empty-icon"
-                  style={{ color: 'var(--text-secondary)' }}
+                  color="rgba(255,255,255,0.6)"
                 />
-                <h2 className="empty-title">No movies found</h2>
+                <h2 className="empty-title">No results found</h2>
                 <p className="empty-text">
-                  We couldn't find any movies matching "{query}". Try adjusting
-                  your search or explore our suggestions below.
+                  We couldn't find anything matching "{query}". Try adjusting
+                  your search below.
                 </p>
-
                 <div className="no-results-box">
-                  <h3 className="no-results-title">Search Tips:</h3>
+                  <h3 className="no-results-title">Search Tips</h3>
                   <ul className="suggestions-list">
                     <li>Check your spelling</li>
                     <li>Try different keywords</li>
                     <li>Use more general terms</li>
-                    <li>Search by movie title, actor, or genre</li>
+                    <li>Search by title, actor, or genre</li>
                   </ul>
                 </div>
               </div>
@@ -230,19 +248,18 @@ export default function SearchPageWrapper({ query, data }) {
         ) : (
           <div className="empty-state">
             <Search
-              size={80}
+              size={72}
               className="empty-icon"
-              style={{ color: 'var(--text-secondary)' }}
+              color="rgba(255,255,255,0.6)"
             />
             <h2 className="empty-title">Start Your Search</h2>
             <p className="empty-text">
               Enter a movie title, actor name, or genre in the search bar above
               to find what you're looking for.
             </p>
-
             <div className="suggestions-box">
               <div className="suggestions-title">
-                <TrendingUp size={20} color="#e50914" />
+                <TrendingUp size={16} color="#ffc13c" />
                 Popular Searches
               </div>
               <ul className="suggestions-list">
