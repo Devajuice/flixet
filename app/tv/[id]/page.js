@@ -152,7 +152,8 @@ export default function TVShowDetails({ params }) {
     try {
       const [showRes, externalRes] = await Promise.all([
         fetch(
-          `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos`,
+          // Added 'watch/providers' to append_to_response
+          `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos,watch/providers`,
         ),
         fetch(
           `https://api.themoviedb.org/3/tv/${showId}/external_ids?api_key=${API_KEY}`,
@@ -284,6 +285,9 @@ export default function TVShowDetails({ params }) {
   const cast = show.credits?.cast?.slice(0, 12) || [];
   const validSeasons = show.seasons?.filter((s) => s.season_number > 0) || [];
   const creators = show.created_by || [];
+
+  // Get Watch Providers for a specific region (e.g., US)
+  const watchProviders = show['watch/providers']?.results?.IN;
 
   const servers = [
     {
@@ -561,6 +565,19 @@ export default function TVShowDetails({ params }) {
           font-size: 15px;
           color: rgba(255, 255, 255, 0.55);
           font-weight: 500;
+        }
+
+        /* ── Watch Provider UI ───────────────── */
+        .provider-logo {
+          width: 42px;
+          height: 42px;
+          border-radius: 8px;
+          object-fit: cover;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          transition: transform 0.2s ease;
+        }
+        .provider-logo:hover {
+          transform: scale(1.1);
         }
 
         /* ── Episode IMDb badge ──────────────── */
@@ -978,6 +995,90 @@ export default function TVShowDetails({ params }) {
               )}
             </motion.div>
 
+            <div className="section">
+              <h2 className="section-title">Overview</h2>
+              <p className="overview-text">
+                {show.overview || 'No overview available.'}
+              </p>
+            </div>
+
+            {/* WHERE TO WATCH SECTION */}
+            {watchProviders &&
+              (watchProviders.flatrate ||
+                watchProviders.rent ||
+                watchProviders.buy) && (
+                <div className="section">
+                  <h2 className="section-title">Where to Watch</h2>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '20px',
+                      marginTop: '10px',
+                    }}
+                  >
+                    {/* Streaming (Flatrate) */}
+                    {watchProviders.flatrate?.map((provider) => (
+                      <div
+                        key={provider.provider_id}
+                        style={{ textAlign: 'center' }}
+                      >
+                        <img
+                          src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+                          alt={provider.provider_name}
+                          title={`${provider.provider_name} (Stream)`}
+                          className="provider-logo"
+                        />
+                        <p
+                          style={{
+                            fontSize: '10px',
+                            color: 'rgba(255,255,255,0.4)',
+                            marginTop: '5px',
+                          }}
+                        >
+                          Stream
+                        </p>
+                      </div>
+                    ))}
+
+                    {/* Buy/Rent (if no streaming is available) */}
+                    {!watchProviders.flatrate &&
+                      watchProviders.buy?.slice(0, 3).map((provider) => (
+                        <div
+                          key={provider.provider_id}
+                          style={{ textAlign: 'center' }}
+                        >
+                          <img
+                            src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+                            alt={provider.provider_name}
+                            title={`${provider.provider_name} (Buy)`}
+                            className="provider-logo"
+                            style={{ filter: 'grayscale(0.3)' }}
+                          />
+                          <p
+                            style={{
+                              fontSize: '10px',
+                              color: 'rgba(255,255,255,0.4)',
+                              marginTop: '5px',
+                            }}
+                          >
+                            Buy
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                  <p
+                    style={{
+                      fontSize: '10px',
+                      color: 'rgba(255,255,255,0.2)',
+                      marginTop: '15px',
+                    }}
+                  >
+                    Streaming data provided by JustWatch via TMDB.
+                  </p>
+                </div>
+              )}
+
             {validSeasons.length > 0 && (
               <div className="section">
                 <h2 className="section-title">Select Season</h2>
@@ -1066,13 +1167,6 @@ export default function TVShowDetails({ params }) {
                 </div>
               </div>
             ) : null}
-
-            <div className="section">
-              <h2 className="section-title">Overview</h2>
-              <p className="overview-text">
-                {show.overview || 'No overview available.'}
-              </p>
-            </div>
 
             {creators.length > 0 && (
               <div className="section">

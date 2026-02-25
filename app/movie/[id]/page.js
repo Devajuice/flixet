@@ -43,7 +43,8 @@ export default function MovieDetails({ params }) {
     try {
       const [movieRes, externalRes] = await Promise.all([
         fetch(
-          `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations`,
+          // Added 'watch/providers' to append_to_response
+          `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations,watch/providers`,
         ),
         fetch(
           `https://api.themoviedb.org/3/movie/${movieId}/external_ids?api_key=${API_KEY}`,
@@ -157,6 +158,9 @@ export default function MovieDetails({ params }) {
     movie.credits?.crew
       ?.filter((p) => p.job === 'Writer' || p.job === 'Screenplay')
       .slice(0, 3) || [];
+
+  // Get Watch Providers for a specific region (e.g., US)
+  const watchProviders = movie['watch/providers']?.results?.IN;
 
   const formatRuntime = (minutes) => {
     if (!minutes) return 'N/A';
@@ -361,7 +365,6 @@ export default function MovieDetails({ params }) {
           letter-spacing: 0.01em;
         }
 
-        /* ── IMDb badge in header ─────────────────────── */
         .imdb-badge {
           display: inline-flex;
           align-items: center;
@@ -446,6 +449,18 @@ export default function MovieDetails({ params }) {
           font-size: 15px;
           color: rgba(255, 255, 255, 0.55);
           font-weight: 500;
+        }
+
+        .provider-logo {
+          width: 42px;
+          height: 42px;
+          border-radius: 8px;
+          object-fit: cover;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          transition: transform 0.2s;
+        }
+        .provider-logo:hover {
+          transform: scale(1.1);
         }
 
         @media (max-width: 968px) {
@@ -782,7 +797,6 @@ export default function MovieDetails({ params }) {
               {movie.tagline && <p className="tagline">"{movie.tagline}"</p>}
 
               <div className="metadata">
-                {/* ── IMDb Rating Badge ── */}
                 {imdbRating === undefined && OMDB_KEY ? (
                   <div className="imdb-shimmer" />
                 ) : imdbRating ? (
@@ -830,6 +844,83 @@ export default function MovieDetails({ params }) {
                 {movie.overview || 'No overview available.'}
               </p>
             </div>
+
+            {/* WHERE TO WATCH SECTION */}
+            {watchProviders &&
+              (watchProviders.flatrate ||
+                watchProviders.rent ||
+                watchProviders.buy) && (
+                <div className="section">
+                  <h2 className="section-title">Where to Watch</h2>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '20px',
+                      marginTop: '10px',
+                    }}
+                  >
+                    {/* Streaming (Flatrate) */}
+                    {watchProviders.flatrate?.map((provider) => (
+                      <div
+                        key={provider.provider_id}
+                        style={{ textAlign: 'center' }}
+                      >
+                        <img
+                          src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+                          alt={provider.provider_name}
+                          title={`${provider.provider_name} (Stream)`}
+                          className="provider-logo"
+                        />
+                        <p
+                          style={{
+                            fontSize: '10px',
+                            color: 'rgba(255,255,255,0.4)',
+                            marginTop: '5px',
+                          }}
+                        >
+                          Stream
+                        </p>
+                      </div>
+                    ))}
+
+                    {/* Renting (if no streaming is available) */}
+                    {!watchProviders.flatrate &&
+                      watchProviders.rent?.slice(0, 3).map((provider) => (
+                        <div
+                          key={provider.provider_id}
+                          style={{ textAlign: 'center' }}
+                        >
+                          <img
+                            src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+                            alt={provider.provider_name}
+                            title={`${provider.provider_name} (Rent)`}
+                            className="provider-logo"
+                            style={{ filter: 'grayscale(0.3)' }}
+                          />
+                          <p
+                            style={{
+                              fontSize: '10px',
+                              color: 'rgba(255,255,255,0.4)',
+                              marginTop: '5px',
+                            }}
+                          >
+                            Rent
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                  <p
+                    style={{
+                      fontSize: '10px',
+                      color: 'rgba(255,255,255,0.2)',
+                      marginTop: '15px',
+                    }}
+                  >
+                    Streaming data provided by JustWatch via TMDB.
+                  </p>
+                </div>
+              )}
 
             {directors.length > 0 && (
               <div className="section">
