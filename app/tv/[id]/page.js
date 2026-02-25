@@ -18,7 +18,7 @@ import WatchlistButton from '@/components/WatchlistButton';
 import { useContinueWatching } from '@/context/ContinueWatchingContext';
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
-const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY; // optional
+const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
 
 export default function TVShowDetails({ params }) {
   const unwrappedParams = use(params);
@@ -40,8 +40,6 @@ export default function TVShowDetails({ params }) {
 
   const [tvServer, setTvServer] = useState('2embed');
   const [externalIds, setExternalIds] = useState(null);
-
-  // ── OMDb ratings cache: "S1E3" → { rating, votes } | null ──
   const [omdbCache, setOmdbCache] = useState({});
 
   useEffect(() => {
@@ -71,12 +69,11 @@ export default function TVShowDetails({ params }) {
     if (selectedSeason !== null) fetchSeasonDetails(selectedSeason);
   }, [selectedSeason]);
 
-  // ── Pre-fetch OMDb ratings when season data loads ──────────
   useEffect(() => {
     if (!OMDB_KEY || !externalIds?.imdb_id || !seasonData?.episodes) return;
     seasonData.episodes.forEach((ep) => {
       const key = `S${selectedSeason}E${ep.episode_number}`;
-      if (omdbCache[key] !== undefined) return; // already cached
+      if (omdbCache[key] !== undefined) return;
       fetchOmdbRating(selectedSeason, ep.episode_number);
     });
   }, [seasonData, externalIds]);
@@ -170,7 +167,6 @@ export default function TVShowDetails({ params }) {
     }
   };
 
-  // ── Fetch a single episode's OMDb / IMDb rating ────────────
   const fetchOmdbRating = async (season, episode) => {
     const key = `S${season}E${episode}`;
     if (!OMDB_KEY || !externalIds?.imdb_id) return;
@@ -315,12 +311,10 @@ export default function TVShowDetails({ params }) {
             opacity: 0.4;
           }
         }
-
         * {
           font-family: 'DM Sans', sans-serif;
         }
 
-        /* ── Layout ──────────────────────────────────── */
         .page-container {
           padding: 20px;
           padding-bottom: 100px;
@@ -334,7 +328,6 @@ export default function TVShowDetails({ params }) {
           margin-top: 28px;
         }
 
-        /* ── Back link ───────────────────────────────── */
         .back-link {
           display: inline-flex;
           align-items: center;
@@ -351,7 +344,6 @@ export default function TVShowDetails({ params }) {
           color: #ffc13c;
         }
 
-        /* ── Backdrop ────────────────────────────────── */
         .backdrop {
           position: relative;
           width: 100%;
@@ -371,7 +363,6 @@ export default function TVShowDetails({ params }) {
           background: linear-gradient(to bottom, transparent 30%, #0d0d0f 100%);
         }
 
-        /* ── Poster sidebar ──────────────────────────── */
         .poster-section {
           position: sticky;
           top: 80px;
@@ -387,7 +378,6 @@ export default function TVShowDetails({ params }) {
           display: block;
         }
 
-        /* ── Tip box ─────────────────────────────────── */
         .tip-box {
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.07);
@@ -429,7 +419,6 @@ export default function TVShowDetails({ params }) {
           line-height: 1.4;
         }
 
-        /* ── Details panel ───────────────────────────── */
         .details {
           padding-bottom: 40px;
         }
@@ -451,7 +440,6 @@ export default function TVShowDetails({ params }) {
           margin: 0 0 24px;
         }
 
-        /* ── Meta row ────────────────────────────────── */
         .metadata {
           display: flex;
           gap: 18px;
@@ -471,7 +459,6 @@ export default function TVShowDetails({ params }) {
           font-weight: 700;
         }
 
-        /* ── Genres ──────────────────────────────────── */
         .genres {
           display: flex;
           gap: 8px;
@@ -489,7 +476,6 @@ export default function TVShowDetails({ params }) {
           letter-spacing: 0.03em;
         }
 
-        /* ── Sections ────────────────────────────────── */
         .section {
           margin-bottom: 36px;
         }
@@ -521,24 +507,7 @@ export default function TVShowDetails({ params }) {
           font-weight: 500;
         }
 
-        /* ── Episode loading ─────────────────────────── */
-        .loading-episodes {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 14px;
-          padding: 40px 20px;
-        }
-        .spinner-sm {
-          width: 28px;
-          height: 28px;
-          border: 3px solid rgba(255, 193, 60, 0.12);
-          border-top-color: #ffc13c;
-          border-radius: 50%;
-          animation: spin 0.9s linear infinite;
-        }
-
-        /* ── Rating badges ───────────────────────────── */
+        /* ── Rating badges ───────────────────────────────── */
         .ep-ratings {
           display: flex;
           align-items: center;
@@ -597,7 +566,6 @@ export default function TVShowDetails({ params }) {
           animation: shimmer 1.5s ease-in-out infinite;
         }
 
-        /* ── Responsive ──────────────────────────────── */
         @media (max-width: 968px) {
           .content-grid {
             grid-template-columns: 230px 1fr;
@@ -650,7 +618,7 @@ export default function TVShowDetails({ params }) {
           Back to TV Shows
         </Link>
 
-        {/* Player modal */}
+        {/* ── Player modal ──────────────────────────── */}
         <AnimatePresence>
           {showPlayer && (
             <motion.div
@@ -711,7 +679,6 @@ export default function TVShowDetails({ params }) {
                 >
                   <X size={20} />
                 </button>
-
                 <div
                   style={{
                     position: 'absolute',
@@ -779,7 +746,6 @@ export default function TVShowDetails({ params }) {
                     </button>
                   ))}
                 </div>
-
                 <iframe
                   key={`${tvServer}-${selectedSeason}-${selectedEpisode}`}
                   src={servers.find((s) => s.id === tvServer)?.url}
@@ -934,7 +900,6 @@ export default function TVShowDetails({ params }) {
                 <span>{show.name.split(' ').slice(-1)}</span>
               </h1>
               {show.tagline && <p className="tagline">"{show.tagline}"</p>}
-
               <div className="metadata">
                 <div className="meta-item">
                   <Star size={15} fill="#ffc13c" color="#ffc13c" />
@@ -957,7 +922,6 @@ export default function TVShowDetails({ params }) {
                   </span>
                 </div>
               </div>
-
               {show.genres?.length > 0 && (
                 <div className="genres">
                   {show.genres.map((genre) => (
@@ -1048,7 +1012,6 @@ export default function TVShowDetails({ params }) {
                       isActive={selectedEpisode === episode.episode_number}
                       onClick={() => setSelectedEpisode(episode.episode_number)}
                       index={index}
-                      // Pass rating data down
                       omdb={
                         omdbCache[
                           `S${selectedSeason}E${episode.episode_number}`
@@ -1165,11 +1128,32 @@ function TVEpisodeCard({
 }) {
   const [hovered, setHovered] = useState(false);
 
+  // ── Runtime ──
+  const formatRuntime = (mins) => {
+    if (!mins) return null;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  };
+  const runtime = formatRuntime(episode.runtime);
+
+  // ── Air date ──
+  const airDate = episode.air_date
+    ? new Date(episode.air_date).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : null;
+
+  // ── Ratings ──
   const tmdbRating = episode.vote_average
     ? parseFloat(episode.vote_average).toFixed(1)
     : null;
   const showTmdb = tmdbRating && parseFloat(tmdbRating) > 0;
   const showRatings = showTmdb || omdb || (hasOmdbKey && omdb === undefined);
+
+  const F = { fontFamily: "'DM Sans', sans-serif" };
 
   return (
     <motion.div
@@ -1182,7 +1166,7 @@ function TVEpisodeCard({
       whileHover={{ scale: 1.005 }}
       whileTap={{ scale: 0.998 }}
       style={{
-        padding: '16px 18px',
+        padding: '14px 18px',
         background: isActive
           ? 'rgba(255,193,60,0.07)'
           : hovered
@@ -1196,19 +1180,19 @@ function TVEpisodeCard({
           'background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
       }}
     >
-      {/* Header row */}
+      {/* ── Row 1: title + runtime chip + date ──── */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          marginBottom: showRatings || episode.overview ? '8px' : 0,
+          alignItems: 'center',
           gap: '12px',
-          flexWrap: 'wrap',
+          marginBottom: showRatings || episode.overview ? '8px' : 0,
         }}
       >
         <h4
           style={{
+            ...F,
             fontSize: '14px',
             fontWeight: '700',
             margin: 0,
@@ -1217,50 +1201,83 @@ function TVEpisodeCard({
             flexWrap: 'wrap',
             gap: '7px',
             flex: 1,
-            fontFamily: "'DM Sans', sans-serif",
+            minWidth: 0,
           }}
         >
           <span
-            style={{ color: '#ffc13c', fontWeight: '800', fontSize: '13px' }}
+            style={{
+              ...F,
+              color: '#ffc13c',
+              fontWeight: '800',
+              fontSize: '13px',
+              flexShrink: 0,
+            }}
           >
             Ep {episode.episode_number}
           </span>
           <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
           <span
             style={{
+              ...F,
               color: isActive
                 ? 'rgba(255,255,255,0.95)'
                 : 'rgba(255,255,255,0.8)',
-              fontFamily: "'DM Sans', sans-serif",
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
             {episode.name || 'Untitled'}
           </span>
         </h4>
-        {episode.air_date && (
-          <span
-            style={{
-              fontSize: '11px',
-              color: 'rgba(255,255,255,0.28)',
-              whiteSpace: 'nowrap',
-              fontWeight: '500',
-              fontFamily: "'DM Sans', sans-serif",
-              letterSpacing: '0.02em',
-            }}
-          >
-            {new Date(episode.air_date).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            })}
-          </span>
-        )}
+
+        {/* Right: runtime + date */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            flexShrink: 0,
+          }}
+        >
+          {runtime && (
+            <span
+              style={{
+                ...F,
+                fontSize: '11px',
+                fontWeight: '600',
+                color: 'rgba(255,193,60,0.85)',
+                background: 'rgba(255,193,60,0.1)',
+                border: '1px solid rgba(255,193,60,0.22)',
+                borderRadius: '4px',
+                padding: '2px 8px',
+                letterSpacing: '0.02em',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              ⏱ {runtime}
+            </span>
+          )}
+          {airDate && (
+            <span
+              style={{
+                ...F,
+                fontSize: '11px',
+                fontWeight: '600',
+                color: 'rgba(255,193,60,0.6)',
+                whiteSpace: 'nowrap',
+                letterSpacing: '0.02em',
+              }}
+            >
+              {airDate}
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* ── Ratings row ────────────────────────────── */}
+      {/* ── Row 2: TMDb + OMDb ratings ──────────── */}
       {showRatings && (
         <div className="ep-ratings">
-          {/* TMDb */}
           {showTmdb && (
             <div className="rating-badge badge-tmdb">
               <Star size={11} fill="#ffc13c" color="#ffc13c" />
@@ -1268,8 +1285,6 @@ function TVEpisodeCard({
               <span className="badge-tmdb-label">TMDb</span>
             </div>
           )}
-
-          {/* IMDb via OMDb — loaded */}
           {omdb && (
             <div className="rating-badge badge-imdb">
               <span className="badge-imdb-logo">IMDb</span>
@@ -1281,23 +1296,21 @@ function TVEpisodeCard({
               )}
             </div>
           )}
-
-          {/* IMDb — still loading */}
           {hasOmdbKey && omdb === undefined && (
             <div className="badge-loading" />
           )}
         </div>
       )}
 
-      {/* Overview */}
+      {/* ── Row 3: overview ─────────────────────── */}
       {episode.overview ? (
         <p
           style={{
+            ...F,
             fontSize: '13px',
             lineHeight: '1.65',
             color: 'rgba(255,255,255,0.4)',
             margin: 0,
-            fontFamily: "'DM Sans', sans-serif",
           }}
         >
           {episode.overview.length > 150
