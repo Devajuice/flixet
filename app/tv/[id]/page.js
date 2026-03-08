@@ -1,7 +1,7 @@
-'use client';
-import { useState, useEffect, use, useRef, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+"use client";
+import { useState, useEffect, use, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
   ArrowLeft,
@@ -10,10 +10,10 @@ import {
   Check,
   Tv,
   X,
-} from 'lucide-react';
-import Link from 'next/link';
-import WatchlistButton from '@/components/WatchlistButton';
-import { useContinueWatching } from '@/context/ContinueWatchingContext';
+} from "lucide-react";
+import Link from "next/link";
+import WatchlistButton from "@/components/WatchlistButton";
+import { useContinueWatching } from "@/context/ContinueWatchingContext";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
@@ -36,7 +36,7 @@ export default function TVShowDetails({ params }) {
   const { addToContinueWatching } = useContinueWatching();
   const hasAddedToWatching = useRef(false);
 
-  const [tvServer, setTvServer] = useState('2embed');
+  const [tvServer, setTvServer] = useState("vidlink");
   const [externalIds, setExternalIds] = useState(null);
 
   // Show-level IMDb: undefined = loading, null = unavailable, { rating, votes } = loaded
@@ -50,8 +50,8 @@ export default function TVShowDetails({ params }) {
 
   useEffect(() => {
     if (show && !initialLoadDone) {
-      const urlSeason = searchParams.get('season');
-      const urlEpisode = searchParams.get('episode');
+      const urlSeason = searchParams.get("season");
+      const urlEpisode = searchParams.get("episode");
       if (urlSeason && urlEpisode) {
         const seasonNum = parseInt(urlSeason);
         const episodeNum = parseInt(urlEpisode);
@@ -80,7 +80,7 @@ export default function TVShowDetails({ params }) {
       .then((r) => r.json())
       .then((d) =>
         setShowImdbRating(
-          d.imdbRating && d.imdbRating !== 'N/A'
+          d.imdbRating && d.imdbRating !== "N/A"
             ? { rating: d.imdbRating, votes: d.imdbVotes }
             : null,
         ),
@@ -107,7 +107,7 @@ export default function TVShowDetails({ params }) {
         currentEpisode?.runtime || show.episode_run_time?.[0] || 45;
       addToContinueWatching({
         id: show.id,
-        type: 'tv',
+        type: "tv",
         name: show.name,
         poster_path: show.poster_path,
         backdrop_path: show.backdrop_path,
@@ -130,10 +130,10 @@ export default function TVShowDetails({ params }) {
 
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && showPlayer) setShowPlayer(false);
+      if (e.key === "Escape" && showPlayer) setShowPlayer(false);
     };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
   }, [showPlayer]);
 
   const setDefaultSeason = () => {
@@ -159,7 +159,7 @@ export default function TVShowDetails({ params }) {
           `https://api.themoviedb.org/3/tv/${showId}/external_ids?api_key=${API_KEY}`,
         ),
       ]);
-      if (!showRes.ok) throw new Error('Failed to fetch TV show details');
+      if (!showRes.ok) throw new Error("Failed to fetch TV show details");
       const [showData, externalData] = await Promise.all([
         showRes.json(),
         externalRes.json(),
@@ -167,7 +167,7 @@ export default function TVShowDetails({ params }) {
       setShow(showData);
       setExternalIds(externalData);
     } catch (err) {
-      console.error('Error fetching TV show details:', err);
+      console.error("Error fetching TV show details:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -180,12 +180,12 @@ export default function TVShowDetails({ params }) {
       const response = await fetch(
         `https://api.themoviedb.org/3/tv/${showId}/season/${seasonNumber}?api_key=${API_KEY}`,
       );
-      if (!response.ok) throw new Error('Failed to fetch season details');
+      if (!response.ok) throw new Error("Failed to fetch season details");
       const data = await response.json();
       setSeasonData(data);
       if (selectedEpisode === null) setSelectedEpisode(1);
     } catch (err) {
-      console.error('Error fetching season details:', err);
+      console.error("Error fetching season details:", err);
     } finally {
       setLoadingSeason(false);
     }
@@ -202,7 +202,7 @@ export default function TVShowDetails({ params }) {
       setOmdbCache((prev) => ({
         ...prev,
         [key]:
-          data.imdbRating && data.imdbRating !== 'N/A'
+          data.imdbRating && data.imdbRating !== "N/A"
             ? { rating: data.imdbRating, votes: data.imdbVotes }
             : null,
       }));
@@ -258,10 +258,10 @@ export default function TVShowDetails({ params }) {
     return (
       <div style={styles.error}>
         <h2 style={styles.errorTitle}>
-          {error ? 'Error Loading TV Show' : 'TV Show Not Found'}
+          {error ? "Error Loading TV Show" : "TV Show Not Found"}
         </h2>
         <p style={styles.errorText}>
-          {error || 'The TV show you are looking for does not exist.'}
+          {error || "The TV show you are looking for does not exist."}
         </p>
         <Link href="/tv">
           <button style={styles.backButton}>
@@ -278,41 +278,41 @@ export default function TVShowDetails({ params }) {
     : null;
   const posterUrl = show.poster_path
     ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
-    : '/placeholder.png';
+    : "/placeholder.png";
   const trailer = show.videos?.results?.find(
-    (v) => v.type === 'Trailer' && v.site === 'YouTube',
+    (v) => v.type === "Trailer" && v.site === "YouTube",
   );
   const cast = show.credits?.cast?.slice(0, 12) || [];
   const validSeasons = show.seasons?.filter((s) => s.season_number > 0) || [];
   const creators = show.created_by || [];
 
   // Get Watch Providers for a specific region (e.g., US)
-  const watchProviders = show['watch/providers']?.results?.IN;
+  const watchProviders = show["watch/providers"]?.results?.IN;
 
   const servers = [
     {
-      id: '2embed',
-      label: 'Server 1',
-      color: '#ffc13c',
+      id: "vidlink",
+      label: "Server 1",
+      color: "#ffc13c",
+      url: `https://vidlink.pro/tv/${showId}/${selectedSeason}/${selectedEpisode}?primaryColor=ffc13c&autoplay=true&nextbutton=true`,
+    },
+    {
+      id: "2embed",
+      label: "Server 2",
+      color: "#34d399",
       url: `https://www.2embed.cc/embedtv/${externalIds?.imdb_id || showId}&s=${selectedSeason}&e=${selectedEpisode}`,
     },
     {
-      id: 'vidsrcme',
-      label: 'Server 2',
-      color: '#34d399',
+      id: "vidsrcme",
+      label: "Server 3",
+      color: "#60a5fa",
       url: `https://vidsrc.me/embed/tv?tmdb=${showId}&season=${selectedSeason}&episode=${selectedEpisode}`,
     },
     {
-      id: 'vidsrcnet',
-      label: 'Server 3',
-      color: '#60a5fa',
+      id: "vidsrcnet",
+      label: "Server 4",
+      color: "#a78bfa",
       url: `https://vidsrc.net/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
-    },
-    {
-      id: 'vidsrcto',
-      label: 'Server 4',
-      color: '#a78bfa',
-      url: `https://vidsrc.to/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
     },
   ];
 
@@ -336,7 +336,7 @@ export default function TVShowDetails({ params }) {
           }
         }
         * {
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
         }
 
         .page-container {
@@ -381,7 +381,7 @@ export default function TVShowDetails({ params }) {
           object-fit: cover;
         }
         .backdrop::after {
-          content: '';
+          content: "";
           position: absolute;
           inset: 0;
           background: linear-gradient(to bottom, transparent 30%, #0d0d0f 100%);
@@ -551,7 +551,7 @@ export default function TVShowDetails({ params }) {
           gap: 8px;
         }
         .section-title::after {
-          content: '';
+          content: "";
           flex: 1;
           height: 1px;
           background: rgba(255, 255, 255, 0.06);
@@ -684,14 +684,14 @@ export default function TVShowDetails({ params }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               style={{
-                position: 'fixed',
+                position: "fixed",
                 inset: 0,
-                background: 'rgba(0,0,0,0.96)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                background: "rgba(0,0,0,0.96)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 zIndex: 10000,
-                padding: '20px',
+                padding: "20px",
               }}
             >
               <motion.div
@@ -701,50 +701,50 @@ export default function TVShowDetails({ params }) {
                 exit={{ scale: 0.92 }}
                 transition={{ duration: 0.25 }}
                 style={{
-                  position: 'relative',
-                  width: '100%',
-                  maxWidth: '1400px',
-                  aspectRatio: '16/9',
-                  background: '#000',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
+                  position: "relative",
+                  width: "100%",
+                  maxWidth: "1400px",
+                  aspectRatio: "16/9",
+                  background: "#000",
+                  borderRadius: "12px",
+                  overflow: "hidden",
                   boxShadow:
-                    '0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)',
+                    "0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)",
                 }}
               >
                 <button
                   onClick={() => setShowPlayer(false)}
                   aria-label="Close player"
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: 14,
                     right: 14,
-                    background: 'rgba(0,0,0,0.75)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '50%',
+                    background: "rgba(0,0,0,0.75)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "50%",
                     width: 40,
                     height: 40,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'white',
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    color: "white",
                     zIndex: 10,
-                    backdropFilter: 'blur(4px)',
+                    backdropFilter: "blur(4px)",
                   }}
                 >
                   <X size={20} />
                 </button>
                 <div
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: 14,
                     left: 14,
                     right: 64,
-                    display: 'flex',
+                    display: "flex",
                     gap: 7,
                     zIndex: 10,
-                    flexWrap: 'wrap',
+                    flexWrap: "wrap",
                   }}
                 >
                   {servers.map((server) => (
@@ -752,48 +752,48 @@ export default function TVShowDetails({ params }) {
                       key={server.id}
                       onClick={() => setTvServer(server.id)}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
+                        display: "flex",
+                        alignItems: "center",
                         gap: 6,
-                        padding: '6px 12px',
-                        border: `1px solid ${tvServer === server.id ? server.color : 'rgba(255,255,255,0.1)'}`,
+                        padding: "6px 12px",
+                        border: `1px solid ${tvServer === server.id ? server.color : "rgba(255,255,255,0.1)"}`,
                         borderRadius: 6,
-                        cursor: 'pointer',
+                        cursor: "pointer",
                         fontFamily: "'DM Sans', sans-serif",
                         fontSize: 12,
                         fontWeight: 600,
-                        letterSpacing: '0.02em',
+                        letterSpacing: "0.02em",
                         background:
                           tvServer === server.id
                             ? `${server.color}1a`
-                            : 'rgba(0,0,0,0.5)',
+                            : "rgba(0,0,0,0.5)",
                         color:
                           tvServer === server.id
                             ? server.color
-                            : 'rgba(255,255,255,0.5)',
-                        transition: 'all 0.2s ease',
+                            : "rgba(255,255,255,0.5)",
+                        transition: "all 0.2s ease",
                       }}
                     >
                       <span
                         style={{
                           width: 6,
                           height: 6,
-                          borderRadius: '50%',
+                          borderRadius: "50%",
                           backgroundColor: server.color,
                           flexShrink: 0,
                         }}
                       />
                       {server.label}
-                      {server.id === '2embed' && (
+                      {server.id === "vidlink" && (
                         <span
                           style={{
                             fontSize: 9,
                             fontWeight: 700,
-                            background: '#ffc13c',
-                            color: '#0d0d0f',
+                            background: "#ffc13c",
+                            color: "#0d0d0f",
                             borderRadius: 4,
-                            padding: '2px 5px',
-                            letterSpacing: '0.02em',
+                            padding: "2px 5px",
+                            letterSpacing: "0.02em",
                           }}
                         >
                           Default
@@ -805,7 +805,7 @@ export default function TVShowDetails({ params }) {
                 <iframe
                   key={`${tvServer}-${selectedSeason}-${selectedEpisode}`}
                   src={servers.find((s) => s.id === tvServer)?.url}
-                  style={{ width: '100%', height: '100%', border: 'none' }}
+                  style={{ width: "100%", height: "100%", border: "none" }}
                   frameBorder="0"
                   allowFullScreen
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -831,27 +831,27 @@ export default function TVShowDetails({ params }) {
               loading="lazy"
             />
             <div
-              style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
             >
               <motion.button
                 style={{
-                  width: '100%',
-                  padding: '14px',
+                  width: "100%",
+                  padding: "14px",
                   background:
                     !selectedSeason || !selectedEpisode
-                      ? 'rgba(255,193,60,0.4)'
-                      : '#ffc13c',
-                  color: '#0d0d0f',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '15px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '9px',
-                  letterSpacing: '0.02em',
+                      ? "rgba(255,193,60,0.4)"
+                      : "#ffc13c",
+                  color: "#0d0d0f",
+                  border: "none",
+                  borderRadius: "10px",
+                  fontSize: "15px",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "9px",
+                  letterSpacing: "0.02em",
                   fontFamily: "'DM Sans', sans-serif",
                 }}
                 whileHover={{ scale: 1.03, opacity: 0.92 }}
@@ -868,28 +868,28 @@ export default function TVShowDetails({ params }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    width: '100%',
-                    padding: '13px',
-                    background: 'transparent',
-                    color: 'rgba(255,255,255,0.75)',
-                    border: '1px solid rgba(255,255,255,0.14)',
-                    borderRadius: '10px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    textDecoration: 'none',
-                    letterSpacing: '0.02em',
+                    width: "100%",
+                    padding: "13px",
+                    background: "transparent",
+                    color: "rgba(255,255,255,0.75)",
+                    border: "1px solid rgba(255,255,255,0.14)",
+                    borderRadius: "10px",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    textDecoration: "none",
+                    letterSpacing: "0.02em",
                     fontFamily: "'DM Sans', sans-serif",
-                    boxSizing: 'border-box',
+                    boxSizing: "border-box",
                   }}
                   whileHover={{
                     scale: 1.03,
-                    borderColor: 'rgba(255,193,60,0.5)',
-                    color: '#ffc13c',
+                    borderColor: "rgba(255,193,60,0.5)",
+                    color: "#ffc13c",
                   }}
                   whileTap={{ scale: 0.97 }}
                 >
@@ -900,7 +900,7 @@ export default function TVShowDetails({ params }) {
               <WatchlistButton
                 item={{
                   id: show.id,
-                  type: 'tv',
+                  type: "tv",
                   name: show.name,
                   title: show.name,
                   poster_path: show.poster_path,
@@ -917,16 +917,16 @@ export default function TVShowDetails({ params }) {
                 <p className="tip-desc">Free streaming may show ads:</p>
                 <div className="tip-list">
                   {[
-                    'Use ad-blocker (uBlock Origin)',
-                    'Try different servers if needed',
-                    'Close pop-ups immediately',
-                    'Never enter personal info',
+                    "Use ad-blocker (uBlock Origin)",
+                    "Try different servers if needed",
+                    "Close pop-ups immediately",
+                    "Never enter personal info",
                   ].map((tip) => (
                     <div className="tip-item" key={tip}>
                       <Check
                         size={12}
                         style={{
-                          color: '#4ade80',
+                          color: "#4ade80",
                           flexShrink: 0,
                           marginTop: 1,
                         }}
@@ -946,8 +946,8 @@ export default function TVShowDetails({ params }) {
               transition={{ duration: 0.4 }}
             >
               <h1 className="show-title">
-                {show.name.split(' ').slice(0, -1).join(' ')}{' '}
-                <span>{show.name.split(' ').slice(-1)}</span>
+                {show.name.split(" ").slice(0, -1).join(" ")}{" "}
+                <span>{show.name.split(" ").slice(-1)}</span>
               </h1>
               {show.tagline && <p className="tagline">"{show.tagline}"</p>}
 
@@ -960,10 +960,10 @@ export default function TVShowDetails({ params }) {
                     <span className="imdb-logo">IMDb</span>
                     <span className="imdb-score">{showImdbRating.rating}</span>
                     <span className="imdb-votes">
-                      / 10 ·{' '}
+                      / 10 ·{" "}
                       {Number(
-                        showImdbRating.votes?.replace(/,/g, ''),
-                      ).toLocaleString()}{' '}
+                        showImdbRating.votes?.replace(/,/g, ""),
+                      ).toLocaleString()}{" "}
                       votes
                     </span>
                   </div>
@@ -972,14 +972,14 @@ export default function TVShowDetails({ params }) {
                 <div className="meta-item">
                   <Calendar size={15} />
                   <span>
-                    {new Date(show.first_air_date).getFullYear() || 'N/A'}
+                    {new Date(show.first_air_date).getFullYear() || "N/A"}
                   </span>
                 </div>
                 <div className="meta-item">
                   <Tv size={15} />
                   <span>
                     {show.number_of_seasons} Season
-                    {show.number_of_seasons !== 1 ? 's' : ''}
+                    {show.number_of_seasons !== 1 ? "s" : ""}
                   </span>
                 </div>
               </div>
@@ -998,7 +998,7 @@ export default function TVShowDetails({ params }) {
             <div className="section">
               <h2 className="section-title">Overview</h2>
               <p className="overview-text">
-                {show.overview || 'No overview available.'}
+                {show.overview || "No overview available."}
               </p>
             </div>
 
@@ -1011,17 +1011,17 @@ export default function TVShowDetails({ params }) {
                   <h2 className="section-title">Where to Watch</h2>
                   <div
                     style={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '20px',
-                      marginTop: '10px',
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "20px",
+                      marginTop: "10px",
                     }}
                   >
                     {/* Streaming (Flatrate) */}
                     {watchProviders.flatrate?.map((provider) => (
                       <div
                         key={provider.provider_id}
-                        style={{ textAlign: 'center' }}
+                        style={{ textAlign: "center" }}
                       >
                         <img
                           src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
@@ -1031,9 +1031,9 @@ export default function TVShowDetails({ params }) {
                         />
                         <p
                           style={{
-                            fontSize: '10px',
-                            color: 'rgba(255,255,255,0.4)',
-                            marginTop: '5px',
+                            fontSize: "10px",
+                            color: "rgba(255,255,255,0.4)",
+                            marginTop: "5px",
                           }}
                         >
                           Stream
@@ -1046,20 +1046,20 @@ export default function TVShowDetails({ params }) {
                       watchProviders.buy?.slice(0, 3).map((provider) => (
                         <div
                           key={provider.provider_id}
-                          style={{ textAlign: 'center' }}
+                          style={{ textAlign: "center" }}
                         >
                           <img
                             src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                             alt={provider.provider_name}
                             title={`${provider.provider_name} (Buy)`}
                             className="provider-logo"
-                            style={{ filter: 'grayscale(0.3)' }}
+                            style={{ filter: "grayscale(0.3)" }}
                           />
                           <p
                             style={{
-                              fontSize: '10px',
-                              color: 'rgba(255,255,255,0.4)',
-                              marginTop: '5px',
+                              fontSize: "10px",
+                              color: "rgba(255,255,255,0.4)",
+                              marginTop: "5px",
                             }}
                           >
                             Buy
@@ -1069,9 +1069,9 @@ export default function TVShowDetails({ params }) {
                   </div>
                   <p
                     style={{
-                      fontSize: '10px',
-                      color: 'rgba(255,255,255,0.2)',
-                      marginTop: '15px',
+                      fontSize: "10px",
+                      color: "rgba(255,255,255,0.2)",
+                      marginTop: "15px",
                     }}
                   >
                     Streaming data provided by JustWatch via TMDB.
@@ -1082,7 +1082,7 @@ export default function TVShowDetails({ params }) {
             {validSeasons.length > 0 && (
               <div className="section">
                 <h2 className="section-title">Select Season</h2>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                   {validSeasons.map((season) => (
                     <TVSeasonBtn
                       key={season.id}
@@ -1098,27 +1098,27 @@ export default function TVShowDetails({ params }) {
             {loadingSeason ? (
               <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '14px',
-                  padding: '40px 20px',
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "14px",
+                  padding: "40px 20px",
                 }}
               >
                 <div
                   style={{
                     width: 28,
                     height: 28,
-                    border: '3px solid rgba(255,193,60,0.12)',
-                    borderTopColor: '#ffc13c',
-                    borderRadius: '50%',
-                    animation: 'spin 0.9s linear infinite',
+                    border: "3px solid rgba(255,193,60,0.12)",
+                    borderTopColor: "#ffc13c",
+                    borderRadius: "50%",
+                    animation: "spin 0.9s linear infinite",
                   }}
                 />
                 <p
                   style={{
-                    fontSize: '13px',
-                    color: 'rgba(255,255,255,0.35)',
+                    fontSize: "13px",
+                    color: "rgba(255,255,255,0.35)",
                     margin: 0,
                     fontFamily: "'DM Sans', sans-serif",
                   }}
@@ -1132,11 +1132,11 @@ export default function TVShowDetails({ params }) {
                   Episodes
                   <span
                     style={{
-                      fontSize: '11px',
-                      fontWeight: '600',
-                      color: 'rgba(255,255,255,0.25)',
-                      letterSpacing: '0.05em',
-                      textTransform: 'none',
+                      fontSize: "11px",
+                      fontWeight: "600",
+                      color: "rgba(255,255,255,0.25)",
+                      letterSpacing: "0.05em",
+                      textTransform: "none",
                     }}
                   >
                     {seasonData.episodes.length} eps
@@ -1144,9 +1144,9 @@ export default function TVShowDetails({ params }) {
                 </h2>
                 <div
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px',
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
                   }}
                 >
                   {seasonData.episodes.map((episode, index) => (
@@ -1171,10 +1171,10 @@ export default function TVShowDetails({ params }) {
             {creators.length > 0 && (
               <div className="section">
                 <h2 className="section-title">
-                  {creators.length > 1 ? 'Creators' : 'Creator'}
+                  {creators.length > 1 ? "Creators" : "Creator"}
                 </h2>
                 <p className="creator-text">
-                  {creators.map((p) => p.name).join(', ')}
+                  {creators.map((p) => p.name).join(", ")}
                 </p>
               </div>
             )}
@@ -1184,11 +1184,11 @@ export default function TVShowDetails({ params }) {
                 <h2 className="section-title">Top Cast</h2>
                 <div
                   style={{
-                    display: 'grid',
+                    display: "grid",
                     gridTemplateColumns:
-                      'repeat(auto-fill, minmax(130px, 1fr))',
-                    gap: '16px',
-                    marginTop: '4px',
+                      "repeat(auto-fill, minmax(130px, 1fr))",
+                    gap: "16px",
+                    marginTop: "4px",
                   }}
                 >
                   {cast.map((actor) => (
@@ -1205,7 +1205,7 @@ export default function TVShowDetails({ params }) {
                   {show.production_companies
                     .slice(0, 3)
                     .map((c) => c.name)
-                    .join(', ')}
+                    .join(", ")}
                 </p>
               </div>
             )}
@@ -1226,26 +1226,26 @@ function TVSeasonBtn({ season, isActive, onClick }) {
       onHoverEnd={() => setHovered(false)}
       whileTap={{ scale: 0.96 }}
       style={{
-        padding: '8px 18px',
+        padding: "8px 18px",
         background: isActive
-          ? 'rgba(255,193,60,0.12)'
+          ? "rgba(255,193,60,0.12)"
           : hovered
-            ? 'rgba(255,255,255,0.06)'
-            : 'rgba(255,255,255,0.04)',
-        border: `1px solid ${isActive ? 'rgba(255,193,60,0.5)' : hovered ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)'}`,
-        borderRadius: '8px',
+            ? "rgba(255,255,255,0.06)"
+            : "rgba(255,255,255,0.04)",
+        border: `1px solid ${isActive ? "rgba(255,193,60,0.5)" : hovered ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.08)"}`,
+        borderRadius: "8px",
         color: isActive
-          ? '#ffc13c'
+          ? "#ffc13c"
           : hovered
-            ? 'rgba(255,255,255,0.85)'
-            : 'rgba(255,255,255,0.5)',
+            ? "rgba(255,255,255,0.85)"
+            : "rgba(255,255,255,0.5)",
         fontFamily: "'DM Sans', sans-serif",
-        fontSize: '13px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        letterSpacing: '0.02em',
+        fontSize: "13px",
+        fontWeight: "600",
+        cursor: "pointer",
+        letterSpacing: "0.02em",
         transition:
-          'background 0.2s ease, border-color 0.2s ease, color 0.2s ease',
+          "background 0.2s ease, border-color 0.2s ease, color 0.2s ease",
       }}
     >
       Season {season.season_number}
@@ -1273,10 +1273,10 @@ function TVEpisodeCard({
   };
   const runtime = formatRuntime(episode.runtime);
   const airDate = episode.air_date
-    ? new Date(episode.air_date).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
+    ? new Date(episode.air_date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
       })
     : null;
 
@@ -1293,40 +1293,40 @@ function TVEpisodeCard({
       whileHover={{ scale: 1.005 }}
       whileTap={{ scale: 0.998 }}
       style={{
-        padding: '14px 18px',
+        padding: "14px 18px",
         background: isActive
-          ? 'rgba(255,193,60,0.07)'
+          ? "rgba(255,193,60,0.07)"
           : hovered
-            ? 'rgba(255,255,255,0.05)'
-            : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${isActive ? 'rgba(255,193,60,0.3)' : hovered ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.06)'}`,
-        borderRadius: '10px',
-        cursor: 'pointer',
-        boxShadow: isActive ? '0 0 0 1px rgba(255,193,60,0.1)' : 'none',
+            ? "rgba(255,255,255,0.05)"
+            : "rgba(255,255,255,0.03)",
+        border: `1px solid ${isActive ? "rgba(255,193,60,0.3)" : hovered ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.06)"}`,
+        borderRadius: "10px",
+        cursor: "pointer",
+        boxShadow: isActive ? "0 0 0 1px rgba(255,193,60,0.1)" : "none",
         transition:
-          'background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+          "background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
       }}
     >
       {/* Row 1: title + runtime + date */}
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '12px',
-          marginBottom: showRatingRow || episode.overview ? '8px' : 0,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: showRatingRow || episode.overview ? "8px" : 0,
         }}
       >
         <h4
           style={{
             ...F,
-            fontSize: '14px',
-            fontWeight: '700',
+            fontSize: "14px",
+            fontWeight: "700",
             margin: 0,
-            display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '7px',
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "7px",
             flex: 1,
             minWidth: 0,
           }}
@@ -1334,34 +1334,34 @@ function TVEpisodeCard({
           <span
             style={{
               ...F,
-              color: '#ffc13c',
-              fontWeight: '800',
-              fontSize: '13px',
+              color: "#ffc13c",
+              fontWeight: "800",
+              fontSize: "13px",
               flexShrink: 0,
             }}
           >
             Ep {episode.episode_number}
           </span>
-          <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
+          <span style={{ color: "rgba(255,255,255,0.2)" }}>·</span>
           <span
             style={{
               ...F,
               color: isActive
-                ? 'rgba(255,255,255,0.95)'
-                : 'rgba(255,255,255,0.8)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+                ? "rgba(255,255,255,0.95)"
+                : "rgba(255,255,255,0.8)",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
             }}
           >
-            {episode.name || 'Untitled'}
+            {episode.name || "Untitled"}
           </span>
         </h4>
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
             flexShrink: 0,
           }}
         >
@@ -1369,15 +1369,15 @@ function TVEpisodeCard({
             <span
               style={{
                 ...F,
-                fontSize: '11px',
-                fontWeight: '600',
-                color: 'rgba(255,193,60,0.85)',
-                background: 'rgba(255,193,60,0.1)',
-                border: '1px solid rgba(255,193,60,0.22)',
-                borderRadius: '4px',
-                padding: '2px 8px',
-                letterSpacing: '0.02em',
-                whiteSpace: 'nowrap',
+                fontSize: "11px",
+                fontWeight: "600",
+                color: "rgba(255,193,60,0.85)",
+                background: "rgba(255,193,60,0.1)",
+                border: "1px solid rgba(255,193,60,0.22)",
+                borderRadius: "4px",
+                padding: "2px 8px",
+                letterSpacing: "0.02em",
+                whiteSpace: "nowrap",
               }}
             >
               ⏱ {runtime}
@@ -1387,11 +1387,11 @@ function TVEpisodeCard({
             <span
               style={{
                 ...F,
-                fontSize: '11px',
-                fontWeight: '600',
-                color: 'rgba(255,193,60,0.6)',
-                whiteSpace: 'nowrap',
-                letterSpacing: '0.02em',
+                fontSize: "11px",
+                fontWeight: "600",
+                color: "rgba(255,193,60,0.6)",
+                whiteSpace: "nowrap",
+                letterSpacing: "0.02em",
               }}
             >
               {airDate}
@@ -1409,7 +1409,7 @@ function TVEpisodeCard({
               <span className="ep-imdb-score">{omdb.rating}</span>
               {omdb.votes && (
                 <span className="ep-imdb-votes">
-                  ({Number(omdb.votes.replace(/,/g, '')).toLocaleString()})
+                  ({Number(omdb.votes.replace(/,/g, "")).toLocaleString()})
                 </span>
               )}
             </div>
@@ -1424,9 +1424,9 @@ function TVEpisodeCard({
         <p
           style={{
             ...F,
-            fontSize: '13px',
-            lineHeight: '1.65',
-            color: 'rgba(255,255,255,0.4)',
+            fontSize: "13px",
+            lineHeight: "1.65",
+            color: "rgba(255,255,255,0.4)",
             margin: 0,
           }}
         >
@@ -1447,81 +1447,81 @@ function TVCastCard({ actor }) {
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
       animate={hovered ? { y: -5, scale: 1.02 } : { y: 0, scale: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
       style={{
-        background: '#0d0d0f',
-        borderRadius: '10px',
-        overflow: 'hidden',
-        cursor: 'pointer',
+        background: "#0d0d0f",
+        borderRadius: "10px",
+        overflow: "hidden",
+        cursor: "pointer",
         boxShadow: hovered
-          ? '0 14px 30px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,193,60,0.22)'
-          : '0 2px 8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)',
-        transition: 'box-shadow 0.3s ease',
+          ? "0 14px 30px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,193,60,0.22)"
+          : "0 2px 8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)",
+        transition: "box-shadow 0.3s ease",
       }}
     >
       <div
         style={{
-          width: '100%',
-          paddingBottom: '150%',
-          position: 'relative',
-          overflow: 'hidden',
-          background: '#111114',
+          width: "100%",
+          paddingBottom: "150%",
+          position: "relative",
+          overflow: "hidden",
+          background: "#111114",
         }}
       >
         <img
           src={
             actor.profile_path
               ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
-              : 'https://via.placeholder.com/185x278/111114/444?text=No+Image'
+              : "https://via.placeholder.com/185x278/111114/444?text=No+Image"
           }
           alt={actor.name}
           loading="lazy"
           onError={(e) => {
             e.target.src =
-              'https://via.placeholder.com/185x278/111114/444?text=No+Image';
+              "https://via.placeholder.com/185x278/111114/444?text=No+Image";
           }}
           style={{
-            position: 'absolute',
+            position: "absolute",
             inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            transform: hovered ? 'scale(1.07)' : 'scale(1)',
-            filter: hovered ? 'brightness(0.5)' : 'brightness(1)',
-            transition: 'transform 0.45s ease, filter 0.35s ease',
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transform: hovered ? "scale(1.07)" : "scale(1)",
+            filter: hovered ? "brightness(0.5)" : "brightness(1)",
+            transition: "transform 0.45s ease, filter 0.35s ease",
           }}
         />
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            height: '50%',
+            height: "50%",
             background:
-              'linear-gradient(to top, rgba(13,13,15,0.9) 0%, transparent 100%)',
-            pointerEvents: 'none',
+              "linear-gradient(to top, rgba(13,13,15,0.9) 0%, transparent 100%)",
+            pointerEvents: "none",
             zIndex: 1,
           }}
         />
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            padding: '10px 8px',
+            padding: "10px 8px",
             zIndex: 2,
             opacity: hovered ? 1 : 0,
-            transition: 'opacity 0.25s ease',
+            transition: "opacity 0.25s ease",
           }}
         >
           <p
             style={{
-              fontSize: '10px',
-              color: '#ffc13c',
-              fontWeight: '600',
-              textAlign: 'center',
+              fontSize: "10px",
+              color: "#ffc13c",
+              fontWeight: "600",
+              textAlign: "center",
               margin: 0,
               lineHeight: 1.3,
               fontFamily: "'DM Sans', sans-serif",
@@ -1533,33 +1533,33 @@ function TVCastCard({ actor }) {
       </div>
       <div
         style={{
-          padding: '10px 8px 11px',
-          textAlign: 'center',
-          background: '#0d0d0f',
+          padding: "10px 8px 11px",
+          textAlign: "center",
+          background: "#0d0d0f",
         }}
       >
         <p
           style={{
-            fontSize: '12px',
-            fontWeight: '700',
-            color: hovered ? '#ffc13c' : 'rgba(255,255,255,0.9)',
-            margin: '0 0 3px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            fontSize: "12px",
+            fontWeight: "700",
+            color: hovered ? "#ffc13c" : "rgba(255,255,255,0.9)",
+            margin: "0 0 3px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
             fontFamily: "'DM Sans', sans-serif",
-            transition: 'color 0.2s',
+            transition: "color 0.2s",
           }}
         >
           {actor.name}
         </p>
         <p
           style={{
-            fontSize: '10px',
-            color: 'rgba(255,255,255,0.35)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            fontSize: "10px",
+            color: "rgba(255,255,255,0.35)",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
             margin: 0,
             fontFamily: "'DM Sans', sans-serif",
           }}
@@ -1573,62 +1573,62 @@ function TVCastCard({ actor }) {
 
 const styles = {
   loading: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '70vh',
-    gap: '18px',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "70vh",
+    gap: "18px",
     fontFamily: "'DM Sans', sans-serif",
   },
   spinner: {
-    width: '44px',
-    height: '44px',
-    border: '4px solid rgba(255,193,60,0.1)',
-    borderTopColor: '#ffc13c',
-    borderRadius: '50%',
-    animation: 'spin 0.9s linear infinite',
+    width: "44px",
+    height: "44px",
+    border: "4px solid rgba(255,193,60,0.1)",
+    borderTopColor: "#ffc13c",
+    borderRadius: "50%",
+    animation: "spin 0.9s linear infinite",
   },
   loadingText: {
-    color: 'rgba(255,255,255,0.38)',
-    fontSize: '14px',
+    color: "rgba(255,255,255,0.38)",
+    fontSize: "14px",
     fontFamily: "'DM Sans', sans-serif",
     margin: 0,
-    letterSpacing: '0.02em',
+    letterSpacing: "0.02em",
   },
   error: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '70vh',
-    textAlign: 'center',
-    padding: '20px',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "70vh",
+    textAlign: "center",
+    padding: "20px",
     fontFamily: "'DM Sans', sans-serif",
   },
   errorTitle: {
-    fontSize: '28px',
-    fontWeight: '800',
-    marginBottom: '12px',
-    color: '#ffc13c',
+    fontSize: "28px",
+    fontWeight: "800",
+    marginBottom: "12px",
+    color: "#ffc13c",
   },
   errorText: {
-    fontSize: '16px',
-    color: 'rgba(255,255,255,0.45)',
-    marginBottom: '28px',
+    fontSize: "16px",
+    color: "rgba(255,255,255,0.45)",
+    marginBottom: "28px",
   },
   backButton: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '9px',
-    padding: '11px 26px',
-    background: '#ffc13c',
-    color: '#0d0d0f',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '700',
-    cursor: 'pointer',
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "9px",
+    padding: "11px 26px",
+    background: "#ffc13c",
+    color: "#0d0d0f",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: "700",
+    cursor: "pointer",
     fontFamily: "'DM Sans', sans-serif",
   },
 };

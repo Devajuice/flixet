@@ -1,6 +1,6 @@
-'use client';
-import { useState, useEffect, use, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+"use client";
+import { useState, useEffect, use, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
   Clock,
@@ -9,10 +9,10 @@ import {
   Lightbulb,
   Check,
   X,
-} from 'lucide-react';
-import Link from 'next/link';
-import WatchlistButton from '@/components/WatchlistButton';
-import { useContinueWatching } from '@/context/ContinueWatchingContext';
+} from "lucide-react";
+import Link from "next/link";
+import WatchlistButton from "@/components/WatchlistButton";
+import { useContinueWatching } from "@/context/ContinueWatchingContext";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
@@ -30,7 +30,7 @@ export default function MovieDetails({ params }) {
 
   const { addToContinueWatching } = useContinueWatching();
   const hasAddedToWatching = useRef(false);
-  const [movieServer, setMovieServer] = useState('2embed');
+  const [movieServer, setMovieServer] = useState("vidlink");
 
   useEffect(() => {
     fetchMovieDetails();
@@ -50,7 +50,7 @@ export default function MovieDetails({ params }) {
           `https://api.themoviedb.org/3/movie/${movieId}/external_ids?api_key=${API_KEY}`,
         ),
       ]);
-      if (!movieRes.ok) throw new Error('Failed to fetch movie details');
+      if (!movieRes.ok) throw new Error("Failed to fetch movie details");
       const movieData = await movieRes.json();
       const externalData = await externalRes.json();
       setMovie(movieData);
@@ -63,7 +63,7 @@ export default function MovieDetails({ params }) {
           .then((r) => r.json())
           .then((d) =>
             setImdbRating(
-              d.imdbRating && d.imdbRating !== 'N/A'
+              d.imdbRating && d.imdbRating !== "N/A"
                 ? { rating: d.imdbRating, votes: d.imdbVotes }
                 : null,
             ),
@@ -73,7 +73,7 @@ export default function MovieDetails({ params }) {
         setImdbRating(null);
       }
     } catch (err) {
-      console.error('Error fetching movie details:', err);
+      console.error("Error fetching movie details:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -84,7 +84,7 @@ export default function MovieDetails({ params }) {
     if (showPlayer && movie && !hasAddedToWatching.current) {
       addToContinueWatching({
         id: movie.id,
-        type: 'movie',
+        type: "movie",
         title: movie.title,
         poster_path: movie.poster_path,
         backdrop_path: movie.backdrop_path,
@@ -98,10 +98,10 @@ export default function MovieDetails({ params }) {
 
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && showPlayer) setShowPlayer(false);
+      if (e.key === "Escape" && showPlayer) setShowPlayer(false);
     };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
   }, [showPlayer]);
 
   if (loading) {
@@ -126,10 +126,10 @@ export default function MovieDetails({ params }) {
     return (
       <div style={styles.error}>
         <h2 style={styles.errorTitle}>
-          {error ? 'Error Loading Movie' : 'Movie Not Found'}
+          {error ? "Error Loading Movie" : "Movie Not Found"}
         </h2>
         <p style={styles.errorText}>
-          {error || 'The movie you are looking for does not exist.'}
+          {error || "The movie you are looking for does not exist."}
         </p>
         <Link href="/movies">
           <button style={styles.backButton}>
@@ -146,24 +146,24 @@ export default function MovieDetails({ params }) {
     : null;
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-    : '/placeholder.png';
+    : "/placeholder.png";
 
   const trailer = movie.videos?.results?.find(
-    (video) => video.type === 'Trailer' && video.site === 'YouTube',
+    (video) => video.type === "Trailer" && video.site === "YouTube",
   );
   const cast = movie.credits?.cast?.slice(0, 12) || [];
   const directors =
-    movie.credits?.crew?.filter((p) => p.job === 'Director') || [];
+    movie.credits?.crew?.filter((p) => p.job === "Director") || [];
   const writers =
     movie.credits?.crew
-      ?.filter((p) => p.job === 'Writer' || p.job === 'Screenplay')
+      ?.filter((p) => p.job === "Writer" || p.job === "Screenplay")
       .slice(0, 3) || [];
 
   // Get Watch Providers for a specific region (e.g., US)
-  const watchProviders = movie['watch/providers']?.results?.IN;
+  const watchProviders = movie["watch/providers"]?.results?.IN;
 
   const formatRuntime = (minutes) => {
-    if (!minutes) return 'N/A';
+    if (!minutes) return "N/A";
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
@@ -171,28 +171,28 @@ export default function MovieDetails({ params }) {
 
   const servers = [
     {
-      id: '2embed',
-      label: 'Server 1',
-      color: '#ffc13c',
+      id: "vidlink",
+      label: "Server 1",
+      color: "#ffc13c",
+      url: `https://vidlink.pro/movie/${movieId}?primaryColor=ffc13c&autoplay=true`,
+    },
+    {
+      id: "2embed",
+      label: "Server 2",
+      color: "#34d399",
       url: `https://www.2embed.cc/embed/${movieId}`,
     },
     {
-      id: 'vidsrcme',
-      label: 'Server 2',
-      color: '#34d399',
+      id: "vidsrcme",
+      label: "Server 3",
+      color: "#60a5fa",
       url: `https://vidsrc.me/embed/movie?tmdb=${movieId}`,
     },
     {
-      id: 'vidsrcnet',
-      label: 'Server 3',
-      color: '#60a5fa',
+      id: "vidsrcnet",
+      label: "Server 4",
+      color: "#a78bfa",
       url: `https://vidsrc.net/embed/movie/${movieId}`,
-    },
-    {
-      id: 'vidsrcto',
-      label: 'Server 4',
-      color: '#a78bfa',
-      url: `https://vidsrc.to/embed/movie/${movieId}`,
     },
   ];
 
@@ -217,7 +217,7 @@ export default function MovieDetails({ params }) {
         }
 
         * {
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
         }
 
         .page-container {
@@ -263,7 +263,7 @@ export default function MovieDetails({ params }) {
           object-fit: cover;
         }
         .backdrop::after {
-          content: '';
+          content: "";
           position: absolute;
           inset: 0;
           background: linear-gradient(to bottom, transparent 30%, #0d0d0f 100%);
@@ -435,7 +435,7 @@ export default function MovieDetails({ params }) {
           gap: 8px;
         }
         .section-title::after {
-          content: '';
+          content: "";
           flex: 1;
           height: 1px;
           background: rgba(255, 255, 255, 0.06);
@@ -525,14 +525,14 @@ export default function MovieDetails({ params }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               style={{
-                position: 'fixed',
+                position: "fixed",
                 inset: 0,
-                background: 'rgba(0,0,0,0.96)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                background: "rgba(0,0,0,0.96)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 zIndex: 10000,
-                padding: '20px',
+                padding: "20px",
               }}
             >
               <motion.div
@@ -542,36 +542,36 @@ export default function MovieDetails({ params }) {
                 exit={{ scale: 0.92 }}
                 transition={{ duration: 0.25 }}
                 style={{
-                  position: 'relative',
-                  width: '100%',
-                  maxWidth: '1400px',
-                  aspectRatio: '16/9',
-                  background: '#000',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
+                  position: "relative",
+                  width: "100%",
+                  maxWidth: "1400px",
+                  aspectRatio: "16/9",
+                  background: "#000",
+                  borderRadius: "12px",
+                  overflow: "hidden",
                   boxShadow:
-                    '0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)',
+                    "0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)",
                 }}
               >
                 <button
                   onClick={() => setShowPlayer(false)}
                   aria-label="Close player"
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: 14,
                     right: 14,
-                    background: 'rgba(0,0,0,0.75)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '50%',
+                    background: "rgba(0,0,0,0.75)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "50%",
                     width: 40,
                     height: 40,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'white',
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    color: "white",
                     zIndex: 10,
-                    backdropFilter: 'blur(4px)',
+                    backdropFilter: "blur(4px)",
                   }}
                 >
                   <X size={20} />
@@ -579,14 +579,14 @@ export default function MovieDetails({ params }) {
 
                 <div
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: 14,
                     left: 14,
                     right: 64,
-                    display: 'flex',
+                    display: "flex",
                     gap: 7,
                     zIndex: 10,
-                    flexWrap: 'wrap',
+                    flexWrap: "wrap",
                   }}
                 >
                   {servers.map((server) => (
@@ -594,48 +594,48 @@ export default function MovieDetails({ params }) {
                       key={server.id}
                       onClick={() => setMovieServer(server.id)}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
+                        display: "flex",
+                        alignItems: "center",
                         gap: 6,
-                        padding: '6px 12px',
-                        border: `1px solid ${movieServer === server.id ? server.color : 'rgba(255,255,255,0.1)'}`,
+                        padding: "6px 12px",
+                        border: `1px solid ${movieServer === server.id ? server.color : "rgba(255,255,255,0.1)"}`,
                         borderRadius: 6,
-                        cursor: 'pointer',
+                        cursor: "pointer",
                         fontFamily: "'DM Sans', sans-serif",
                         fontSize: 12,
                         fontWeight: 600,
-                        letterSpacing: '0.02em',
+                        letterSpacing: "0.02em",
                         background:
                           movieServer === server.id
                             ? `${server.color}1a`
-                            : 'rgba(0,0,0,0.5)',
+                            : "rgba(0,0,0,0.5)",
                         color:
                           movieServer === server.id
                             ? server.color
-                            : 'rgba(255,255,255,0.5)',
-                        transition: 'all 0.2s ease',
+                            : "rgba(255,255,255,0.5)",
+                        transition: "all 0.2s ease",
                       }}
                     >
                       <span
                         style={{
                           width: 6,
                           height: 6,
-                          borderRadius: '50%',
+                          borderRadius: "50%",
                           backgroundColor: server.color,
                           flexShrink: 0,
                         }}
                       />
                       {server.label}
-                      {server.id === '2embed' && (
+                      {server.id === "vidlink" && (
                         <span
                           style={{
                             fontSize: 9,
                             fontWeight: 700,
-                            background: '#ffc13c',
-                            color: '#0d0d0f',
+                            background: "#ffc13c",
+                            color: "#0d0d0f",
                             borderRadius: 4,
-                            padding: '2px 5px',
-                            letterSpacing: '0.02em',
+                            padding: "2px 5px",
+                            letterSpacing: "0.02em",
                           }}
                         >
                           Default
@@ -648,7 +648,7 @@ export default function MovieDetails({ params }) {
                 <iframe
                   key={movieServer}
                   src={servers.find((s) => s.id === movieServer)?.url}
-                  style={{ width: '100%', height: '100%', border: 'none' }}
+                  style={{ width: "100%", height: "100%", border: "none" }}
                   frameBorder="0"
                   allowFullScreen
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -676,24 +676,24 @@ export default function MovieDetails({ params }) {
             />
 
             <div
-              style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
             >
               <motion.button
                 style={{
-                  width: '100%',
-                  padding: '14px',
-                  background: '#ffc13c',
-                  color: '#0d0d0f',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '15px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '9px',
-                  letterSpacing: '0.02em',
+                  width: "100%",
+                  padding: "14px",
+                  background: "#ffc13c",
+                  color: "#0d0d0f",
+                  border: "none",
+                  borderRadius: "10px",
+                  fontSize: "15px",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "9px",
+                  letterSpacing: "0.02em",
                   fontFamily: "'DM Sans', sans-serif",
                 }}
                 whileHover={{ scale: 1.03, opacity: 0.92 }}
@@ -710,28 +710,28 @@ export default function MovieDetails({ params }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    width: '100%',
-                    padding: '13px',
-                    background: 'transparent',
-                    color: 'rgba(255,255,255,0.75)',
-                    border: '1px solid rgba(255,255,255,0.14)',
-                    borderRadius: '10px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    textDecoration: 'none',
-                    letterSpacing: '0.02em',
+                    width: "100%",
+                    padding: "13px",
+                    background: "transparent",
+                    color: "rgba(255,255,255,0.75)",
+                    border: "1px solid rgba(255,255,255,0.14)",
+                    borderRadius: "10px",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    textDecoration: "none",
+                    letterSpacing: "0.02em",
                     fontFamily: "'DM Sans', sans-serif",
-                    boxSizing: 'border-box',
+                    boxSizing: "border-box",
                   }}
                   whileHover={{
                     scale: 1.03,
-                    borderColor: 'rgba(255,193,60,0.5)',
-                    color: '#ffc13c',
+                    borderColor: "rgba(255,193,60,0.5)",
+                    color: "#ffc13c",
                   }}
                   whileTap={{ scale: 0.97 }}
                 >
@@ -743,7 +743,7 @@ export default function MovieDetails({ params }) {
               <WatchlistButton
                 item={{
                   id: movie.id,
-                  type: 'movie',
+                  type: "movie",
                   title: movie.title,
                   name: movie.title,
                   poster_path: movie.poster_path,
@@ -761,16 +761,16 @@ export default function MovieDetails({ params }) {
                 <p className="tip-desc">Free streaming may show ads:</p>
                 <div className="tip-list">
                   {[
-                    'Use ad-blocker (uBlock Origin)',
-                    'Try different servers if needed',
-                    'Close pop-ups immediately',
-                    'Never enter personal info',
+                    "Use ad-blocker (uBlock Origin)",
+                    "Try different servers if needed",
+                    "Close pop-ups immediately",
+                    "Never enter personal info",
                   ].map((tip) => (
                     <div className="tip-item" key={tip}>
                       <Check
                         size={12}
                         style={{
-                          color: '#4ade80',
+                          color: "#4ade80",
                           flexShrink: 0,
                           marginTop: 1,
                         }}
@@ -791,8 +791,8 @@ export default function MovieDetails({ params }) {
               transition={{ duration: 0.4 }}
             >
               <h1 className="movie-title">
-                {movie.title.split(' ').slice(0, -1).join(' ')}{' '}
-                <span>{movie.title.split(' ').slice(-1)}</span>
+                {movie.title.split(" ").slice(0, -1).join(" ")}{" "}
+                <span>{movie.title.split(" ").slice(-1)}</span>
               </h1>
               {movie.tagline && <p className="tagline">"{movie.tagline}"</p>}
 
@@ -804,10 +804,10 @@ export default function MovieDetails({ params }) {
                     <span className="imdb-logo">IMDb</span>
                     <span className="imdb-score">{imdbRating.rating}</span>
                     <span className="imdb-votes">
-                      / 10 ·{' '}
+                      / 10 ·{" "}
                       {Number(
-                        imdbRating.votes?.replace(/,/g, ''),
-                      ).toLocaleString()}{' '}
+                        imdbRating.votes?.replace(/,/g, ""),
+                      ).toLocaleString()}{" "}
                       votes
                     </span>
                   </div>
@@ -816,7 +816,7 @@ export default function MovieDetails({ params }) {
                 <div className="meta-item">
                   <Calendar size={15} />
                   <span>
-                    {new Date(movie.release_date).getFullYear() || 'N/A'}
+                    {new Date(movie.release_date).getFullYear() || "N/A"}
                   </span>
                 </div>
                 {movie.runtime && (
@@ -841,7 +841,7 @@ export default function MovieDetails({ params }) {
             <div className="section">
               <h2 className="section-title">Overview</h2>
               <p className="overview-text">
-                {movie.overview || 'No overview available.'}
+                {movie.overview || "No overview available."}
               </p>
             </div>
 
@@ -854,17 +854,17 @@ export default function MovieDetails({ params }) {
                   <h2 className="section-title">Where to Watch</h2>
                   <div
                     style={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '20px',
-                      marginTop: '10px',
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "20px",
+                      marginTop: "10px",
                     }}
                   >
                     {/* Streaming (Flatrate) */}
                     {watchProviders.flatrate?.map((provider) => (
                       <div
                         key={provider.provider_id}
-                        style={{ textAlign: 'center' }}
+                        style={{ textAlign: "center" }}
                       >
                         <img
                           src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
@@ -874,9 +874,9 @@ export default function MovieDetails({ params }) {
                         />
                         <p
                           style={{
-                            fontSize: '10px',
-                            color: 'rgba(255,255,255,0.4)',
-                            marginTop: '5px',
+                            fontSize: "10px",
+                            color: "rgba(255,255,255,0.4)",
+                            marginTop: "5px",
                           }}
                         >
                           Stream
@@ -889,20 +889,20 @@ export default function MovieDetails({ params }) {
                       watchProviders.rent?.slice(0, 3).map((provider) => (
                         <div
                           key={provider.provider_id}
-                          style={{ textAlign: 'center' }}
+                          style={{ textAlign: "center" }}
                         >
                           <img
                             src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                             alt={provider.provider_name}
                             title={`${provider.provider_name} (Rent)`}
                             className="provider-logo"
-                            style={{ filter: 'grayscale(0.3)' }}
+                            style={{ filter: "grayscale(0.3)" }}
                           />
                           <p
                             style={{
-                              fontSize: '10px',
-                              color: 'rgba(255,255,255,0.4)',
-                              marginTop: '5px',
+                              fontSize: "10px",
+                              color: "rgba(255,255,255,0.4)",
+                              marginTop: "5px",
                             }}
                           >
                             Rent
@@ -912,9 +912,9 @@ export default function MovieDetails({ params }) {
                   </div>
                   <p
                     style={{
-                      fontSize: '10px',
-                      color: 'rgba(255,255,255,0.2)',
-                      marginTop: '15px',
+                      fontSize: "10px",
+                      color: "rgba(255,255,255,0.2)",
+                      marginTop: "15px",
                     }}
                   >
                     Streaming data provided by JustWatch via TMDB.
@@ -925,10 +925,10 @@ export default function MovieDetails({ params }) {
             {directors.length > 0 && (
               <div className="section">
                 <h2 className="section-title">
-                  {directors.length > 1 ? 'Directors' : 'Director'}
+                  {directors.length > 1 ? "Directors" : "Director"}
                 </h2>
                 <p className="creator-text">
-                  {directors.map((p) => p.name).join(', ')}
+                  {directors.map((p) => p.name).join(", ")}
                 </p>
               </div>
             )}
@@ -936,10 +936,10 @@ export default function MovieDetails({ params }) {
             {writers.length > 0 && (
               <div className="section">
                 <h2 className="section-title">
-                  {writers.length > 1 ? 'Writers' : 'Writer'}
+                  {writers.length > 1 ? "Writers" : "Writer"}
                 </h2>
                 <p className="creator-text">
-                  {writers.map((p) => p.name).join(', ')}
+                  {writers.map((p) => p.name).join(", ")}
                 </p>
               </div>
             )}
@@ -949,11 +949,11 @@ export default function MovieDetails({ params }) {
                 <h2 className="section-title">Top Cast</h2>
                 <div
                   style={{
-                    display: 'grid',
+                    display: "grid",
                     gridTemplateColumns:
-                      'repeat(auto-fill, minmax(130px, 1fr))',
-                    gap: '16px',
-                    marginTop: '4px',
+                      "repeat(auto-fill, minmax(130px, 1fr))",
+                    gap: "16px",
+                    marginTop: "4px",
                   }}
                 >
                   {cast.map((actor) => (
@@ -970,7 +970,7 @@ export default function MovieDetails({ params }) {
                   {movie.production_companies
                     .slice(0, 3)
                     .map((c) => c.name)
-                    .join(', ')}
+                    .join(", ")}
                 </p>
               </div>
             )}
@@ -988,81 +988,81 @@ function CastCard({ actor }) {
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
       animate={hovered ? { y: -5, scale: 1.02 } : { y: 0, scale: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
       style={{
-        background: '#0d0d0f',
-        borderRadius: '10px',
-        overflow: 'hidden',
-        cursor: 'pointer',
+        background: "#0d0d0f",
+        borderRadius: "10px",
+        overflow: "hidden",
+        cursor: "pointer",
         boxShadow: hovered
-          ? '0 14px 30px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,193,60,0.22)'
-          : '0 2px 8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)',
-        transition: 'box-shadow 0.3s ease',
+          ? "0 14px 30px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,193,60,0.22)"
+          : "0 2px 8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)",
+        transition: "box-shadow 0.3s ease",
       }}
     >
       <div
         style={{
-          width: '100%',
-          paddingBottom: '150%',
-          position: 'relative',
-          overflow: 'hidden',
-          background: '#111114',
+          width: "100%",
+          paddingBottom: "150%",
+          position: "relative",
+          overflow: "hidden",
+          background: "#111114",
         }}
       >
         <img
           src={
             actor.profile_path
               ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
-              : 'https://via.placeholder.com/185x278/111114/444?text=No+Image'
+              : "https://via.placeholder.com/185x278/111114/444?text=No+Image"
           }
           alt={actor.name}
           loading="lazy"
           onError={(e) => {
             e.target.src =
-              'https://via.placeholder.com/185x278/111114/444?text=No+Image';
+              "https://via.placeholder.com/185x278/111114/444?text=No+Image";
           }}
           style={{
-            position: 'absolute',
+            position: "absolute",
             inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            transform: hovered ? 'scale(1.07)' : 'scale(1)',
-            filter: hovered ? 'brightness(0.5)' : 'brightness(1)',
-            transition: 'transform 0.45s ease, filter 0.35s ease',
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transform: hovered ? "scale(1.07)" : "scale(1)",
+            filter: hovered ? "brightness(0.5)" : "brightness(1)",
+            transition: "transform 0.45s ease, filter 0.35s ease",
           }}
         />
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            height: '50%',
+            height: "50%",
             background:
-              'linear-gradient(to top, rgba(13,13,15,0.9) 0%, transparent 100%)',
-            pointerEvents: 'none',
+              "linear-gradient(to top, rgba(13,13,15,0.9) 0%, transparent 100%)",
+            pointerEvents: "none",
             zIndex: 1,
           }}
         />
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            padding: '10px 8px',
+            padding: "10px 8px",
             zIndex: 2,
             opacity: hovered ? 1 : 0,
-            transition: 'opacity 0.25s ease',
+            transition: "opacity 0.25s ease",
           }}
         >
           <p
             style={{
-              fontSize: '10px',
-              color: '#ffc13c',
-              fontWeight: '600',
-              textAlign: 'center',
+              fontSize: "10px",
+              color: "#ffc13c",
+              fontWeight: "600",
+              textAlign: "center",
               margin: 0,
               lineHeight: 1.3,
               fontFamily: "'DM Sans', sans-serif",
@@ -1074,33 +1074,33 @@ function CastCard({ actor }) {
       </div>
       <div
         style={{
-          padding: '10px 8px 11px',
-          textAlign: 'center',
-          background: '#0d0d0f',
+          padding: "10px 8px 11px",
+          textAlign: "center",
+          background: "#0d0d0f",
         }}
       >
         <p
           style={{
-            fontSize: '12px',
-            fontWeight: '700',
-            color: hovered ? '#ffc13c' : 'rgba(255,255,255,0.9)',
-            margin: '0 0 3px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            fontSize: "12px",
+            fontWeight: "700",
+            color: hovered ? "#ffc13c" : "rgba(255,255,255,0.9)",
+            margin: "0 0 3px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
             fontFamily: "'DM Sans', sans-serif",
-            transition: 'color 0.2s',
+            transition: "color 0.2s",
           }}
         >
           {actor.name}
         </p>
         <p
           style={{
-            fontSize: '10px',
-            color: 'rgba(255,255,255,0.35)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            fontSize: "10px",
+            color: "rgba(255,255,255,0.35)",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
             margin: 0,
             fontFamily: "'DM Sans', sans-serif",
           }}
@@ -1114,62 +1114,62 @@ function CastCard({ actor }) {
 
 const styles = {
   loading: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '70vh',
-    gap: '18px',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "70vh",
+    gap: "18px",
     fontFamily: "'DM Sans', sans-serif",
   },
   spinner: {
-    width: '44px',
-    height: '44px',
-    border: '4px solid rgba(255,193,60,0.1)',
-    borderTopColor: '#ffc13c',
-    borderRadius: '50%',
-    animation: 'spin 0.9s linear infinite',
+    width: "44px",
+    height: "44px",
+    border: "4px solid rgba(255,193,60,0.1)",
+    borderTopColor: "#ffc13c",
+    borderRadius: "50%",
+    animation: "spin 0.9s linear infinite",
   },
   loadingText: {
-    color: 'rgba(255,255,255,0.38)',
-    fontSize: '14px',
+    color: "rgba(255,255,255,0.38)",
+    fontSize: "14px",
     fontFamily: "'DM Sans', sans-serif",
     margin: 0,
-    letterSpacing: '0.02em',
+    letterSpacing: "0.02em",
   },
   error: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '70vh',
-    textAlign: 'center',
-    padding: '20px',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "70vh",
+    textAlign: "center",
+    padding: "20px",
     fontFamily: "'DM Sans', sans-serif",
   },
   errorTitle: {
-    fontSize: '28px',
-    fontWeight: '800',
-    marginBottom: '12px',
-    color: '#ffc13c',
+    fontSize: "28px",
+    fontWeight: "800",
+    marginBottom: "12px",
+    color: "#ffc13c",
   },
   errorText: {
-    fontSize: '16px',
-    color: 'rgba(255,255,255,0.45)',
-    marginBottom: '28px',
+    fontSize: "16px",
+    color: "rgba(255,255,255,0.45)",
+    marginBottom: "28px",
   },
   backButton: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '9px',
-    padding: '11px 26px',
-    background: '#ffc13c',
-    color: '#0d0d0f',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '700',
-    cursor: 'pointer',
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "9px",
+    padding: "11px 26px",
+    background: "#ffc13c",
+    color: "#0d0d0f",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: "700",
+    cursor: "pointer",
     fontFamily: "'DM Sans', sans-serif",
   },
 };
