@@ -44,6 +44,11 @@ export default function TVShowDetails({ params }) {
   // Episode-level IMDb cache: "S1E3" → { rating, votes } | null
   const [omdbCache, setOmdbCache] = useState({});
 
+  // Next episode button: only shown 90s before episode end
+  const [showNextBtn, setShowNextBtn] = useState(false);
+  const nextBtnTimerRef = useRef(null);
+  const SHOW_BEFORE_END_SECS = 90;
+
   useEffect(() => {
     fetchShowDetails();
   }, [showId]);
@@ -136,6 +141,30 @@ export default function TVShowDetails({ params }) {
     return () => window.removeEventListener("keydown", handleEscape);
   }, [showPlayer]);
 
+  // Timer: show Next Episode button 90s before episode ends
+  useEffect(() => {
+    if (nextBtnTimerRef.current) clearTimeout(nextBtnTimerRef.current);
+    setShowNextBtn(false);
+
+    if (!showPlayer || !seasonData?.episodes) return;
+
+    const currentEpisode = seasonData.episodes.find(
+      (ep) => ep.episode_number === selectedEpisode,
+    );
+    const runtimeMins =
+      currentEpisode?.runtime || show?.episode_run_time?.[0] || 40;
+    const runtimeMs = runtimeMins * 60 * 1000;
+    const delay = runtimeMs - SHOW_BEFORE_END_SECS * 1000;
+
+    if (delay > 0) {
+      nextBtnTimerRef.current = setTimeout(() => setShowNextBtn(true), delay);
+    }
+
+    return () => {
+      if (nextBtnTimerRef.current) clearTimeout(nextBtnTimerRef.current);
+    };
+  }, [showPlayer, selectedEpisode, selectedSeason, seasonData]);
+
   const setDefaultSeason = () => {
     if (show?.seasons && show.seasons.length > 0) {
       const firstSeason =
@@ -152,7 +181,6 @@ export default function TVShowDetails({ params }) {
     try {
       const [showRes, externalRes] = await Promise.all([
         fetch(
-          // Added 'watch/providers' to append_to_response
           `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos,watch/providers`,
         ),
         fetch(
@@ -286,7 +314,6 @@ export default function TVShowDetails({ params }) {
   const validSeasons = show.seasons?.filter((s) => s.season_number > 0) || [];
   const creators = show.created_by || [];
 
-  // Get Watch Providers for a specific region (e.g., US)
   const watchProviders = show["watch/providers"]?.results?.IN;
 
   const servers = [
@@ -315,6 +342,18 @@ export default function TVShowDetails({ params }) {
       url: `https://vidsrc.net/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
     },
   ];
+
+  // Compute next episode info for the button label
+  const episodes = seasonData?.episodes || [];
+  const currentIdx = episodes.findIndex(
+    (ep) => ep.episode_number === selectedEpisode,
+  );
+  const hasNext = currentIdx < episodes.length - 1;
+  const currentSeasonIdx = validSeasons.findIndex(
+    (s) => s.season_number === selectedSeason,
+  );
+  const hasNextSeason = currentSeasonIdx < validSeasons.length - 1;
+  const showNextEpisodeBtn = showNextBtn && (hasNext || hasNextSeason);
 
   return (
     <>
@@ -480,7 +519,6 @@ export default function TVShowDetails({ params }) {
           color: rgba(255, 255, 255, 0.5);
         }
 
-        /* ── IMDb badge (header) ─────────────── */
         .imdb-badge {
           display: inline-flex;
           align-items: center;
@@ -567,7 +605,6 @@ export default function TVShowDetails({ params }) {
           font-weight: 500;
         }
 
-        /* ── Watch Provider UI ───────────────── */
         .provider-logo {
           width: 42px;
           height: 42px;
@@ -580,7 +617,6 @@ export default function TVShowDetails({ params }) {
           transform: scale(1.1);
         }
 
-        /* ── Episode IMDb badge ──────────────── */
         .ep-ratings {
           display: flex;
           align-items: center;
@@ -712,6 +748,7 @@ export default function TVShowDetails({ params }) {
                     "0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)",
                 }}
               >
+                {/* Close button */}
                 <button
                   onClick={() => setShowPlayer(false)}
                   aria-label="Close player"
@@ -735,6 +772,60 @@ export default function TVShowDetails({ params }) {
                 >
                   <X size={20} />
                 </button>
+
+                {/* Next Episode button — appears 90s before episode ends */}
+                <AnimatePresence>
+                  {showNextEpisodeBtn && (
+                    <motion.button
+                      key="next-ep-btn"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.3 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowNextBtn(false);
+                        handleNextEpisode();
+                      }}
+                      style={{
+                        position: "absolute",
+                        bottom: 20,
+                        right: 20,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        padding: "10px 18px",
+                        background: "rgba(0,0,0,0.85)",
+                        border: "1px solid rgba(255,193,60,0.5)",
+                        borderRadius: 8,
+                        cursor: "pointer",
+                        color: "#ffc13c",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        fontFamily: "'DM Sans', sans-serif",
+                        letterSpacing: "0.02em",
+                        backdropFilter: "blur(8px)",
+                        zIndex: 10,
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background =
+                          "rgba(255,193,60,0.15)";
+                        e.currentTarget.style.borderColor = "#ffc13c";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "rgba(0,0,0,0.85)";
+                        e.currentTarget.style.borderColor =
+                          "rgba(255,193,60,0.5)";
+                      }}
+                    >
+                      {hasNext
+                        ? `Next: S${selectedSeason}E${episodes[currentIdx + 1]?.episode_number} →`
+                        : `Next Season →`}
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+
+                {/* Server selector */}
                 <div
                   style={{
                     position: "absolute",
@@ -802,6 +893,7 @@ export default function TVShowDetails({ params }) {
                     </button>
                   ))}
                 </div>
+
                 <iframe
                   key={`${tvServer}-${selectedSeason}-${selectedEpisode}`}
                   src={servers.find((s) => s.id === tvServer)?.url}
@@ -952,7 +1044,6 @@ export default function TVShowDetails({ params }) {
               {show.tagline && <p className="tagline">"{show.tagline}"</p>}
 
               <div className="metadata">
-                {/* ── IMDb Rating Badge ── */}
                 {showImdbRating === undefined && OMDB_KEY ? (
                   <div className="imdb-shimmer" />
                 ) : showImdbRating ? (
@@ -1002,7 +1093,6 @@ export default function TVShowDetails({ params }) {
               </p>
             </div>
 
-            {/* WHERE TO WATCH SECTION */}
             {watchProviders &&
               (watchProviders.flatrate ||
                 watchProviders.rent ||
@@ -1017,7 +1107,6 @@ export default function TVShowDetails({ params }) {
                       marginTop: "10px",
                     }}
                   >
-                    {/* Streaming (Flatrate) */}
                     {watchProviders.flatrate?.map((provider) => (
                       <div
                         key={provider.provider_id}
@@ -1040,8 +1129,6 @@ export default function TVShowDetails({ params }) {
                         </p>
                       </div>
                     ))}
-
-                    {/* Buy/Rent (if no streaming is available) */}
                     {!watchProviders.flatrate &&
                       watchProviders.buy?.slice(0, 3).map((provider) => (
                         <div
@@ -1253,7 +1340,7 @@ function TVSeasonBtn({ season, isActive, onClick }) {
   );
 }
 
-/* ── Episode card — IMDb only ──────────────────────── */
+/* ── Episode card ──────────────────────────────────── */
 function TVEpisodeCard({
   episode,
   isActive,
@@ -1307,7 +1394,6 @@ function TVEpisodeCard({
           "background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
       }}
     >
-      {/* Row 1: title + runtime + date */}
       <div
         style={{
           display: "flex",
@@ -1400,7 +1486,6 @@ function TVEpisodeCard({
         </div>
       </div>
 
-      {/* Row 2: IMDb only */}
       {showRatingRow && (
         <div className="ep-ratings">
           {omdb ? (
@@ -1419,7 +1504,6 @@ function TVEpisodeCard({
         </div>
       )}
 
-      {/* Row 3: overview */}
       {episode.overview ? (
         <p
           style={{
