@@ -179,19 +179,19 @@ export default function MovieDetails({ params }) {
     {
       id: "2embed",
       label: "Server 2",
-      color: "#34d399",
+      color: "#60a5fa",
       url: `https://www.2embed.cc/embed/${movieId}`,
     },
     {
       id: "vidsrcme",
       label: "Server 3",
-      color: "#60a5fa",
+      color: "#a78bfa",
       url: `https://vidsrc.me/embed/movie?tmdb=${movieId}`,
     },
     {
       id: "vidsrcnet",
       label: "Server 4",
-      color: "#a78bfa",
+      color: "#f472b6",
       url: `https://vidsrc.net/embed/movie/${movieId}`,
     },
   ];

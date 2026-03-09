@@ -104,7 +104,7 @@ export default function TVShowDetails({ params }) {
   }, [seasonData, externalIds]);
 
   useEffect(() => {
-    if (showPlayer && show && !hasAddedToWatching.current) {
+    if (showPlayer && show) {
       const currentEpisode = seasonData?.episodes?.find(
         (ep) => ep.episode_number === selectedEpisode,
       );
@@ -121,7 +121,6 @@ export default function TVShowDetails({ params }) {
         runtime: episodeRuntime,
         progress: 15,
       });
-      hasAddedToWatching.current = true;
     }
     if (!showPlayer) hasAddedToWatching.current = false;
   }, [
@@ -132,6 +131,27 @@ export default function TVShowDetails({ params }) {
     seasonData,
     addToContinueWatching,
   ]);
+
+  // Update continue watching whenever episode/season changes
+  useEffect(() => {
+    if (!show || !showPlayer) return;
+    const currentEpisode = seasonData?.episodes?.find(
+      (ep) => ep.episode_number === selectedEpisode,
+    );
+    const episodeRuntime =
+      currentEpisode?.runtime || show.episode_run_time?.[0] || 45;
+    addToContinueWatching({
+      id: show.id,
+      type: "tv",
+      name: show.name,
+      poster_path: show.poster_path,
+      backdrop_path: show.backdrop_path,
+      season: selectedSeason,
+      episode: selectedEpisode,
+      runtime: episodeRuntime,
+      progress: 15,
+    });
+  }, [selectedEpisode, selectedSeason]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -249,17 +269,59 @@ export default function TVShowDetails({ params }) {
     const idx = seasonData.episodes.findIndex(
       (ep) => ep.episode_number === selectedEpisode,
     );
+
     if (idx < seasonData.episodes.length - 1) {
-      setSelectedEpisode(seasonData.episodes[idx + 1].episode_number);
+      const nextEp = seasonData.episodes[idx + 1].episode_number;
+      const nextRuntime =
+        seasonData.episodes[idx + 1]?.runtime ||
+        show?.episode_run_time?.[0] ||
+        45;
+
+      setShowNextBtn(false);
+      setSelectedEpisode(nextEp);
+
+      addToContinueWatching({
+        id: show.id,
+        type: "tv",
+        name: show.name,
+        poster_path: show.poster_path,
+        backdrop_path: show.backdrop_path,
+        season: selectedSeason,
+        episode: nextEp,
+        runtime: nextRuntime,
+        progress: 15,
+      });
+
+      setShowPlayer(false);
+      setTimeout(() => setShowPlayer(true), 300);
     } else {
       const validSeasons =
         show.seasons?.filter((s) => s.season_number > 0) || [];
       const sIdx = validSeasons.findIndex(
         (s) => s.season_number === selectedSeason,
       );
+
       if (sIdx < validSeasons.length - 1) {
-        setSelectedSeason(validSeasons[sIdx + 1].season_number);
+        const nextSeason = validSeasons[sIdx + 1].season_number;
+
+        setShowNextBtn(false);
+        setSelectedSeason(nextSeason);
         setSelectedEpisode(1);
+
+        addToContinueWatching({
+          id: show.id,
+          type: "tv",
+          name: show.name,
+          poster_path: show.poster_path,
+          backdrop_path: show.backdrop_path,
+          season: nextSeason,
+          episode: 1,
+          runtime: show?.episode_run_time?.[0] || 45,
+          progress: 15,
+        });
+
+        setShowPlayer(false);
+        setTimeout(() => setShowPlayer(true), 300);
       }
     }
   };
@@ -321,7 +383,7 @@ export default function TVShowDetails({ params }) {
       id: "vidlink",
       label: "Server 1",
       color: "#ffc13c",
-      url: `https://vidlink.pro/tv/${showId}/${selectedSeason}/${selectedEpisode}?primaryColor=ffc13c&autoplay=true&nextbutton=true`,
+      url: `https://vidlink.pro/tv/${showId}/${selectedSeason}/${selectedEpisode}?primaryColor=ffc13c&secondaryColor=0d0d0f&iconColor=ffc13c&autoplay=true&nextbutton=true`,
     },
     {
       id: "2embed",
@@ -340,6 +402,12 @@ export default function TVShowDetails({ params }) {
       label: "Server 4",
       color: "#a78bfa",
       url: `https://vidsrc.net/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
+    },
+    {
+      id: "vidsrccc",
+      label: "Server 5",
+      color: "#f472b6",
+      url: `https://vidsrc.cc/v2/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
     },
   ];
 

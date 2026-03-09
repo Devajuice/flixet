@@ -1,6 +1,6 @@
-'use client';
-import { useContinueWatching } from '@/context/ContinueWatchingContext';
-import ContinueWatchingCard from './ContinueWatchingCard';
+"use client";
+import { useContinueWatching } from "@/context/ContinueWatchingContext";
+import ContinueWatchingCard from "./ContinueWatchingCard";
 
 export default function ContinueWatchingSection() {
   const { continueWatching } = useContinueWatching();
@@ -11,7 +11,7 @@ export default function ContinueWatchingSection() {
       <style jsx global>{`
         .cw-section {
           margin: 32px 0;
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
         }
 
         /* ── Header ──────────────────────────────── */
@@ -19,7 +19,7 @@ export default function ContinueWatchingSection() {
           margin-bottom: 14px;
         }
         .cw-section-title {
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
           font-size: 15px;
           font-weight: 700;
           color: rgba(255, 255, 255, 0.88);
@@ -31,13 +31,13 @@ export default function ContinueWatchingSection() {
           gap: 10px;
         }
         .cw-section-title::after {
-          content: '';
+          content: "";
           flex: 1;
           height: 1px;
           background: rgba(255, 255, 255, 0.06);
         }
         .cw-subtitle {
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
           font-size: 12px;
           font-weight: 500;
           color: rgba(255, 255, 255, 0.25);
@@ -74,10 +74,7 @@ export default function ContinueWatchingSection() {
         </div>
         <div className="cw-row">
           {continueWatching.map((item) => (
-            <ContinueWatchingCard
-              key={`${item.type}-${item.id}-${item.season}-${item.episode}`}
-              item={item}
-            />
+            <ContinueWatchingCard key={`${item.type}-${item.id}`} item={item} />
           ))}
         </div>
       </section>
