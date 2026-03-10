@@ -177,10 +177,10 @@ export default function MovieDetails({ params }) {
       url: `https://vidlink.pro/movie/${movieId}?primaryColor=ffc13c&autoplay=true`,
     },
     {
-      id: "2embed",
+      id: "vidplus",
       label: "Server 2",
       color: "#60a5fa",
-      url: `https://www.2embed.cc/embed/${movieId}`,
+      url: `https://player.vidplus.to/embed/Movie/${movieId}`,
     },
     {
       id: "vidsrcme",
@@ -195,10 +195,10 @@ export default function MovieDetails({ params }) {
       url: `https://vidsrc.net/embed/movie/${movieId}`,
     },
     {
-      id: "vidplus",
+      id: "2embed",
       label: "Server 6",
       color: "#4ade80",
-      url: `https://player.vidplus.to/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
+      url: `https://www.2embed.cc/embed/${movieId}`,
     },
   ];
 

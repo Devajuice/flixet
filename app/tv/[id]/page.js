@@ -383,13 +383,13 @@ export default function TVShowDetails({ params }) {
       id: "vidlink",
       label: "Server 1",
       color: "#ffc13c",
-      url: `https://vidlink.pro/tv/${showId}/${selectedSeason}/${selectedEpisode}?primaryColor=ffc13c&secondaryColor=0d0d0f&iconColor=ffc13c&autoplay=true&nextbutton=true`,
+      url: `https://vidlink.pro/tv/${showId}/${selectedSeason}/${selectedEpisode}?primaryColor=ffc13c&autoplay=true&nextbutton=true`,
     },
     {
-      id: "2embed",
+      id: "vidplus",
       label: "Server 2",
       color: "#34d399",
-      url: `https://www.2embed.cc/embedtv/${externalIds?.imdb_id || showId}&s=${selectedSeason}&e=${selectedEpisode}`,
+      url: `https://player.vidplus.to/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
     },
     {
       id: "vidsrcme",
@@ -404,10 +404,10 @@ export default function TVShowDetails({ params }) {
       url: `https://vidsrc.net/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
     },
     {
-      id: "vidplus",
+      id: "2embed",
       label: "Server 6",
       color: "#4ade80",
-      url: `https://player.vidplus.to/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
+      url: `https://www.2embed.cc/embedtv/${externalIds?.imdb_id || showId}&s=${selectedSeason}&e=${selectedEpisode}`,
     },
   ];
 
