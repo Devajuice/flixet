@@ -1,6 +1,7 @@
-'use client';
-import { motion } from 'framer-motion';
-import MovieCard from '@/components/MovieCard';
+"use client";
+import { motion } from "framer-motion";
+import MovieCard from "@/components/MovieCard";
+import TVCard from "@/components/TVCard";
 
 export default function SearchResults({ movies }) {
   return (
@@ -49,16 +50,13 @@ export default function SearchResults({ movies }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
         >
-          {movies.map((movie, index) => (
-            <motion.div
-              key={movie.id}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.025, duration: 0.35 }}
-            >
-              <MovieCard movie={movie} />
-            </motion.div>
-          ))}
+          {movies.map((item) =>
+            item.media_type === "tv" ? (
+              <TVCard key={`tv-${item.id}`} show={item} />
+            ) : (
+              <MovieCard key={`movie-${item.id}`} movie={item} />
+            ),
+          )}
         </motion.div>
       </div>
     </>

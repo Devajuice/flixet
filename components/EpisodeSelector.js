@@ -1,7 +1,7 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Star, Tv } from 'lucide-react';
+"use client";
+import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import { Star, Tv } from "lucide-react";
 
 const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
 
@@ -16,33 +16,43 @@ export default function EpisodeSelector({
   const currentSeason = seasons.find((s) => s.season_number === selectedSeason);
   const [omdbCache, setOmdbCache] = useState({});
 
-  const fetchOmdbRating = async (season, episode) => {
-    const key = `S${season}E${episode}`;
-    if (omdbCache[key] !== undefined) return;
-    if (!OMDB_KEY || !imdbId) return;
-    try {
-      const res = await fetch(
-        `https://www.omdbapi.com/?i=${imdbId}&Season=${season}&Episode=${episode}&apikey=${OMDB_KEY}`,
-      );
-      const data = await res.json();
-      setOmdbCache((prev) => ({
-        ...prev,
-        [key]:
-          data.imdbRating && data.imdbRating !== 'N/A'
-            ? { rating: data.imdbRating, votes: data.imdbVotes }
-            : null,
-      }));
-    } catch {
-      setOmdbCache((prev) => ({ ...prev, [key]: null }));
-    }
-  };
+  // Memoized so it can be a stable dep in useEffect below.
+  // Uses functional setState to read latest cache without closing over it.
+  const fetchOmdbRating = useCallback(
+    (season, episode) => {
+      const key = `S${season}E${episode}`;
+      if (!OMDB_KEY || !imdbId) return;
+      setOmdbCache((prev) => {
+        // Already fetched or in-flight
+        if (Object.prototype.hasOwnProperty.call(prev, key)) return prev;
+        // Fire the request
+        fetch(
+          `https://www.omdbapi.com/?i=${imdbId}&Season=${season}&Episode=${episode}&apikey=${OMDB_KEY}`,
+        )
+          .then((r) => r.json())
+          .then((data) =>
+            setOmdbCache((p) => ({
+              ...p,
+              [key]:
+                data.imdbRating && data.imdbRating !== "N/A"
+                  ? { rating: data.imdbRating, votes: data.imdbVotes }
+                  : null,
+            })),
+          )
+          .catch(() => setOmdbCache((p) => ({ ...p, [key]: null })));
+        // Mark as in-flight immediately to prevent duplicate fetches
+        return { ...prev, [key]: undefined };
+      });
+    },
+    [imdbId],
+  );
 
   useEffect(() => {
     if (!OMDB_KEY || !imdbId || !currentSeason?.episodes) return;
     currentSeason.episodes.forEach((ep) => {
       fetchOmdbRating(selectedSeason, ep.episode_number);
     });
-  }, [selectedSeason, imdbId]);
+  }, [selectedSeason, imdbId, currentSeason, fetchOmdbRating]);
 
   return (
     <div style={styles.container}>
@@ -73,15 +83,15 @@ export default function EpisodeSelector({
             Episodes
             <span
               style={{
-                fontSize: '11px',
-                fontWeight: '600',
-                color: 'rgba(255,255,255,0.25)',
-                letterSpacing: '0.07em',
-                textTransform: 'uppercase',
-                marginLeft: '4px',
+                fontSize: "11px",
+                fontWeight: "600",
+                color: "rgba(255,255,255,0.25)",
+                letterSpacing: "0.07em",
+                textTransform: "uppercase",
+                marginLeft: "4px",
               }}
             >
-              {currentSeason.episodes?.length || currentSeason.episode_count}{' '}
+              {currentSeason.episodes?.length || currentSeason.episode_count}{" "}
               eps
             </span>
           </h3>
@@ -137,32 +147,32 @@ function SeasonButton({ season, isActive, onClick }) {
       onHoverEnd={() => setHovered(false)}
       whileTap={{ scale: 0.96 }}
       style={{
-        padding: '8px 18px',
+        padding: "8px 18px",
         background: isActive
-          ? 'rgba(255,193,60,0.12)'
+          ? "rgba(255,193,60,0.12)"
           : hovered
-            ? 'rgba(255,255,255,0.06)'
-            : 'rgba(255,255,255,0.04)',
+            ? "rgba(255,255,255,0.06)"
+            : "rgba(255,255,255,0.04)",
         border: `1px solid ${
           isActive
-            ? 'rgba(255,193,60,0.5)'
+            ? "rgba(255,193,60,0.5)"
             : hovered
-              ? 'rgba(255,255,255,0.12)'
-              : 'rgba(255,255,255,0.08)'
+              ? "rgba(255,255,255,0.12)"
+              : "rgba(255,255,255,0.08)"
         }`,
-        borderRadius: '8px',
+        borderRadius: "8px",
         color: isActive
-          ? '#ffc13c'
+          ? "#ffc13c"
           : hovered
-            ? 'rgba(255,255,255,0.85)'
-            : 'rgba(255,255,255,0.5)',
+            ? "rgba(255,255,255,0.85)"
+            : "rgba(255,255,255,0.5)",
         fontFamily: "'DM Sans', sans-serif",
-        fontSize: '13px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        letterSpacing: '0.02em',
+        fontSize: "13px",
+        fontWeight: "600",
+        cursor: "pointer",
+        letterSpacing: "0.02em",
         transition:
-          'background 0.2s ease, border-color 0.2s ease, color 0.2s ease',
+          "background 0.2s ease, border-color 0.2s ease, color 0.2s ease",
       }}
     >
       Season {season.season_number}
@@ -187,10 +197,10 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
 
   // ── Air date ──
   const airDate = episode.air_date
-    ? new Date(episode.air_date).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
+    ? new Date(episode.air_date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
       })
     : null;
 
@@ -211,47 +221,47 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
       whileHover={{ scale: 1.005 }}
       whileTap={{ scale: 0.998 }}
       style={{
-        padding: '14px 18px',
+        padding: "14px 18px",
         background: isActive
-          ? 'rgba(255,193,60,0.07)'
+          ? "rgba(255,193,60,0.07)"
           : hovered
-            ? 'rgba(255,255,255,0.05)'
-            : 'rgba(255,255,255,0.03)',
+            ? "rgba(255,255,255,0.05)"
+            : "rgba(255,255,255,0.03)",
         border: `1px solid ${
           isActive
-            ? 'rgba(255,193,60,0.3)'
+            ? "rgba(255,193,60,0.3)"
             : hovered
-              ? 'rgba(255,255,255,0.1)'
-              : 'rgba(255,255,255,0.06)'
+              ? "rgba(255,255,255,0.1)"
+              : "rgba(255,255,255,0.06)"
         }`,
-        borderRadius: '10px',
-        cursor: 'pointer',
-        boxShadow: isActive ? '0 0 0 1px rgba(255,193,60,0.1)' : 'none',
+        borderRadius: "10px",
+        cursor: "pointer",
+        boxShadow: isActive ? "0 0 0 1px rgba(255,193,60,0.1)" : "none",
         transition:
-          'background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+          "background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
       }}
     >
       {/* ── Row 1: title · runtime chip · date ─────── */}
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '12px',
-          marginBottom: '8px',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "8px",
         }}
       >
         {/* Ep number + title */}
         <h4
           style={{
             ...F,
-            fontSize: '14px',
-            fontWeight: '700',
+            fontSize: "14px",
+            fontWeight: "700",
             margin: 0,
-            display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '7px',
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "7px",
             flex: 1,
             minWidth: 0,
           }}
@@ -259,9 +269,9 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
           <span
             style={{
               ...F,
-              color: '#ffc13c',
-              fontWeight: '800',
-              fontSize: '13px',
+              color: "#ffc13c",
+              fontWeight: "800",
+              fontSize: "13px",
               flexShrink: 0,
             }}
           >
@@ -269,16 +279,16 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
           </span>
           {episode.name && (
             <>
-              <span style={{ color: 'rgba(255,255,255,0.18)' }}>·</span>
+              <span style={{ color: "rgba(255,255,255,0.18)" }}>·</span>
               <span
                 style={{
                   ...F,
                   color: isActive
-                    ? 'rgba(255,255,255,0.95)'
-                    : 'rgba(255,255,255,0.82)',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                    ? "rgba(255,255,255,0.95)"
+                    : "rgba(255,255,255,0.82)",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {episode.name}
@@ -290,9 +300,9 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
         {/* Right side: runtime + date */}
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
             flexShrink: 0,
           }}
         >
@@ -301,15 +311,15 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
             <span
               style={{
                 ...F,
-                fontSize: '11px',
-                fontWeight: '600',
-                color: 'rgba(255,193,60,0.85)',
-                background: 'rgba(255,193,60,0.1)',
-                border: '1px solid rgba(255,193,60,0.22)',
-                borderRadius: '4px',
-                padding: '2px 8px',
-                letterSpacing: '0.02em',
-                whiteSpace: 'nowrap',
+                fontSize: "11px",
+                fontWeight: "600",
+                color: "rgba(255,193,60,0.85)",
+                background: "rgba(255,193,60,0.1)",
+                border: "1px solid rgba(255,193,60,0.22)",
+                borderRadius: "4px",
+                padding: "2px 8px",
+                letterSpacing: "0.02em",
+                whiteSpace: "nowrap",
               }}
             >
               ⏱ {runtime}
@@ -321,11 +331,11 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
             <span
               style={{
                 ...F,
-                fontSize: '11px',
-                fontWeight: '600',
-                color: 'rgba(255,255,255,0.65)',
-                whiteSpace: 'nowrap',
-                letterSpacing: '0.02em',
+                fontSize: "11px",
+                fontWeight: "600",
+                color: "rgba(255,255,255,0.65)",
+                whiteSpace: "nowrap",
+                letterSpacing: "0.02em",
               }}
             >
               {airDate}
@@ -338,34 +348,34 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
       {(showTmdb || omdb) && (
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginBottom: episode.overview ? '8px' : 0,
-            flexWrap: 'wrap',
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            marginBottom: episode.overview ? "8px" : 0,
+            flexWrap: "wrap",
           }}
         >
           {/* TMDb badge */}
           {showTmdb && (
             <div
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                background: 'rgba(255,193,60,0.08)',
-                border: '1px solid rgba(255,193,60,0.18)',
-                borderRadius: '6px',
-                padding: '3px 8px',
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                background: "rgba(255,193,60,0.08)",
+                border: "1px solid rgba(255,193,60,0.18)",
+                borderRadius: "6px",
+                padding: "3px 8px",
               }}
             >
               <Star size={11} fill="#ffc13c" color="#ffc13c" />
               <span
                 style={{
                   ...F,
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  color: '#ffc13c',
-                  letterSpacing: '0.02em',
+                  fontSize: "11px",
+                  fontWeight: "700",
+                  color: "#ffc13c",
+                  letterSpacing: "0.02em",
                 }}
               >
                 {tmdbRating}
@@ -373,11 +383,11 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
               <span
                 style={{
                   ...F,
-                  fontSize: '10px',
-                  fontWeight: '600',
-                  color: 'rgba(255,193,60,0.5)',
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase',
+                  fontSize: "10px",
+                  fontWeight: "600",
+                  color: "rgba(255,193,60,0.5)",
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
                 }}
               >
                 TMDb
@@ -389,25 +399,25 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
           {omdb && (
             <div
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                background: 'rgba(245,197,24,0.08)',
-                border: '1px solid rgba(245,197,24,0.2)',
-                borderRadius: '6px',
-                padding: '3px 8px',
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                background: "rgba(245,197,24,0.08)",
+                border: "1px solid rgba(245,197,24,0.2)",
+                borderRadius: "6px",
+                padding: "3px 8px",
               }}
             >
               <span
                 style={{
-                  background: '#f5c518',
-                  color: '#000',
+                  background: "#f5c518",
+                  color: "#000",
                   ...F,
-                  fontSize: '9px',
-                  fontWeight: '900',
-                  padding: '1px 4px',
-                  borderRadius: '3px',
-                  letterSpacing: '0.03em',
+                  fontSize: "9px",
+                  fontWeight: "900",
+                  padding: "1px 4px",
+                  borderRadius: "3px",
+                  letterSpacing: "0.03em",
                 }}
               >
                 IMDb
@@ -415,10 +425,10 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
               <span
                 style={{
                   ...F,
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  color: '#f5c518',
-                  letterSpacing: '0.02em',
+                  fontSize: "11px",
+                  fontWeight: "700",
+                  color: "#f5c518",
+                  letterSpacing: "0.02em",
                 }}
               >
                 {omdb.rating}
@@ -427,12 +437,12 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
                 <span
                   style={{
                     ...F,
-                    fontSize: '10px',
-                    color: 'rgba(245,197,24,0.4)',
-                    letterSpacing: '0.02em',
+                    fontSize: "10px",
+                    color: "rgba(245,197,24,0.4)",
+                    letterSpacing: "0.02em",
                   }}
                 >
-                  ({Number(omdb.votes.replace(/,/g, '')).toLocaleString()})
+                  ({Number(omdb.votes.replace(/,/g, "")).toLocaleString()})
                 </span>
               )}
             </div>
@@ -442,10 +452,10 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
           {OMDB_KEY && imdbId && omdb === undefined && (
             <div
               style={{
-                width: '60px',
-                height: '22px',
-                background: 'rgba(255,255,255,0.04)',
-                borderRadius: '6px',
+                width: "60px",
+                height: "22px",
+                background: "rgba(255,255,255,0.04)",
+                borderRadius: "6px",
               }}
             />
           )}
@@ -457,9 +467,9 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
         <p
           style={{
             ...F,
-            fontSize: '13px',
-            lineHeight: '1.65',
-            color: 'rgba(255,255,255,0.4)',
+            fontSize: "13px",
+            lineHeight: "1.65",
+            color: "rgba(255,255,255,0.4)",
             margin: 0,
           }}
         >
@@ -471,15 +481,15 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
         <p
           style={{
             ...F,
-            fontSize: '12px',
-            color: 'rgba(255,255,255,0.22)',
-            fontStyle: 'italic',
+            fontSize: "12px",
+            color: "rgba(255,255,255,0.22)",
+            fontStyle: "italic",
             margin: 0,
           }}
         >
           {fallback
-            ? 'Episode details not available'
-            : 'No description available'}
+            ? "Episode details not available"
+            : "No description available"}
         </p>
       )}
     </motion.div>
@@ -488,32 +498,32 @@ function EpisodeCard({ episode, isActive, onClick, index, fallback, omdb }) {
 
 const styles = {
   container: {
-    marginBottom: '30px',
+    marginBottom: "30px",
     fontFamily: "'DM Sans', sans-serif",
   },
   section: {
-    marginBottom: '32px',
+    marginBottom: "32px",
   },
   label: {
     fontFamily: "'DM Sans', sans-serif",
-    fontSize: '15px',
-    fontWeight: '700',
-    marginBottom: '14px',
-    color: 'rgba(255,255,255,0.88)',
-    letterSpacing: '0.09em',
-    textTransform: 'uppercase',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
+    fontSize: "15px",
+    fontWeight: "700",
+    marginBottom: "14px",
+    color: "rgba(255,255,255,0.88)",
+    letterSpacing: "0.09em",
+    textTransform: "uppercase",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
   },
   seasonGrid: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '8px',
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px",
   },
   episodeList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
   },
 };
