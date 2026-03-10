@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import {
   FileText,
   ShieldCheck,
@@ -13,12 +13,12 @@ import {
   Edit,
   Ban,
   Mail,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function TermsOfService() {
   return (
     <>
-      <style jsx global>{`
+      <style>{`
         /* ── Container ─────────────────────────────────── */
         .terms-container {
           max-width: 1000px;
@@ -258,29 +258,63 @@ export default function TermsOfService() {
         /* ── Responsive ────────────────────────────────── */
         @media (max-width: 768px) {
           .terms-container {
-            padding: 28px 16px 80px;
+            padding: 20px 14px 60px;
+          }
+          .terms-header {
+            margin-bottom: 28px;
           }
           .terms-title {
-            font-size: 28px;
+            font-size: 24px;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
+          }
+          .terms-title svg {
+            width: 28px;
+            height: 28px;
           }
           .terms-subtitle {
-            font-size: 13px;
+            font-size: 12px;
           }
           .terms-section {
-            padding: 20px;
-            margin-bottom: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
           }
           .terms-section-title {
-            font-size: 15px;
+            font-size: 14px;
+          }
+          .terms-text {
+            font-size: 12px;
+          }
+          .terms-list li {
+            font-size: 12px;
+            padding: 8px 0 8px 18px;
           }
           .terms-warning {
             flex-direction: column;
           }
+          .terms-warning p {
+            font-size: 12px;
+          }
+          .terms-disclaimer p {
+            font-size: 11px;
+          }
           .terms-contact-card {
             flex-direction: column;
             text-align: center;
+          }
+          .terms-contact-card p {
+            font-size: 12px;
+          }
+        }
+        @media (max-width: 375px) {
+          .terms-container {
+            padding: 16px 12px 50px;
+          }
+          .terms-title {
+            font-size: 20px;
+          }
+          .terms-section {
+            padding: 14px;
           }
         }
       `}</style>
@@ -308,7 +342,7 @@ export default function TermsOfService() {
           {
             num: 1,
             icon: <ShieldCheck size={18} />,
-            title: 'Acceptance of Terms',
+            title: "Acceptance of Terms",
             content: (
               <p className="terms-text">
                 By accessing and using Flixet ("the Website"), you accept and
@@ -321,7 +355,7 @@ export default function TermsOfService() {
           {
             num: 2,
             icon: <Globe size={18} />,
-            title: 'Description of Service',
+            title: "Description of Service",
             content: (
               <>
                 <p className="terms-text">
@@ -344,7 +378,7 @@ export default function TermsOfService() {
           {
             num: 3,
             icon: <Users size={18} />,
-            title: 'Third-Party Content',
+            title: "Third-Party Content",
             content: (
               <>
                 <p className="terms-text">
@@ -372,7 +406,7 @@ export default function TermsOfService() {
           {
             num: 4,
             icon: <Shield size={18} />,
-            title: 'User Responsibilities',
+            title: "User Responsibilities",
             content: (
               <>
                 <p className="terms-text">
@@ -408,7 +442,7 @@ export default function TermsOfService() {
           {
             num: 5,
             icon: <Copyright size={18} />,
-            title: 'Intellectual Property',
+            title: "Intellectual Property",
             content: (
               <p className="terms-text">
                 All content, trademarks, and data on this Website are the
@@ -422,7 +456,7 @@ export default function TermsOfService() {
           {
             num: 6,
             icon: <ShieldCheck size={18} />,
-            title: 'DMCA Compliance',
+            title: "DMCA Compliance",
             content: (
               <>
                 <p className="terms-text">
@@ -451,7 +485,7 @@ export default function TermsOfService() {
           {
             num: 7,
             icon: <AlertTriangle size={18} />,
-            title: 'Disclaimer of Warranties',
+            title: "Disclaimer of Warranties",
             content: (
               <div className="terms-disclaimer">
                 <p>
@@ -466,7 +500,7 @@ export default function TermsOfService() {
           {
             num: 8,
             icon: <Shield size={18} />,
-            title: 'Limitation of Liability',
+            title: "Limitation of Liability",
             content: (
               <div className="terms-disclaimer">
                 <p>
@@ -480,7 +514,7 @@ export default function TermsOfService() {
           {
             num: 9,
             icon: <UserX size={18} />,
-            title: 'Age Restriction',
+            title: "Age Restriction",
             content: (
               <div className="terms-warning">
                 <AlertTriangle size={16} />
@@ -495,7 +529,7 @@ export default function TermsOfService() {
           {
             num: 10,
             icon: <Edit size={18} />,
-            title: 'Modifications to Terms',
+            title: "Modifications to Terms",
             content: (
               <p className="terms-text">
                 We reserve the right to modify these Terms of Service at any
@@ -508,7 +542,7 @@ export default function TermsOfService() {
           {
             num: 11,
             icon: <Ban size={18} />,
-            title: 'Termination',
+            title: "Termination",
             content: (
               <p className="terms-text">
                 We reserve the right to terminate or suspend access to the
@@ -520,7 +554,7 @@ export default function TermsOfService() {
           {
             num: 12,
             icon: <Mail size={18} />,
-            title: 'Contact Information',
+            title: "Contact Information",
             content: (
               <>
                 <p className="terms-text">
@@ -531,28 +565,22 @@ export default function TermsOfService() {
                   <Mail size={24} />
                   <p>
                     Reach out through the contact information provided on our
-                    website or email us at{' '}
+                    website or email us at{" "}
                     <strong>devajuice@zohomail.in</strong>
                   </p>
                 </div>
               </>
             ),
           },
-        ].map((s, i) => (
-          <motion.div
-            key={s.num}
-            className="terms-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08 + i * 0.05 }}
-          >
+        ].map((s) => (
+          <div key={s.num} className="terms-section">
             <div className="terms-section-header">
               <div className="terms-section-number">{s.num}</div>
               {s.icon}
               <h2 className="terms-section-title">{s.title}</h2>
             </div>
             {s.content}
-          </motion.div>
+          </div>
         ))}
       </motion.div>
     </>

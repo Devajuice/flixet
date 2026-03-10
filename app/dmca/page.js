@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import {
   Shield,
   AlertTriangle,
@@ -8,12 +8,12 @@ import {
   FileText,
   CheckCircle,
   XCircle,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function DMCAPage() {
   return (
     <>
-      <style jsx global>{`
+      <style>{`
         /* ── Container ─────────────────────────────────── */
         .dmca-container {
           max-width: 1000px;
@@ -254,28 +254,61 @@ export default function DMCAPage() {
         /* ── Responsive ────────────────────────────────── */
         @media (max-width: 768px) {
           .dmca-container {
-            padding: 28px 16px 80px;
+            padding: 20px 14px 60px;
           }
           .dmca-title {
-            font-size: 28px;
+            font-size: 24px;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
+          }
+          .dmca-title svg {
+            width: 28px;
+            height: 28px;
           }
           .dmca-subtitle {
-            font-size: 13px;
+            font-size: 12px;
+          }
+          .dmca-header {
+            margin-bottom: 28px;
           }
           .dmca-section {
-            padding: 20px;
-            margin-bottom: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
           }
           .dmca-section-title {
-            font-size: 15px;
+            font-size: 14px;
+          }
+          .dmca-text {
+            font-size: 12px;
+          }
+          .dmca-list li {
+            font-size: 12px;
+            padding: 8px 0 8px 18px;
           }
           .dmca-notice-box {
             flex-direction: column;
+            padding: 14px 16px;
+          }
+          .dmca-notice-box p {
+            font-size: 12px;
           }
           .dmca-steps-grid {
             grid-template-columns: 1fr;
+          }
+          .dmca-contact-item {
+            font-size: 12px;
+            flex-wrap: wrap;
+          }
+        }
+        @media (max-width: 375px) {
+          .dmca-container {
+            padding: 16px 12px 50px;
+          }
+          .dmca-title {
+            font-size: 20px;
+          }
+          .dmca-section {
+            padding: 14px;
           }
         }
       `}</style>
@@ -314,7 +347,7 @@ export default function DMCAPage() {
         {[
           {
             icon: <FileText size={18} />,
-            title: 'Copyright Infringement Notice',
+            title: "Copyright Infringement Notice",
             content: (
               <p className="dmca-text">
                 Flixet respects the intellectual property rights of others and
@@ -326,7 +359,7 @@ export default function DMCAPage() {
           },
           {
             icon: <Mail size={18} />,
-            title: 'How to File a DMCA Notice',
+            title: "How to File a DMCA Notice",
             content: (
               <>
                 <p className="dmca-text">
@@ -366,7 +399,7 @@ export default function DMCAPage() {
           },
           {
             icon: <CheckCircle size={18} />,
-            title: 'Our Response Process',
+            title: "Our Response Process",
             content: (
               <>
                 <p className="dmca-text">
@@ -374,9 +407,9 @@ export default function DMCAPage() {
                 </p>
                 <div className="dmca-steps-grid">
                   {[
-                    'Review the notice for validity',
-                    'Remove or disable access to the link',
-                    'Notify the user if applicable',
+                    "Review the notice for validity",
+                    "Remove or disable access to the link",
+                    "Notify the user if applicable",
                   ].map((step, i) => (
                     <div key={i} className="dmca-step-card">
                       <div className="dmca-step-number">{i + 1}</div>
@@ -389,7 +422,7 @@ export default function DMCAPage() {
           },
           {
             icon: <XCircle size={18} />,
-            title: 'Counter-Notice',
+            title: "Counter-Notice",
             content: (
               <>
                 <p className="dmca-text">
@@ -410,7 +443,7 @@ export default function DMCAPage() {
           },
           {
             icon: <AlertTriangle size={18} />,
-            title: 'Important Notes',
+            title: "Important Notes",
             content: (
               <ul className="dmca-list">
                 <li>
@@ -433,7 +466,7 @@ export default function DMCAPage() {
           },
           {
             icon: <Mail size={18} />,
-            title: 'Contact for DMCA Notices',
+            title: "Contact for DMCA Notices",
             content: (
               <>
                 <p className="dmca-text">
@@ -460,19 +493,13 @@ export default function DMCAPage() {
             ),
           },
         ].map((s, i) => (
-          <motion.div
-            key={i}
-            className="dmca-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 + i * 0.08 }}
-          >
+          <div key={i} className="dmca-section">
             <div className="dmca-section-header">
               {s.icon}
               <h2 className="dmca-section-title">{s.title}</h2>
             </div>
             {s.content}
-          </motion.div>
+          </div>
         ))}
       </motion.div>
     </>

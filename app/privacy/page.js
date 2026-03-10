@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import {
   Shield,
   Eye,
@@ -10,12 +10,12 @@ import {
   FileText,
   Mail,
   AlertCircle,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function PrivacyPolicy() {
   return (
     <>
-      <style jsx global>{`
+      <style>{`
         /* ── Container ─────────────────────────────────── */
         .prv-container {
           max-width: 1000px;
@@ -269,22 +269,39 @@ export default function PrivacyPolicy() {
         /* ── Responsive ────────────────────────────────── */
         @media (max-width: 768px) {
           .prv-container {
-            padding: 28px 16px 80px;
+            padding: 20px 14px 60px;
+          }
+          .prv-header {
+            margin-bottom: 28px;
           }
           .prv-title {
-            font-size: 28px;
+            font-size: 24px;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
+          }
+          .prv-title svg {
+            width: 28px;
+            height: 28px;
           }
           .prv-subtitle {
-            font-size: 13px;
+            font-size: 12px;
           }
           .prv-section {
-            padding: 20px;
-            margin-bottom: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
           }
           .prv-section-title {
-            font-size: 15px;
+            font-size: 14px;
+          }
+          .prv-text {
+            font-size: 12px;
+          }
+          .prv-list li {
+            font-size: 12px;
+            padding: 8px 0 8px 18px;
+          }
+          .prv-highlight p {
+            font-size: 12px;
           }
           .prv-service-grid {
             grid-template-columns: 1fr;
@@ -292,6 +309,17 @@ export default function PrivacyPolicy() {
           .prv-contact-card {
             flex-direction: column;
             text-align: center;
+          }
+        }
+        @media (max-width: 375px) {
+          .prv-container {
+            padding: 16px 12px 50px;
+          }
+          .prv-title {
+            font-size: 20px;
+          }
+          .prv-section {
+            padding: 14px;
           }
         }
       `}</style>
@@ -319,7 +347,7 @@ export default function PrivacyPolicy() {
           {
             num: 1,
             icon: <Eye size={18} />,
-            title: 'Information We Collect',
+            title: "Information We Collect",
             content: (
               <>
                 <p className="prv-text">
@@ -344,7 +372,7 @@ export default function PrivacyPolicy() {
           {
             num: 2,
             icon: <FileText size={18} />,
-            title: 'How We Use Information',
+            title: "How We Use Information",
             content: (
               <>
                 <p className="prv-text">
@@ -361,7 +389,7 @@ export default function PrivacyPolicy() {
           {
             num: 3,
             icon: <Users size={18} />,
-            title: 'Third-Party Services',
+            title: "Third-Party Services",
             content: (
               <>
                 <p className="prv-text">
@@ -394,7 +422,7 @@ export default function PrivacyPolicy() {
           {
             num: 4,
             icon: <Cookie size={18} />,
-            title: 'Cookies',
+            title: "Cookies",
             content: (
               <p className="prv-text">
                 We may use cookies to enhance user experience. Third-party embed
@@ -407,7 +435,7 @@ export default function PrivacyPolicy() {
           {
             num: 5,
             icon: <Lock size={18} />,
-            title: 'Data Security',
+            title: "Data Security",
             content: (
               <p className="prv-text">
                 Since we do not collect personal information, there is no
@@ -435,7 +463,7 @@ export default function PrivacyPolicy() {
           {
             num: 7,
             icon: <FileText size={18} />,
-            title: 'Changes to Privacy Policy',
+            title: "Changes to Privacy Policy",
             content: (
               <p className="prv-text">
                 We may update this Privacy Policy from time to time. Changes
@@ -447,7 +475,7 @@ export default function PrivacyPolicy() {
           {
             num: 8,
             icon: <Shield size={18} />,
-            title: 'Your Rights',
+            title: "Your Rights",
             content: (
               <>
                 <p className="prv-text">
@@ -468,7 +496,7 @@ export default function PrivacyPolicy() {
           {
             num: 9,
             icon: <Mail size={18} />,
-            title: 'Contact Us',
+            title: "Contact Us",
             content: (
               <>
                 <p className="prv-text">
@@ -487,21 +515,15 @@ export default function PrivacyPolicy() {
               </>
             ),
           },
-        ].map((s, i) => (
-          <motion.div
-            key={s.num}
-            className="prv-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08 + i * 0.05 }}
-          >
+        ].map((s) => (
+          <div key={s.num} className="prv-section">
             <div className="prv-section-header">
               <div className="prv-section-number">{s.num}</div>
               {s.icon}
               <h2 className="prv-section-title">{s.title}</h2>
             </div>
             {s.content}
-          </motion.div>
+          </div>
         ))}
       </motion.div>
     </>
