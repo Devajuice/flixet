@@ -404,10 +404,10 @@ export default function TVShowDetails({ params }) {
       url: `https://vidsrc.net/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
     },
     {
-      id: "vidsrccc",
-      label: "Server 5",
-      color: "#f472b6",
-      url: `https://vidsrc.cc/v2/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
+      id: "vidplus",
+      label: "Server 6",
+      color: "#4ade80",
+      url: `https://vidplus.site/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
     },
   ];
 

@@ -194,6 +194,12 @@ export default function MovieDetails({ params }) {
       color: "#f472b6",
       url: `https://vidsrc.net/embed/movie/${movieId}`,
     },
+    {
+      id: "vidplus",
+      label: "Server 6",
+      color: "#4ade80",
+      url: `https://vidplus.site/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
+    },
   ];
 
   return (
