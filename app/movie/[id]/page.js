@@ -198,7 +198,7 @@ export default function MovieDetails({ params }) {
       id: "vidplus",
       label: "Server 6",
       color: "#4ade80",
-      url: `https://vidplus.site/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
+      url: `https://player.vidplus.to/embed/tv/${showId}/${selectedSeason}/${selectedEpisode}`,
     },
   ];
 
