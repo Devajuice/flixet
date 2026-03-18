@@ -1,245 +1,202 @@
-'use client';
+"use client";
 
-import SearchResults from '@/components/SearchResults';
-import { Search, Film, TrendingUp } from 'lucide-react';
+import SearchResults from "@/components/SearchResults";
+import { Search, Film, TrendingUp } from "lucide-react";
 
 export default function SearchPageWrapper({ query, data }) {
   return (
     <>
       <style jsx>{`
-        * {
-          font-family: 'DM Sans', sans-serif;
-        }
-
-        .search-container {
-          padding: 40px 20px 100px;
-          max-width: 1400px;
+        .search-page {
+          max-width: 1600px;
           margin: 0 auto;
+          padding-bottom: 80px;
         }
 
-        /* ── Header ──────────────────────────────────── */
+        /* ── Header ── */
         .search-header {
-          text-align: center;
-          margin-bottom: 48px;
+          margin-bottom: 36px;
         }
-
+        .search-eyebrow {
+          font-size: 12px;
+          font-weight: 700;
+          color: #e50914;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          margin-bottom: 10px;
+        }
         .search-title {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 42px;
-          font-weight: 800;
-          letter-spacing: -0.03em;
-          color: rgba(255, 255, 255, 0.95);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 14px;
-          flex-wrap: wrap;
+          font-family: "Bebas Neue", sans-serif;
+          font-size: clamp(32px, 5vw, 56px);
+          letter-spacing: 0.02em;
+          color: #fff;
+          line-height: 1;
           margin: 0 0 12px;
         }
-
-        .search-title span {
-          color: #ffc13c;
+        .search-meta {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
         }
-
-        .search-subtitle {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 16px;
-          color: rgba(255, 255, 255, 0.4);
-          margin: 0 0 16px;
-          letter-spacing: 0.01em;
+        .search-query-text {
+          font-size: 15px;
+          color: rgba(255, 255, 255, 0.5);
+          font-weight: 400;
         }
-
-        .search-query {
-          color: rgba(255, 255, 255, 0.85);
-          font-weight: 600;
+        .search-query-text strong {
+          color: rgba(255, 255, 255, 0.9);
+          font-weight: 700;
         }
-
-        .results-count {
+        .results-badge {
           display: inline-flex;
           align-items: center;
-          gap: 7px;
-          background: rgba(255, 193, 60, 0.08);
-          border: 1px solid rgba(255, 193, 60, 0.22);
+          gap: 6px;
+          background: rgba(229, 9, 20, 0.12);
+          border: 1px solid rgba(229, 9, 20, 0.3);
           border-radius: 50px;
-          padding: 6px 16px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 600;
-          color: #ffc13c;
+          padding: 4px 12px;
+          font-size: 12px;
+          font-weight: 700;
+          color: #ff6b73;
           letter-spacing: 0.02em;
         }
 
-        /* ── Empty / no-results state ────────────────── */
+        /* ── Empty state ── */
         .empty-state {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          min-height: 50vh;
-          gap: 16px;
+          min-height: 45vh;
+          gap: 20px;
           text-align: center;
+          padding: 40px 20px;
         }
-
-        .empty-icon {
-          opacity: 0.18;
+        .empty-icon-wrap {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
-
         .empty-title {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 28px;
-          font-weight: 800;
-          color: rgba(255, 255, 255, 0.88);
+          font-family: "Bebas Neue", sans-serif;
+          font-size: 36px;
+          letter-spacing: 0.02em;
+          color: rgba(255, 255, 255, 0.9);
           margin: 0;
-          letter-spacing: -0.02em;
         }
-
         .empty-text {
-          font-family: 'DM Sans', sans-serif;
           font-size: 15px;
-          color: rgba(255, 255, 255, 0.38);
-          max-width: 480px;
+          color: rgba(255, 255, 255, 0.4);
+          max-width: 440px;
           line-height: 1.7;
           margin: 0;
         }
 
-        /* ── Suggestions box ─────────────────────────── */
-        .suggestions-box {
+        /* ── Tips / suggestions card ── */
+        .info-card {
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.07);
           border-radius: 12px;
-          padding: 22px 24px;
-          margin-top: 16px;
-          backdrop-filter: blur(10px);
-          max-width: 520px;
+          padding: 20px 24px;
+          max-width: 440px;
           width: 100%;
+          text-align: left;
         }
-
-        .suggestions-title {
+        .info-card-title {
           display: flex;
           align-items: center;
-          gap: 9px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 14px;
+          gap: 8px;
+          font-size: 13px;
           font-weight: 700;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(255, 255, 255, 0.7);
           margin-bottom: 14px;
-          letter-spacing: 0.01em;
+          text-transform: uppercase;
+          letter-spacing: 0.07em;
         }
-
-        .suggestions-list {
+        .info-list {
           list-style: none;
           padding: 0;
           margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
         }
-
-        .suggestions-list li {
-          padding: 9px 0 9px 22px;
+        .info-list li {
+          padding: 9px 0 9px 18px;
           position: relative;
-          font-family: 'DM Sans', sans-serif;
           font-size: 14px;
           color: rgba(255, 255, 255, 0.45);
-          line-height: 1.5;
           border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-          letter-spacing: 0.01em;
+          line-height: 1.5;
         }
-
-        .suggestions-list li:last-child {
+        .info-list li:last-child {
           border-bottom: none;
         }
-
-        .suggestions-list li:before {
-          content: '→';
+        .info-list li::before {
+          content: "→";
           position: absolute;
           left: 0;
-          color: #ffc13c;
+          color: #e50914;
           font-weight: 700;
         }
 
-        /* ── No results tip box ──────────────────────── */
-        .no-results-box {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-left: 3px solid #ffc13c;
-          border-radius: 12px;
-          padding: 22px 24px;
-          margin-top: 16px;
-          max-width: 520px;
-          width: 100%;
-        }
-
-        .no-results-title {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 700;
-          color: #ffc13c;
-          margin: 0 0 12px;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-        }
-
-        /* ── Responsive ──────────────────────────────── */
         @media (max-width: 768px) {
-          .search-container {
-            padding: 28px 15px 80px;
-          }
           .search-title {
-            font-size: 26px;
-            gap: 10px;
-          }
-          .search-subtitle {
-            font-size: 14px;
-          }
-          .empty-title {
-            font-size: 22px;
-          }
-          .empty-text {
-            font-size: 14px;
+            font-size: 32px;
           }
         }
       `}</style>
 
-      <div className="search-container">
+      <div className="search-page">
         {query ? (
           <>
+            {/* Header */}
             <div className="search-header">
-              <h1 className="search-title">
-                <Search size={32} color="#ffc13c" />
-                Search <span>Results</span>
-              </h1>
-              <p className="search-subtitle">
-                Showing results for:{' '}
-                <span className="search-query">"{query}"</span>
-              </p>
-              {data.results.length > 0 && (
-                <div className="results-count">
-                  <Film size={13} />
-                  {data.results.length}{' '}
-                  {data.results.length === 1 ? 'result' : 'results'} found
-                </div>
-              )}
+              <p className="search-eyebrow">Search</p>
+              <h1 className="search-title">Results</h1>
+              <div className="search-meta">
+                <p className="search-query-text">
+                  Showing results for <strong>"{query}"</strong>
+                </p>
+                {data.results.length > 0 && (
+                  <span className="results-badge">
+                    <Film size={12} />
+                    {data.results.length}{" "}
+                    {data.results.length === 1 ? "result" : "results"}
+                  </span>
+                )}
+              </div>
             </div>
 
+            {/* Results */}
             {data.results.length > 0 ? (
               <SearchResults movies={data.results} />
             ) : (
               <div className="empty-state">
-                <Search
-                  size={72}
-                  className="empty-icon"
-                  color="rgba(255,255,255,0.6)"
-                />
-                <h2 className="empty-title">No results found</h2>
+                <div className="empty-icon-wrap">
+                  <Search size={32} color="rgba(255,255,255,0.3)" />
+                </div>
+                <h2 className="empty-title">No Results Found</h2>
                 <p className="empty-text">
-                  We couldn't find anything matching "{query}". Try adjusting
-                  your search below.
+                  We couldn't find anything for "{query}". Try checking your
+                  spelling or using different keywords.
                 </p>
-                <div className="no-results-box">
-                  <h3 className="no-results-title">Search Tips</h3>
-                  <ul className="suggestions-list">
+                <div className="info-card">
+                  <div className="info-card-title">
+                    <TrendingUp size={14} color="#e50914" />
+                    Search Tips
+                  </div>
+                  <ul className="info-list">
                     <li>Check your spelling</li>
-                    <li>Try different keywords</li>
-                    <li>Use more general terms</li>
+                    <li>Try different or more general keywords</li>
                     <li>Search by title, actor, or genre</li>
+                    <li>Use English titles for best results</li>
                   </ul>
                 </div>
               </div>
@@ -247,26 +204,23 @@ export default function SearchPageWrapper({ query, data }) {
           </>
         ) : (
           <div className="empty-state">
-            <Search
-              size={72}
-              className="empty-icon"
-              color="rgba(255,255,255,0.6)"
-            />
-            <h2 className="empty-title">Start Your Search</h2>
+            <div className="empty-icon-wrap">
+              <Search size={32} color="rgba(255,255,255,0.3)" />
+            </div>
+            <h2 className="empty-title">Search Flixet</h2>
             <p className="empty-text">
-              Enter a movie title, actor name, or genre in the search bar above
-              to find what you're looking for.
+              Type in the search bar above to find movies, TV shows, and more.
             </p>
-            <div className="suggestions-box">
-              <div className="suggestions-title">
-                <TrendingUp size={16} color="#ffc13c" />
+            <div className="info-card">
+              <div className="info-card-title">
+                <TrendingUp size={14} color="#e50914" />
                 Popular Searches
               </div>
-              <ul className="suggestions-list">
+              <ul className="info-list">
                 <li>Action movies</li>
                 <li>Marvel movies</li>
-                <li>Comedy films</li>
-                <li>Horror movies</li>
+                <li>Breaking Bad</li>
+                <li>Horror films</li>
                 <li>Sci-fi classics</li>
               </ul>
             </div>
