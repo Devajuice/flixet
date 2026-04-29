@@ -1,95 +1,43 @@
 "use client";
-import { useState, useEffect, use, useRef } from "react";
+import { useState, useEffect, use, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
-  ArrowLeft,
   Play,
-  X,
-  ChevronLeft,
+  Star,
+  ExternalLink,
+  Film,
+  Globe,
+  Tv,
   ChevronRight,
-  ChevronDown,
   Clock,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight as ChevronRightIcon,
 } from "lucide-react";
 import Link from "next/link";
 import WatchlistButton from "@/components/WatchlistButton";
+import VideoPlayer from "@/components/VideoPlayer";
+import MediaCard from "@/components/MediaCard";
+import ScrollRow from "@/components/ScrollRow";
 import { useContinueWatching } from "@/context/ContinueWatchingContext";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
 const IMG = "https://image.tmdb.org/t/p";
 
-/* ── Skeleton ────────────────────────────────────────────────────────────── */
 function Skeleton() {
   return (
-    <div role="status" aria-label="Loading TV show details…" aria-busy="true">
-      <div
-        className="skeleton"
-        style={{
-          width: "100%",
-          height: "70vh",
-          minHeight: 400,
-          borderRadius: 0,
-        }}
-        aria-hidden="true"
-      />
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 40px" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "260px 1fr",
-            gap: 40,
-            marginTop: -80,
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
-          <div
-            className="skeleton"
-            style={{ borderRadius: 12, aspectRatio: "2/3" }}
-            aria-hidden="true"
-          />
+    <div>
+      <div className="skeleton" style={{ width: "100%", height: "70vh", minHeight: 400, borderRadius: 0 }} />
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 var(--container-padding)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 40, marginTop: -80, position: "relative", zIndex: 1 }}>
+          <div className="skeleton" style={{ borderRadius: "var(--radius-xl)", aspectRatio: "2/3" }} />
           <div style={{ paddingTop: 80 }}>
-            <div
-              className="skeleton"
-              style={{
-                height: 52,
-                width: "60%",
-                marginBottom: 16,
-                borderRadius: 8,
-              }}
-              aria-hidden="true"
-            />
+            <div className="skeleton" style={{ height: 52, width: "60%", marginBottom: 16, borderRadius: "var(--radius-lg)" }} />
             {[100, 80, 65].map((w, i) => (
-              <div
-                key={i}
-                className="skeleton"
-                style={{
-                  height: 13,
-                  width: `${w}%`,
-                  marginBottom: 10,
-                  borderRadius: 6,
-                }}
-                aria-hidden="true"
-              />
-            ))}
-            <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
-              {[80, 70, 75, 65].map((w, i) => (
-                <div
-                  key={i}
-                  className="skeleton"
-                  style={{ height: 36, width: w, borderRadius: 8 }}
-                  aria-hidden="true"
-                />
-              ))}
-            </div>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="skeleton"
-                style={{ height: 62, borderRadius: 8, marginTop: 8 }}
-                aria-hidden="true"
-              />
+              <div key={i} className="skeleton" style={{ height: 13, width: `${w}%`, marginBottom: 10, borderRadius: "var(--radius-md)" }} />
             ))}
           </div>
         </div>
@@ -98,8 +46,78 @@ function Skeleton() {
   );
 }
 
-/* ── Episode card ────────────────────────────────────────────────────────── */
-function EpisodeCard({ ep, isActive, onClick, omdb, hasOmdb, index }) {
+/* ── Score ring ─────────────────────────────────────────────── */
+function ScoreRing({ score, size = 56 }) {
+  const pct = Math.round((score / 10) * 100);
+  const r = (size - 6) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (pct / 100) * circ;
+  const color = score >= 7 ? "#22c55e" : score >= 5 ? "#f5c518" : "#ef4444";
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth="3" strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
+      </svg>
+      <div>
+        <span style={{ fontSize: "var(--text-lg)", fontWeight: "var(--font-bold)", color: "var(--text-primary)" }}>{score.toFixed(1)}</span>
+        <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", display: "block" }}>TMDB</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Info card ──────────────────────────────────────────────── */
+function InfoCard({ icon, label, value }) {
+  return (
+    <div className="tv-info-card" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)" }}>
+      <div style={{ color: "var(--accent)", flexShrink: 0 }}>{icon}</div>
+      <div style={{ minWidth: 0 }}>
+        <p style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", margin: 0, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</p>
+        <p className="tv-info-card-value" style={{ fontSize: "var(--text-sm)", fontWeight: "var(--font-semibold)", color: "var(--text-secondary)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ── Cast card ──────────────────────────────────────────────── */
+function CastCard({ actor }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <Link href={`/person/${actor.id}`} style={{ display: "block" }}>
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          width: 110,
+          cursor: "pointer",
+          borderRadius: "var(--radius-lg)",
+          overflow: "hidden",
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid var(--border)",
+          padding: 8,
+          textAlign: "center",
+          transition: "all var(--transition-base)",
+          transform: hovered ? "translateY(-4px)" : "none",
+        }}
+      >
+        <div style={{ width: 84, height: 84, borderRadius: "var(--radius-full)", overflow: "hidden", background: "var(--bg-tertiary)", margin: "0 auto 8px" }}>
+          {actor.profile_path ? (
+            <img src={`${IMG}/w185${actor.profile_path}`} alt={actor.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
+          ) : (
+            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "var(--text-muted)" }}>👤</div>
+          )}
+        </div>
+        <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-semibold)", color: "var(--text-primary)", margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{actor.name}</p>
+        <p style={{ fontSize: 10, color: "var(--text-tertiary)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{actor.character}</p>
+      </div>
+    </Link>
+  );
+}
+
+/* ── Episode card ───────────────────────────────────────────── */
+function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
   const formatRT = (m) => {
     if (!m) return null;
     const h = Math.floor(m / 60);
@@ -107,328 +125,89 @@ function EpisodeCard({ ep, isActive, onClick, omdb, hasOmdb, index }) {
     return h > 0 ? `${h}h ${min}m` : `${min}m`;
   };
   const rt = formatRT(ep.runtime);
-  const air = ep.air_date
-    ? new Date(ep.air_date).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : null;
+  const air = ep.air_date ? new Date(ep.air_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : null;
+  const isFuture = ep.air_date && new Date(ep.air_date) > new Date();
 
   return (
     <motion.div
-      onClick={onClick}
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: Math.min(index * 0.02, 0.3) }}
-      whileHover={{ scale: 1.005 }}
+      onClick={isFuture ? undefined : onClick}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: Math.min(index * 0.03, 0.4) }}
       tabIndex={0}
       role="button"
-      aria-label={`Episode ${ep.episode_number}: ${ep.name || "Untitled"}${isActive ? " (selected)" : ""}`}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      style={{
-        display: "flex",
-        gap: 14,
-        padding: "14px 16px",
-        borderRadius: 10,
-        cursor: "pointer",
-        background: isActive ? "rgba(229,9,20,0.1)" : "rgba(255,255,255,0.03)",
-        border: `1px solid ${isActive ? "rgba(229,9,20,0.4)" : "rgba(255,255,255,0.06)"}`,
-        transition: "all 0.2s ease",
-        alignItems: "flex-start",
-      }}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }}
+      className={`episode-card ${isActive ? "active" : ""} ${isFuture ? "future" : ""}`}
     >
+      {/* Episode number */}
+      <div className="episode-ep-num">
+        <span className="episode-num-text">{String(ep.episode_number).padStart(2, "0")}</span>
+      </div>
+
       {/* Thumbnail */}
-      <div
-        style={{
-          width: 120,
-          height: 68,
-          flexShrink: 0,
-          borderRadius: 6,
-          overflow: "hidden",
-          background: "#1a1a1a",
-          position: "relative",
-        }}
-      >
+      <div className="episode-thumb">
         {ep.still_path ? (
-          <img
-            src={`${IMG}/w185${ep.still_path}`}
-            alt={ep.name || `Episode ${ep.episode_number}`}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            loading="lazy"
-          />
+          <img src={`${IMG}/w300${ep.still_path}`} alt="" loading="lazy" />
         ) : (
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Play size={20} color="rgba(255,255,255,0.2)" />
+          <div className="episode-thumb-placeholder"><Play size={20} color="var(--text-muted)" /></div>
+        )}
+        {isActive && !isFuture && (
+          <div className="episode-thumb-overlay">
+            <div className="episode-play-btn"><Play size={16} fill="white" color="white" strokeWidth={0} /></div>
           </div>
         )}
-        {isActive && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: "rgba(229,9,20,0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: "#e50914",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Play size={14} fill="white" color="white" />
-            </div>
+        {isFuture && (
+          <div className="episode-thumb-overlay future-overlay">
+            <Clock size={18} color="var(--text-muted)" />
           </div>
         )}
       </div>
 
       {/* Info */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            gap: 8,
-            marginBottom: 5,
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 800,
-                color: isActive ? "#e50914" : "rgba(255,255,255,0.4)",
-                marginRight: 8,
-              }}
-            >
-              E{ep.episode_number}
-            </span>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: isActive ? "#fff" : "rgba(255,255,255,0.85)",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {ep.name || "Untitled"}
-            </span>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              flexShrink: 0,
-              alignItems: "center",
-            }}
-          >
-            {rt && (
-              <span
-                style={{
-                  fontSize: 11,
-                  color: "rgba(255,255,255,0.35)",
-                  fontWeight: 500,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {rt}
+      <div className="episode-info">
+        <div className="episode-header-row">
+          <p className="episode-title">{ep.name || `Episode ${ep.episode_number}`}</p>
+          <div className="episode-ratings">
+            {ep.vote_average > 0 && (
+              <span className={`episode-rating ${ep.vote_average >= 7 ? "high" : ep.vote_average >= 5 ? "mid" : "low"}`}>
+                <Star size={10} fill="currentColor" />{ep.vote_average.toFixed(1)}
               </span>
             )}
             {omdb?.rating && (
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: "#f5c518",
-                  background: "rgba(245,197,24,0.1)",
-                  border: "1px solid rgba(245,197,24,0.2)",
-                  borderRadius: 4,
-                  padding: "2px 6px",
-                }}
-              >
-                ★ {omdb.rating}
-              </span>
+              <span className="episode-rating omdb">{omdb.rating}</span>
             )}
           </div>
         </div>
-        {ep.overview && (
-          <p
-            style={{
-              fontSize: 12,
-              color: "rgba(255,255,255,0.4)",
-              lineHeight: 1.55,
-              margin: 0,
-              overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {ep.overview}
-          </p>
+
+        {ep.overview ? (
+          <p className="episode-overview">{ep.overview}</p>
+        ) : (
+          <p className="episode-overview no-overview">No overview available.</p>
         )}
-        {air && (
-          <p
-            style={{
-              fontSize: 10,
-              color: "rgba(255,255,255,0.25)",
-              margin: "5px 0 0",
-              fontWeight: 500,
-            }}
-          >
-            {air}
-          </p>
-        )}
+
+        <div className="episode-meta-row">
+          {air && <span className="episode-meta">{air}</span>}
+          {rt && <span className="episode-meta"><Clock size={10} />{rt}</span>}
+          {isFuture && <span className="episode-meta upcoming">Upcoming</span>}
+        </div>
       </div>
     </motion.div>
   );
 }
 
-/* ── Cast row ────────────────────────────────────────────────────────────── */
-function CastRow({ cast }) {
-  const ref = useRef(null);
-  const scroll = (dir) =>
-    ref.current?.scrollBy({ left: dir * 400, behavior: "smooth" });
-  if (!cast.length) return null;
-  return (
-    <section style={{ marginBottom: 48 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
-        <h2 style={{ fontSize: 18, fontWeight: 700 }}>Cast</h2>
-        <div style={{ display: "flex", gap: 8 }}>
-          {[ChevronLeft, ChevronRight].map((Icon, i) => (
-            <button
-              key={i}
-              onClick={() => scroll(i ? 1 : -1)}
-              aria-label={i ? "Scroll right" : "Scroll left"}
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                cursor: "pointer",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Icon size={14} />
-            </button>
-          ))}
-        </div>
-      </div>
-      <div ref={ref} className="scroll-row">
-        {cast.map((actor) => (
-          <div
-            key={actor.id}
-            style={{ width: 110, flexShrink: 0, textAlign: "center" }}
-          >
-            <div
-              style={{
-                width: 110,
-                height: 110,
-                borderRadius: "50%",
-                overflow: "hidden",
-                background: "#1a1a1a",
-                marginBottom: 8,
-                border: "2px solid rgba(255,255,255,0.07)",
-              }}
-            >
-              {actor.profile_path ? (
-                <img
-                  src={`${IMG}/w185${actor.profile_path}`}
-                  alt={actor.name}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  loading="lazy"
-                />
-              ) : (
-                <div
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 28,
-                    color: "rgba(255,255,255,0.2)",
-                  }}
-                >
-                  👤
-                </div>
-              )}
-            </div>
-            <p
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: "rgba(255,255,255,0.9)",
-                margin: "0 0 3px",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {actor.name}
-            </p>
-            <p
-              style={{
-                fontSize: 11,
-                color: "rgba(255,255,255,0.4)",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                margin: 0,
-              }}
-            >
-              {actor.character}
-            </p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ── Main page ───────────────────────────────────────────────────────────── */
-export default function TVShowDetails({ params }) {
+/* ── Page ───────────────────────────────────────────────────── */
+function TVShowDetailsContent({ params }) {
+  const searchParams = useSearchParams();
+  const seasonParam = searchParams.get("season");
+  const episodeParam = searchParams.get("episode");
   const resolvedParams = use(params);
   const showId = resolvedParams?.id;
+
   const [show, setShow] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showPlayer, setShowPlayer] = useState(false);
+  const [showTrailer, setShowTrailer] = useState(false);
   const [selSeason, setSelSeason] = useState(null);
   const [selEpisode, setSelEpisode] = useState(null);
   const [seasonData, setSeasonData] = useState(null);
@@ -436,982 +215,837 @@ export default function TVShowDetails({ params }) {
   const [externalIds, setExternalIds] = useState(null);
   const [showImdb, setShowImdb] = useState(undefined);
   const [omdbCache, setOmdbCache] = useState({});
-  const [activeServer, setActiveServer] = useState(0);
-  const [showNextBtn, setShowNextBtn] = useState(false);
-  const nextTimer = useRef(null);
   const { addToContinueWatching } = useContinueWatching();
 
-  // Fetch show
   useEffect(() => {
     if (!showId) return;
     setLoading(true);
     setError(null);
     setShowImdb(undefined);
     Promise.all([
-      fetch(
-        `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos,watch%2Fproviders`,
-      ),
-      fetch(
-        `https://api.themoviedb.org/3/tv/${showId}/external_ids?api_key=${API_KEY}`,
-      ),
+      fetch(`https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations,watch%2Fproviders`),
+      fetch(`https://api.themoviedb.org/3/tv/${showId}/external_ids?api_key=${API_KEY}`),
     ])
       .then((rs) => Promise.all(rs.map((r) => r.json())))
       .then(([showData, extData]) => {
-        if (showData.success === false || showData.status_code) {
-          throw new Error(
-            showData.status_message || "Failed to fetch show data",
-          );
-        }
+        if (showData.success === false || showData.status_code) throw new Error(showData.status_message || "Failed to fetch show data");
         setShow(showData);
         setExternalIds(extData);
-        const validSeasons =
-          showData.seasons?.filter((s) => s.season_number > 0) || [];
+        const validSeasons = showData.seasons?.filter((s) => s.season_number > 0) || [];
         if (validSeasons.length > 0) {
-          setSelSeason(validSeasons[0].season_number);
-          setSelEpisode(1);
+          const paramSeason = seasonParam ? parseInt(seasonParam, 10) : null;
+          const paramEpisode = episodeParam ? parseInt(episodeParam, 10) : null;
+          const isValidSeason = paramSeason && validSeasons.some((s) => s.season_number === paramSeason);
+          setSelSeason(isValidSeason ? paramSeason : validSeasons[0].season_number);
+          setSelEpisode(paramEpisode && paramEpisode > 0 ? paramEpisode : 1);
         }
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [showId]);
+  }, [showId, seasonParam, episodeParam]);
 
-  // Fetch show IMDb
   useEffect(() => {
     if (!OMDB_KEY || !externalIds?.imdb_id) return;
-    fetch(
-      `https://www.omdbapi.com/?i=${externalIds.imdb_id}&apikey=${OMDB_KEY}`,
-    )
+    fetch(`https://www.omdbapi.com/?i=${externalIds.imdb_id}&apikey=${OMDB_KEY}`)
       .then((r) => r.json())
-      .then((d) =>
-        setShowImdb(
-          d.imdbRating && d.imdbRating !== "N/A"
-            ? { rating: d.imdbRating, votes: d.imdbVotes }
-            : null,
-        ),
-      )
+      .then((d) => setShowImdb(d.imdbRating && d.imdbRating !== "N/A" ? { rating: d.imdbRating, votes: d.imdbVotes } : null))
       .catch(() => setShowImdb(null));
   }, [externalIds]);
 
-  // Fetch season
   useEffect(() => {
     if (selSeason === null) return;
     setLoadingSeason(true);
-    fetch(
-      `https://api.themoviedb.org/3/tv/${showId}/season/${selSeason}?api_key=${API_KEY}`,
-    )
+    fetch(`https://api.themoviedb.org/3/tv/${showId}/season/${selSeason}?api_key=${API_KEY}`)
       .then((r) => r.json())
       .then((d) => setSeasonData(d))
       .catch(console.error)
       .finally(() => setLoadingSeason(false));
   }, [selSeason, showId]);
 
-  // Pre-fetch episode OMDb ratings
   useEffect(() => {
     if (!OMDB_KEY || !externalIds?.imdb_id || !seasonData?.episodes) return;
     seasonData.episodes.forEach((ep) => {
       const key = `S${selSeason}E${ep.episode_number}`;
       if (omdbCache[key] !== undefined) return;
-      fetch(
-        `https://www.omdbapi.com/?i=${externalIds.imdb_id}&Season=${selSeason}&Episode=${ep.episode_number}&apikey=${OMDB_KEY}`,
-      )
+      fetch(`https://www.omdbapi.com/?i=${externalIds.imdb_id}&Season=${selSeason}&Episode=${ep.episode_number}&apikey=${OMDB_KEY}`)
         .then((r) => r.json())
-        .then((d) =>
-          setOmdbCache((prev) => ({
-            ...prev,
-            [key]:
-              d.imdbRating && d.imdbRating !== "N/A"
-                ? { rating: d.imdbRating }
-                : null,
-          })),
-        )
-        .catch(() =>
-          setOmdbCache((prev) => ({
-            ...prev,
-            [`S${selSeason}E${ep.episode_number}`]: null,
-          })),
-        );
+        .then((d) => setOmdbCache((prev) => ({ ...prev, [key]: d.imdbRating && d.imdbRating !== "N/A" ? { rating: d.imdbRating } : null })))
+        .catch(() => setOmdbCache((prev) => ({ ...prev, [`S${selSeason}E${ep.episode_number}`]: null })));
     });
-  }, [seasonData, externalIds]);
+  }, [seasonData, externalIds, selSeason, omdbCache]);
 
-  // Continue watching
   useEffect(() => {
     if (showPlayer && show) {
-      const ep = seasonData?.episodes?.find(
-        (e) => e.episode_number === selEpisode,
-      );
-      addToContinueWatching({
-        id: show.id,
-        type: "tv",
-        name: show.name,
-        poster_path: show.poster_path,
-        backdrop_path: show.backdrop_path,
-        season: selSeason,
-        episode: selEpisode,
-        runtime: ep?.runtime || show.episode_run_time?.[0] || 45,
-        progress: 15,
-      });
+      const ep = seasonData?.episodes?.find((e) => e.episode_number === selEpisode);
+      addToContinueWatching({ id: show.id, type: "tv", name: show.name, poster_path: show.poster_path, backdrop_path: show.backdrop_path, season: selSeason, episode: selEpisode, runtime: ep?.runtime || show.episode_run_time?.[0] || 45, progress: 15 });
     }
-  }, [
-    showPlayer,
-    selSeason,
-    selEpisode,
-    show,
-    seasonData,
-    addToContinueWatching,
-  ]);
-
-  // Next-episode timer
-  useEffect(() => {
-    if (nextTimer.current) clearTimeout(nextTimer.current);
-    setShowNextBtn(false);
-    if (!showPlayer || !seasonData?.episodes) return;
-    const ep = seasonData.episodes.find((e) => e.episode_number === selEpisode);
-    const mins = ep?.runtime || show?.episode_run_time?.[0] || 40;
-    const delay = mins * 60 * 1000 - 90 * 1000;
-    if (delay > 0)
-      nextTimer.current = setTimeout(() => setShowNextBtn(true), delay);
-    return () => {
-      if (nextTimer.current) clearTimeout(nextTimer.current);
-    };
-  }, [showPlayer, selEpisode, selSeason, seasonData]);
-
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "Escape" && showPlayer) setShowPlayer(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [showPlayer]);
-
-  useEffect(() => {
-    document.body.style.overflow = showPlayer ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [showPlayer]);
-
-  const handleNextEpisode = () => {
-    if (!seasonData?.episodes) return;
-    const idx = seasonData.episodes.findIndex(
-      (e) => e.episode_number === selEpisode,
-    );
-    if (idx < seasonData.episodes.length - 1) {
-      setSelEpisode(seasonData.episodes[idx + 1].episode_number);
-    } else {
-      const validSeasons =
-        show.seasons?.filter((s) => s.season_number > 0) || [];
-      const sIdx = validSeasons.findIndex((s) => s.season_number === selSeason);
-      if (sIdx < validSeasons.length - 1) {
-        setSelSeason(validSeasons[sIdx + 1].season_number);
-        setSelEpisode(1);
-      }
-    }
-    setShowNextBtn(false);
-    setShowPlayer(false);
-    setTimeout(() => setShowPlayer(true), 300);
-  };
+  }, [showPlayer, selSeason, selEpisode, show, seasonData, addToContinueWatching]);
 
   if (loading) return <Skeleton />;
   if (error || !show)
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "70vh",
-          textAlign: "center",
-          padding: 20,
-        }}
-        role="alert"
-      >
-        <p
-          style={{
-            fontSize: 22,
-            fontWeight: 700,
-            color: "#e50914",
-            marginBottom: 12,
-          }}
-        >
-          {error ? "Error" : "Not Found"}
-        </p>
-        <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: 24 }}>
-          {error || "This TV show doesn't exist."}
-        </p>
-        <Link href="/tv">
-          <button
-            style={{
-              padding: "11px 26px",
-              background: "#e50914",
-              border: "none",
-              borderRadius: 8,
-              color: "#fff",
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            ← Back to TV
-          </button>
-        </Link>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "70vh", textAlign: "center", padding: 20 }}>
+        <p style={{ fontSize: "var(--text-2xl)", fontWeight: "var(--font-bold)", color: "var(--accent)", marginBottom: 12 }}>{error ? "Error" : "Not Found"}</p>
+        <p style={{ color: "var(--text-tertiary)", marginBottom: 24 }}>{error || "This TV show doesn't exist."}</p>
+        <Link href="/tv"><button className="btn btn-primary">Back to TV Shows</button></Link>
       </div>
     );
 
-  const backdrop = show.backdrop_path
-    ? `${IMG}/w1280${show.backdrop_path}`
-    : null;
+  const backdrop = show.backdrop_path ? `${IMG}/original${show.backdrop_path}` : null;
   const poster = show.poster_path ? `${IMG}/w500${show.poster_path}` : null;
   const cast = show.credits?.cast?.slice(0, 16) || [];
   const validSeasons = show.seasons?.filter((s) => s.season_number > 0) || [];
-  const watchProviders = (show["watch/providers"] ?? show["watch%2Fproviders"])
-    ?.results?.IN;
+  const watchProviders = (show["watch/providers"] ?? show["watch%2Fproviders"])?.results?.IN;
   const creators = show.created_by || [];
+  const tagline = show.tagline;
 
   const episodes = seasonData?.episodes || [];
-  const currentEpIdx = episodes.findIndex(
-    (e) => e.episode_number === selEpisode,
-  );
+  const currentEpIdx = episodes.findIndex((e) => e.episode_number === selEpisode);
   const hasNext = currentEpIdx < episodes.length - 1;
-  const currentSeasonIdx = validSeasons.findIndex(
-    (s) => s.season_number === selSeason,
-  );
+  const currentSeasonIdx = validSeasons.findIndex((s) => s.season_number === selSeason);
   const hasNextSeason = currentSeasonIdx < validSeasons.length - 1;
   const canGoNext = hasNext || hasNextSeason;
 
-  // VidLink as primary (default), VidPlus and others as fallback
-  const servers = [
-    {
-      label: "Server 1",
-      url: `https://vidlink.pro/tv/${showId}/${selSeason}/${selEpisode}?primaryColor=e50914&autoplay=true&nextbutton=true`,
-    },
-    {
-      label: "Server 2",
-      url: `https://player.vidplus.to/embed/tv/${showId}/${selSeason}/${selEpisode}`,
-    },
-    {
-      label: "Server 3",
-      url: `https://vidsrc.me/embed/tv?tmdb=${showId}&season=${selSeason}&episode=${selEpisode}`,
-    },
-    {
-      label: "Server 4",
-      url: `https://vidsrc.net/embed/tv/${showId}/${selSeason}/${selEpisode}`,
-    },
-    {
-      label: "Server 5",
-      url: `https://www.2embed.cc/embedtv/${externalIds?.imdb_id || showId}&s=${selSeason}&e=${selEpisode}`,
-    },
-  ];
+  const handleNextEpisode = () => {
+    if (!seasonData?.episodes) return;
+    const idx = seasonData.episodes.findIndex((e) => e.episode_number === selEpisode);
+    if (idx < seasonData.episodes.length - 1) {
+      setSelEpisode(seasonData.episodes[idx + 1].episode_number);
+    } else {
+      const vs = show.seasons?.filter((s) => s.season_number > 0) || [];
+      const sIdx = vs.findIndex((s) => s.season_number === selSeason);
+      if (sIdx < vs.length - 1) { setSelSeason(vs[sIdx + 1].season_number); setSelEpisode(1); }
+    }
+    setShowPlayer(false);
+    setTimeout(() => setShowPlayer(true), 300);
+  };
+
+  const trailer = show.videos?.results?.find((v) => v.type === "Trailer" && v.site === "YouTube") || show.videos?.results?.find((v) => v.site === "YouTube");
+  const status = show.status === "Ended" ? "Ended" : show.status === "Returning Series" ? "Returning" : show.status === "Canceled" ? "Canceled" : "Ongoing";
+  const statusColor = show.status === "Returning Series" ? "#22c55e" : show.status === "Ended" ? "var(--text-tertiary)" : show.status === "Canceled" ? "#ef4444" : "#3b82f6";
 
   return (
     <>
-      <style jsx global>{`
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        @keyframes shimmer {
-          0% {
-            opacity: 0.4;
-          }
-          50% {
-            opacity: 0.85;
-          }
-          100% {
-            opacity: 0.4;
-          }
-        }
-        .tv-detail-container {
-          max-width: 1600px;
-          margin: 0 auto;
-          padding: 0 20px 80px;
-        }
-        @media (max-width: 768px) {
-          .tv-detail-container {
-            padding: 0 16px 80px;
-          }
-          .tv-detail-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .poster-col-tv {
-            display: none !important;
-          }
-        }
-      `}</style>
+      <VideoPlayer isOpen={showPlayer} onClose={() => setShowPlayer(false)} type="tv" id={showId} title={show.name} season={selSeason} episode={selEpisode} onNextEpisode={canGoNext ? handleNextEpisode : null} hasNext={canGoNext} />
 
-      {/* ── Fullscreen player ── */}
+      {/* Trailer modal */}
       <AnimatePresence>
-        {showPlayer && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            role="dialog"
-            aria-modal="true"
-            aria-label={`Watching ${show.name} S${selSeason}E${selEpisode}`}
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "#000",
-              zIndex: 99999,
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            {/* Top bar */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "12px 20px",
-                background:
-                  "linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, transparent 100%)",
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                zIndex: 10,
-                gap: 12,
-                flexWrap: "wrap",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <button
-                  onClick={() => setShowPlayer(false)}
-                  aria-label="Back"
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.12)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    cursor: "pointer",
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <ArrowLeft size={18} aria-hidden="true" />
-                </button>
-                <div>
-                  <p
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: "#fff",
-                      margin: 0,
-                    }}
-                  >
-                    {show.name}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 12,
-                      color: "rgba(255,255,255,0.5)",
-                      margin: 0,
-                    }}
-                  >
-                    Season {selSeason} · Episode {selEpisode}
-                  </p>
-                </div>
-              </div>
-
-              {/* Server tabs */}
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {servers.map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveServer(i)}
-                    aria-pressed={activeServer === i}
-                    style={{
-                      padding: "6px 12px",
-                      borderRadius: 6,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      background:
-                        activeServer === i
-                          ? "#e50914"
-                          : "rgba(255,255,255,0.1)",
-                      border: `1px solid ${activeServer === i ? "#e50914" : "rgba(255,255,255,0.15)"}`,
-                      color: "#fff",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    {s.label}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={() => setShowPlayer(false)}
-                aria-label="Close"
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: "50%",
-                  background: "rgba(255,255,255,0.12)",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  cursor: "pointer",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <X size={18} aria-hidden="true" />
-              </button>
-            </div>
-
-            {/* Next episode button */}
-            <AnimatePresence>
-              {showNextBtn && canGoNext && (
-                <motion.button
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  onClick={handleNextEpisode}
-                  aria-label={
-                    hasNext
-                      ? `Next Episode S${selSeason}E${episodes[currentEpIdx + 1]?.episode_number}`
-                      : "Next Season"
-                  }
-                  style={{
-                    position: "absolute",
-                    bottom: 24,
-                    right: 24,
-                    zIndex: 10,
-                    padding: "12px 20px",
-                    background: "#e50914",
-                    border: "none",
-                    borderRadius: 8,
-                    color: "#fff",
-                    fontSize: 14,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <Play size={16} fill="white" aria-hidden="true" />
-                  {hasNext
-                    ? `Next: E${episodes[currentEpIdx + 1]?.episode_number}`
-                    : "Next Season"}
-                </motion.button>
-              )}
-            </AnimatePresence>
-
-            <iframe
-              key={`${activeServer}-${selSeason}-${selEpisode}`}
-              src={servers[activeServer].url}
-              style={{ width: "100%", height: "100%", border: "none", flex: 1 }}
-              allowFullScreen
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              title={`Watch ${show.name} S${selSeason}E${selEpisode}`}
-            />
+        {showTrailer && trailer && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowTrailer(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: "min(900px, 95vw)", aspectRatio: "16/9", borderRadius: "var(--radius-xl)", overflow: "hidden", background: "#000" }}>
+              <iframe src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&rel=0`} allow="autoplay; encrypted-media" allowFullScreen style={{ width: "100%", height: "100%", border: "none" }} />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── Backdrop hero ── */}
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          height: "58vh",
-          minHeight: 340,
-          overflow: "hidden",
-        }}
-      >
-        {backdrop && (
-          <img
-            src={backdrop}
-            alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-        )}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(to right, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(to top, #0a0a0a 0%, transparent 50%)",
-          }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            bottom: "10%",
-            left: 0,
-            padding: "0 40px",
-            width: "55%",
-            minWidth: 360,
-            maxWidth: 720,
-          }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1
-              style={{
-                fontFamily: "'Bebas Neue', sans-serif",
-                fontSize: "clamp(36px, 5vw, 72px)",
-                lineHeight: 1,
-                letterSpacing: "0.02em",
-                color: "#fff",
-                marginBottom: 12,
-                textShadow: "0 4px 24px rgba(0,0,0,0.6)",
-              }}
-            >
-              {show.name}
-            </h1>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              {show.first_air_date && (
-                <span
-                  style={{
-                    fontSize: 14,
-                    color: "rgba(255,255,255,0.65)",
-                    fontWeight: 600,
-                  }}
-                >
-                  {new Date(show.first_air_date).getFullYear()}
-                </span>
-              )}
-              <span
-                style={{
-                  fontSize: 14,
-                  color: "rgba(255,255,255,0.65)",
-                  fontWeight: 600,
-                }}
-              >
-                {validSeasons.length} Season
-                {validSeasons.length !== 1 ? "s" : ""}
-              </span>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* IMDb badge — pinned far right, vertically aligned with metadata */}
-        <div style={{ position: "absolute", bottom: "10%", right: 40 }}>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {showImdb && (
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  background: "rgba(245,197,24,0.12)",
-                  border: "1px solid rgba(245,197,24,0.3)",
-                  borderRadius: 7,
-                  padding: "5px 11px",
-                }}
-              >
-                <span
-                  style={{
-                    background: "#f5c518",
-                    color: "#000",
-                    fontSize: 9,
-                    fontWeight: 900,
-                    padding: "1px 5px",
-                    borderRadius: 3,
-                    letterSpacing: "0.03em",
-                  }}
-                >
-                  IMDb
-                </span>
-                <span
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 800,
-                    color: "#f5c518",
-                    letterSpacing: "0.01em",
-                  }}
-                >
-                  {showImdb.rating}
-                </span>
-              </div>
-            )}
-          </motion.div>
-        </div>
+      {/* Backdrop hero */}
+      <div style={{ position: "relative", width: "100%", height: "clamp(280px, 50vh, 500px)", overflow: "hidden" }}>
+        {backdrop && <img src={backdrop} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, var(--bg) 0%, rgba(10,10,10,0.6) 50%, rgba(10,10,10,0.3) 100%)" }} />
       </div>
 
-      {/* ── Detail content ── */}
-      <div className="tv-detail-container">
-        <div
-          className="tv-detail-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "260px 1fr",
-            gap: 44,
-            marginTop: 40,
-            position: "relative",
-            zIndex: 1,
-            marginBottom: 48,
-          }}
-        >
-          {/* Poster — sticky so it follows scroll alongside the episode list */}
-          <div className="poster-col-tv">
-            <div style={{ position: "sticky", top: 90 }}>
+      {/* Detail content — poster + info */}
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 var(--container-padding)" }}>
+        <div className="tv-detail-grid">
+          {/* Poster */}
+          <div style={{ position: "relative" }}>
+            <div className="tv-poster-wrapper">
               {poster ? (
-                <img
-                  src={poster}
-                  alt={`${show.name} poster`}
-                  style={{
-                    width: "100%",
-                    borderRadius: 12,
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.8)",
-                    display: "block",
-                  }}
-                  loading="lazy"
-                />
+                <img src={poster} alt={`${show.name} poster`} style={{ width: "100%", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-xl)", display: "block" }} loading="lazy" />
               ) : (
-                <div
-                  style={{
-                    width: "100%",
-                    aspectRatio: "2/3",
-                    borderRadius: 12,
-                    background: "rgba(255,255,255,0.05)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "rgba(255,255,255,0.2)",
-                    fontSize: 48,
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.8)",
-                  }}
-                >
-                  🎬
-                </div>
+                <div style={{ width: "100%", aspectRatio: "2/3", borderRadius: "var(--radius-xl)", background: "var(--bg-tertiary)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: 48, boxShadow: "var(--shadow-xl)" }}>📺</div>
               )}
             </div>
           </div>
 
-          {/* Info + Episode Selector */}
-          <div>
-            {/* Genres */}
-            {show.genres?.length > 0 && (
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  flexWrap: "wrap",
-                  marginBottom: 20,
-                }}
-              >
-                {show.genres.map((g) => (
-                  <span
-                    key={g.id}
-                    style={{
-                      padding: "5px 12px",
-                      background: "rgba(229,9,20,0.1)",
-                      border: "1px solid rgba(229,9,20,0.3)",
-                      borderRadius: 50,
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: "#ff6b73",
-                    }}
-                  >
-                    {g.name}
-                  </span>
-                ))}
-              </div>
-            )}
+          {/* Info */}
+          <div className="tv-info-section">
+            {/* Status + Genres */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12, alignItems: "center" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", background: `${statusColor}18`, border: `1px solid ${statusColor}40`, borderRadius: "var(--radius-md)", fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: statusColor }}>{status}</span>
+              {show.genres?.slice(0, 3).map((g) => (
+                <span key={g.id} className="genre-pill">{g.name}</span>
+              ))}
+            </div>
 
-            {/* ── Action buttons ── */}
-            <div
-              style={{
-                display: "flex",
-                gap: 10,
-                alignItems: "center",
-                flexWrap: "wrap",
-                marginBottom: 24,
-              }}
-            >
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setShowPlayer(true)}
-                disabled={!selSeason || !selEpisode}
-                aria-label={
-                  selSeason && selEpisode
-                    ? `Play Season ${selSeason} Episode ${selEpisode}`
-                    : "Loading episode"
-                }
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  height: 44,
-                  padding: "0 24px",
-                  background: "#e50914",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 8,
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  letterSpacing: "0.02em",
-                  opacity: !selSeason || !selEpisode ? 0.5 : 1,
-                  flexShrink: 0,
-                }}
-              >
-                <Play size={16} fill="white" aria-hidden="true" />
-                Play S{selSeason}E{selEpisode}
-              </motion.button>
-              {/* width: fit-content prevents WatchlistButton from stretching full row */}
-              <div style={{ width: "fit-content", flexShrink: 0 }}>
-                <WatchlistButton
-                  item={{
-                    id: show.id,
-                    type: "tv",
-                    name: show.name,
-                    title: show.name,
-                    poster_path: show.poster_path,
-                    vote_average: show.vote_average,
-                    first_air_date: show.first_air_date,
-                  }}
-                  variant="large"
-                />
+            <h1 className="tv-show-title" style={{ fontSize: "clamp(28px, 4vw, 48px)", lineHeight: 1.1, fontWeight: "var(--font-extrabold)", letterSpacing: "-0.025em", color: "var(--text-primary)", marginBottom: 12 }}>{show.name}</h1>
+
+            {tagline && <p style={{ fontSize: "var(--text-base)", color: "var(--text-tertiary)", fontStyle: "italic", marginBottom: 20 }}>{tagline}</p>}
+
+            {/* Scores + Meta */}
+            <div className="tv-scores-row" style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 28 }}>
+              <ScoreRing score={show.vote_average || 0} />
+              {showImdb && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ background: "var(--gold)", color: "#000", fontSize: 10, fontWeight: 900, padding: "2px 6px", borderRadius: "var(--radius-sm)" }}>IMDb</span>
+                  <span style={{ fontSize: "var(--text-base)", fontWeight: "var(--font-bold)", color: "var(--gold)" }}>{showImdb.rating}</span>
+                  {showImdb.votes && <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>({showImdb.votes})</span>}
+                </div>
+              )}
+              <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                {show.first_air_date && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text-secondary)" }}>
+                    <Calendar size={14} />
+                    <span style={{ fontSize: "var(--text-sm)" }}>{new Date(show.first_air_date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+                  </div>
+                )}
+                {validSeasons.length > 0 && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text-secondary)" }}>
+                    <Tv size={14} />
+                    <span style={{ fontSize: "var(--text-sm)" }}>{validSeasons.length} Season{validSeasons.length !== 1 ? "s" : ""}</span>
+                  </div>
+                )}
+                {show.number_of_episodes && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text-secondary)" }}>
+                    <Film size={14} />
+                    <span style={{ fontSize: "var(--text-sm)" }}>{show.number_of_episodes} Episodes</span>
+                  </div>
+                )}
               </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="tv-actions-row" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 32 }}>
+              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setShowPlayer(true)} disabled={!selSeason || !selEpisode} className="btn btn-primary" style={{ padding: "clamp(10px, 2vw, 14px) clamp(20px, 4vw, 32px)", fontSize: "clamp(var(--text-sm), 2.5vw, var(--text-base))", fontWeight: "var(--font-bold)", opacity: !selSeason || !selEpisode ? 0.5 : 1 }}>
+                <Play size={18} fill="currentColor" /> Play S{selSeason}E{selEpisode}
+              </motion.button>
+              {trailer && (
+                <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setShowTrailer(true)} className="btn btn-secondary" style={{ padding: "clamp(10px, 2vw, 14px) clamp(16px, 3vw, 24px)" }}>
+                  <Film size={16} /> Trailer
+                </motion.button>
+              )}
+              <WatchlistButton item={{ id: show.id, type: "tv", name: show.name, poster_path: show.poster_path, vote_average: show.vote_average, first_air_date: show.first_air_date }} variant="large" />
             </div>
 
             {/* Overview */}
             {show.overview && (
-              <p
-                style={{
-                  fontSize: 15,
-                  lineHeight: 1.85,
-                  color: "rgba(255,255,255,0.65)",
-                  marginBottom: 24,
-                  maxWidth: 680,
-                }}
-              >
-                {show.overview}
-              </p>
+              <p style={{ fontSize: "clamp(var(--text-sm), 2.5vw, var(--text-base))", lineHeight: 1.85, color: "var(--text-secondary)", marginBottom: 32, maxWidth: 720 }}>{show.overview}</p>
             )}
 
-            {/* Meta */}
-            {(creators.length > 0 || show.production_companies?.length > 0) && (
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-                  gap: 16,
-                  marginBottom: 28,
-                }}
-              >
-                {creators.length > 0 && (
-                  <div>
-                    <p
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: "rgba(255,255,255,0.3)",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.08em",
-                        marginBottom: 4,
-                      }}
-                    >
-                      Creator
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: "rgba(255,255,255,0.85)",
-                      }}
-                    >
-                      {creators.map((c) => c.name).join(", ")}
-                    </p>
-                  </div>
-                )}
-                {show.production_companies?.length > 0 && (
-                  <div>
-                    <p
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: "rgba(255,255,255,0.3)",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.08em",
-                        marginBottom: 4,
-                      }}
-                    >
-                      Network
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: "rgba(255,255,255,0.85)",
-                      }}
-                    >
-                      {show.networks
-                        ?.slice(0, 2)
-                        .map((n) => n.name)
-                        .join(", ") ||
-                        show.production_companies
-                          .slice(0, 2)
-                          .map((c) => c.name)
-                          .join(", ")}
-                    </p>
-                  </div>
-                )}
+            {/* Metadata cards */}
+            <div className="tv-meta-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 32 }}>
+              {creators.length > 0 && <InfoCard icon={<Film size={18} />} label="Creator" value={creators.map((c) => c.name).join(", ")} />}
+              {show.networks?.length > 0 && <InfoCard icon={<Tv size={18} />} label="Network" value={show.networks.slice(0, 2).map((n) => n.name).join(", ")} />}
+              {show.original_language && (
+                <InfoCard icon={<Globe size={18} />} label="Language" value={new Intl.DisplayNames(["en"], { type: "language" }).of(show.original_language) || show.original_language} />
+              )}
+              {show.status && <InfoCard icon={<Star size={18} />} label="Status" value={show.status} />}
+              {show.last_air_date && (
+                <InfoCard icon={<Calendar size={18} />} label="Last Aired" value={new Date(show.last_air_date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} />
+              )}
+              {show.in_production && <InfoCard icon={<Globe size={18} />} label="Production" value="In Production" />}
+            </div>
+
+            {/* Watch providers */}
+            {watchProviders?.flatrate?.length > 0 && (
+              <div style={{ marginBottom: 32 }}>
+                <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Available On</p>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  {watchProviders.flatrate.map((p) => (
+                    <img key={p.provider_id} src={`${IMG}/w92${p.logo_path}`} alt={p.provider_name} title={p.provider_name} style={{ width: 36, height: 36, borderRadius: "var(--radius-md)", objectFit: "cover", border: "1px solid var(--border)" }} />
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* ── Season + Episode selector ── */}
+            {/* External links */}
+            <div className="tv-external-links" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 40 }}>
+              {externalIds?.imdb_id && (
+                <a href={`https://www.imdb.com/title/${externalIds.imdb_id}/`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(245,197,24,0.08)", border: "1px solid rgba(245,197,24,0.2)", borderRadius: "var(--radius-lg)", color: "var(--gold)", fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)", textDecoration: "none" }}>
+                  IMDb <ExternalLink size={13} />
+                </a>
+              )}
+              {externalIds?.tvdb_id && (
+                <a href={`https://www.thetvdb.com/series/${externalIds.tvdb_id}`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", color: "var(--text-secondary)", fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)", textDecoration: "none" }}>
+                  TVDb <ExternalLink size={13} />
+                </a>
+              )}
+              {show.homepage && (
+                <a href={show.homepage} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", color: "var(--text-secondary)", fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)", textDecoration: "none" }}>
+                  Official Site <ExternalLink size={13} />
+                </a>
+              )}
+            </div>
+
+            {/* Season + Episode selector */}
             {validSeasons.length > 0 && (
-              <div style={{ marginBottom: 0 }}>
-                {/* Season tabs */}
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    flexWrap: "wrap",
-                    marginBottom: 20,
-                  }}
-                >
-                  {validSeasons.map((s) => (
-                    <motion.button
-                      key={s.id}
-                      onClick={() => {
-                        setSelSeason(s.season_number);
-                        setSelEpisode(1);
-                      }}
-                      whileTap={{ scale: 0.96 }}
-                      aria-pressed={selSeason === s.season_number}
-                      style={{
-                        padding: "8px 18px",
-                        borderRadius: 8,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        background:
-                          selSeason === s.season_number
-                            ? "#e50914"
-                            : "rgba(255,255,255,0.06)",
-                        border: `1px solid ${selSeason === s.season_number ? "#e50914" : "rgba(255,255,255,0.1)"}`,
-                        color: "#fff",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      S{s.season_number}
-                    </motion.button>
-                  ))}
+              <div className="tv-season-section">
+                {/* Header */}
+                <div className="tv-episode-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+    <div className="score-ring" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <h3 style={{ fontSize: "var(--text-lg)", fontWeight: "var(--font-bold)", color: "var(--text-primary)", margin: 0 }}>Episodes</h3>
+                    <span style={{ fontSize: "var(--text-sm)", color: "var(--text-muted)", fontWeight: "var(--font-medium)" }}>Season {selSeason}</span>
+                  </div>
+                  {episodes.length > 0 && (
+                    <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>{episodes.length} episodes</span>
+                  )}
+                </div>
+
+                {/* Season selector with navigation */}
+                <div className="tv-season-selector">
+                  <button
+                    className="season-nav-btn"
+                    onClick={() => {
+                      const idx = validSeasons.findIndex((s) => s.season_number === selSeason);
+                      if (idx > 0) { setSelSeason(validSeasons[idx - 1].season_number); setSelEpisode(1); }
+                    }}
+                    disabled={currentSeasonIdx === 0}
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  <div className="season-scroll">
+                    {validSeasons.map((s) => (
+                      <motion.button
+                        key={s.id}
+                        onClick={() => { setSelSeason(s.season_number); setSelEpisode(1); }}
+                        whileTap={{ scale: 0.96 }}
+                        className={`season-btn ${selSeason === s.season_number ? "active" : ""}`}
+                      >
+                        {s.season_number}
+                        {s.episode_count && <span className="season-count">({s.episode_count})</span>}
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  <button
+                    className="season-nav-btn"
+                    onClick={() => {
+                      const idx = validSeasons.findIndex((s) => s.season_number === selSeason);
+                      if (idx < validSeasons.length - 1) { setSelSeason(validSeasons[idx + 1].season_number); setSelEpisode(1); }
+                    }}
+                    disabled={!hasNextSeason}
+                  >
+                    <ChevronRightIcon size={16} />
+                  </button>
                 </div>
 
                 {/* Episodes */}
                 {loadingSeason ? (
-                  <div
-                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
-                  >
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="skeleton"
-                        style={{ height: 96, borderRadius: 10 }}
-                        aria-hidden="true"
-                      />
+                  <div className="episodes-list-loading">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="skeleton" style={{ height: 110, borderRadius: "var(--radius-lg)" }} />
+                    ))}
+                  </div>
+                ) : episodes.length > 0 ? (
+                  <div className="episodes-list">
+                    {episodes.map((ep, idx) => (
+                      <EpisodeCard key={ep.id} ep={ep} isActive={selEpisode === ep.episode_number} onClick={() => setSelEpisode(ep.episode_number)} omdb={omdbCache[`S${selSeason}E${ep.episode_number}`]} index={idx} />
                     ))}
                   </div>
                 ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 8,
-                      maxHeight: 520,
-                      overflowY: "auto",
-                      scrollbarWidth: "thin",
-                      scrollbarColor: "rgba(229,9,20,0.4) transparent",
-                    }}
-                    role="list"
-                    aria-label="Episode list"
-                  >
-                    {episodes.map((ep, idx) => (
-                      <EpisodeCard
-                        key={ep.id}
-                        ep={ep}
-                        isActive={selEpisode === ep.episode_number}
-                        onClick={() => setSelEpisode(ep.episode_number)}
-                        omdb={omdbCache[`S${selSeason}E${ep.episode_number}`]}
-                        hasOmdb={!!OMDB_KEY && !!externalIds?.imdb_id}
-                        index={idx}
-                      />
-                    ))}
+                  <div className="episodes-empty">
+                    <Tv size={32} style={{ marginBottom: 12, opacity: 0.3 }} />
+                    <p style={{ fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)" }}>No episodes available</p>
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* Where to watch */}
-            {watchProviders?.flatrate?.length > 0 && (
-              <div style={{ marginTop: 32 }}>
-                <p
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "rgba(255,255,255,0.3)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                    marginBottom: 10,
-                  }}
-                >
-                  Available On
-                </p>
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  {watchProviders.flatrate.map((p) => (
-                    <img
-                      key={p.provider_id}
-                      src={`https://image.tmdb.org/t/p/original${p.logo_path}`}
-                      alt={p.provider_name}
-                      title={p.provider_name}
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 8,
-                        objectFit: "cover",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-                      }}
-                    />
-                  ))}
-                </div>
-                <p
-                  style={{
-                    fontSize: 10,
-                    color: "rgba(255,255,255,0.2)",
-                    marginTop: 8,
-                  }}
-                >
-                  Data via JustWatch / TMDB
-                </p>
               </div>
             )}
           </div>
         </div>
 
         {/* Cast */}
-        <CastRow cast={cast} />
+        {cast.length > 0 && (
+          <ScrollRow title="Top Cast">
+            {cast.map((actor) => <CastCard key={actor.id} actor={actor} />)}
+          </ScrollRow>
+        )}
+
+        {/* Recommendations */}
+        {show.recommendations?.results?.filter((s) => s.poster_path).slice(0, 16).length > 0 && (
+          <ScrollRow title="More Like This" style={{ marginTop: 40, marginBottom: 60 }}>
+            {show.recommendations.results.filter((s) => s.poster_path).slice(0, 16).map((s) => <MediaCard key={s.id} item={s} type="tv" />)}
+          </ScrollRow>
+        )}
+
+        {cast.length === 0 && (!show.recommendations?.results?.length) && <div style={{ height: 60 }} />}
       </div>
+
+      <style jsx global>{`
+        .tv-detail-grid {
+          display: grid;
+          grid-template-columns: 260px 1fr;
+          gap: 44px;
+          margin-top: -120px;
+          position: relative;
+          z-index: 2;
+          margin-bottom: 56px;
+        }
+        .tv-poster-wrapper {
+          position: sticky;
+          top: 90px;
+        }
+        .tv-info-section {
+          min-width: 0;
+          overflow: hidden;
+        }
+        .tv-show-title {
+          overflow-wrap: break-word;
+          word-break: break-word;
+        }
+        .season-scroll::-webkit-scrollbar {
+          display: none;
+        }
+        .tv-meta-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 12px;
+        }
+        .tv-scores-row {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          flex-wrap: wrap;
+        }
+        .tv-actions-row {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+        .tv-external-links {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+        .tv-external-links a {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .tv-info-card {
+          min-width: 0;
+        }
+        .tv-episode-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+        .episodes-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-width: 100%;
+          overflow: hidden;
+        }
+        .episodes-list-loading {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-width: 100%;
+          overflow: hidden;
+        }
+        .episodes-empty {
+          text-align: center;
+          padding: 48px 20px;
+          color: var(--text-tertiary);
+        }
+        .tv-season-section {
+          margin-bottom: 0;
+          max-width: 100%;
+          overflow: hidden;
+        }
+        .tv-season-selector {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 20px;
+          overflow: hidden;
+          max-width: 100%;
+        }
+        .season-nav-btn {
+          width: 34px;
+          height: 34px;
+          border-radius: var(--radius-md);
+          background: rgba(255,255,255,0.04);
+          border: 1px solid var(--border);
+          color: var(--text-secondary);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 1;
+          transition: all 0.2s;
+          flex-shrink: 0;
+        }
+        .season-nav-btn:disabled {
+          color: var(--text-muted);
+          cursor: not-allowed;
+          opacity: 0.4;
+        }
+        .season-scroll {
+          flex: 1;
+          display: flex;
+          gap: 6px;
+          overflow-x: auto;
+          scrollbar-width: none;
+          msOverflowStyle: none;
+          -webkit-overflow-scrolling: touch;
+          padding: 2px 0;
+        }
+        .season-btn {
+          padding: 8px 14px;
+          border-radius: var(--radius-md);
+          font-size: var(--text-sm);
+          font-weight: var(--font-semibold);
+          cursor: pointer;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          color: var(--text-secondary);
+          transition: all 0.2s;
+          white-space: nowrap;
+          flex-shrink: 0;
+          min-height: 36px;
+        }
+        .season-btn.active {
+          background: var(--accent);
+          border-color: var(--accent);
+          color: #fff;
+        }
+        .season-count {
+          opacity: 0.5;
+          margin-left: 3px;
+        }
+
+        /* Episode card */
+        .episode-card {
+          display: flex;
+          gap: 16px;
+          padding: 16px;
+          border-radius: var(--radius-lg);
+          cursor: pointer;
+          background: rgba(255,255,255,0.02);
+          border: 1px solid rgba(255,255,255,0.06);
+          transition: all 0.2s ease;
+          align-items: flex-start;
+          opacity: 1;
+          max-width: 100%;
+          overflow: hidden;
+        }
+        .episode-card.active {
+          background: var(--accent-subtle);
+          border-color: var(--accent-border);
+        }
+        .episode-card.future {
+          cursor: default;
+          opacity: 0.5;
+        }
+        .episode-ep-num {
+          width: 32px;
+          flex-shrink: 0;
+          text-align: center;
+          padding-top: 2px;
+        }
+        .episode-num-text {
+          font-size: var(--text-lg);
+          font-weight: var(--font-extrabold);
+          line-height: 1;
+          color: var(--text-muted);
+        }
+        .episode-card.active .episode-num-text {
+          color: var(--accent);
+        }
+        .episode-thumb {
+          width: 140px;
+          height: 80px;
+          flex-shrink: 0;
+          border-radius: var(--radius-md);
+          overflow: hidden;
+          background: var(--bg-tertiary);
+          position: relative;
+        }
+        .episode-thumb img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .episode-thumb-placeholder {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .episode-thumb-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0,0,0,0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .episode-thumb-overlay.future-overlay {
+          background: rgba(0,0,0,0.6);
+        }
+        .episode-play-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: var(--accent);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .episode-info {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          overflow: hidden;
+        }
+        .episode-header-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 12px;
+          min-width: 0;
+        }
+        .episode-title {
+          font-size: var(--text-sm);
+          font-weight: var(--font-bold);
+          color: var(--text-primary);
+          margin: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          min-width: 0;
+          flex: 1;
+        }
+        .episode-ratings {
+          display: flex;
+          gap: 6px;
+          flex-shrink: 0;
+          align-items: center;
+        }
+        .episode-rating {
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+          font-size: 11px;
+          font-weight: var(--font-bold);
+        }
+        .episode-rating.high { color: #22c55e; }
+        .episode-rating.mid { color: #f5c518; }
+        .episode-rating.low { color: #ef4444; }
+        .episode-rating.omdb {
+          color: var(--gold);
+          background: var(--gold-subtle);
+          border: 1px solid var(--gold-border);
+          border-radius: var(--radius-sm);
+          padding: 2px 6px;
+        }
+        .episode-overview {
+          font-size: var(--text-xs);
+          color: var(--text-tertiary);
+          line-height: 1.6;
+          margin: 0;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+        .episode-overview.no-overview {
+          color: var(--text-muted);
+          font-style: italic;
+        }
+        .episode-meta-row {
+          display: flex;
+          gap: 12px;
+          margin-top: 2px;
+          flex-wrap: wrap;
+        }
+        .episode-meta {
+          font-size: 11px;
+          color: var(--text-muted);
+          font-weight: var(--font-medium);
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+        }
+        .episode-meta.upcoming {
+          color: var(--accent);
+          font-weight: var(--font-semibold);
+        }
+
+        @media (max-width: 768px) {
+          .tv-detail-grid {
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-top: -80px;
+            margin-bottom: 32px;
+          }
+          .tv-poster-wrapper {
+            position: relative;
+            top: 0;
+            max-width: 180px;
+            margin: 0 auto;
+          }
+          .tv-scores-row {
+            gap: 16px;
+            margin-bottom: 20px;
+          }
+          .tv-scores-row .score-ring svg {
+            width: 44px;
+            height: 44px;
+          }
+          .tv-actions-row {
+            margin-bottom: 24px;
+          }
+          .tv-actions-row .btn {
+            padding: 10px 16px;
+            font-size: var(--text-sm);
+          }
+          .tv-meta-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 24px;
+          }
+          .tv-info-card {
+            padding: 10px 12px;
+          }
+          .tv-info-card-value {
+            font-size: var(--text-xs) !important;
+          }
+          .tv-external-links {
+            margin-bottom: 28px;
+          }
+          .tv-external-links a {
+            padding: 8px 12px;
+            font-size: var(--text-sm);
+          }
+          .tv-episode-header {
+            margin-bottom: 16px;
+          }
+          .tv-episode-header h3 {
+            font-size: var(--text-base) !important;
+          }
+          .tv-season-selector {
+            gap: 6px;
+            margin-bottom: 16px;
+          }
+          .season-nav-btn {
+            width: 32px;
+            height: 32px;
+          }
+          .season-btn {
+            padding: 8px 12px !important;
+            min-height: 36px !important;
+            font-size: var(--text-sm) !important;
+          }
+          .episode-card {
+            gap: 12px;
+            padding: 12px;
+          }
+          .episode-thumb {
+            width: 110px;
+            height: 64px;
+          }
+          .episode-ep-num {
+            width: 28px;
+          }
+          .episode-num-text {
+            font-size: var(--text-base);
+          }
+          .episode-title {
+            font-size: var(--text-sm);
+          }
+          .episode-overview {
+            font-size: var(--text-xs);
+            -webkit-line-clamp: 1;
+          }
+          .episode-rating {
+            font-size: 10px;
+          }
+          .episode-meta {
+            font-size: 10px;
+          }
+        }
+        @media (max-width: 480px) {
+          .tv-poster-wrapper {
+            max-width: 140px;
+          }
+          .tv-meta-grid {
+            grid-template-columns: 1fr;
+            gap: 8px;
+          }
+          .episode-card {
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+          }
+          .episode-thumb {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
+          }
+          .episode-ep-num {
+            display: none;
+          }
+          .episodes-list {
+            gap: 8px;
+          }
+          .episodes-list-loading {
+            gap: 8px;
+          }
+          .episode-title {
+            font-size: var(--text-sm);
+          }
+          .episode-overview {
+            font-size: 11px;
+            line-height: 1.5;
+          }
+          .episode-meta {
+            font-size: 10px;
+          }
+          .episode-rating {
+            font-size: 10px;
+          }
+          .tv-actions-row {
+            gap: 8px;
+          }
+          .tv-actions-row .btn {
+            padding: 10px 14px;
+            font-size: var(--text-sm);
+            flex: 1;
+            justify-content: center;
+          }
+          .tv-external-links {
+            gap: 8px;
+            margin-bottom: 24px;
+          }
+          .tv-external-links a {
+            padding: 8px 10px;
+            font-size: var(--text-sm);
+            flex: 1 1 calc(50% - 8px);
+            justify-content: center;
+          }
+          .season-nav-btn {
+            width: 30px;
+            height: 30px;
+          }
+          .season-btn {
+            padding: 6px 10px !important;
+            min-height: 32px !important;
+          }
+          .tv-episode-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            margin-bottom: 14px;
+          }
+        }
+      `}</style>
     </>
+  );
+}
+
+export default function TVShowDetails({ params }) {
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <TVShowDetailsContent params={params} />
+    </Suspense>
   );
 }

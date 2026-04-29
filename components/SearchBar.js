@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Search, X } from "lucide-react";
+import { Search, X, Film, Tv, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+const IMG = "https://image.tmdb.org/t/p";
 
-export default function SearchBar() {
+export default function SearchBar({ autoFocus }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -46,10 +47,9 @@ export default function SearchBar() {
       );
       const data = await response.json();
       const filtered = data.results
-        .filter(
-          (item) => item.media_type === "movie" || item.media_type === "tv",
-        )
-        .slice(0, 6);
+        .filter((item) => item.media_type === "movie" || item.media_type === "tv")
+        .filter((item) => item.poster_path)
+        .slice(0, 8);
       setResults(filtered);
       setIsOpen(true);
     } catch (error) {
@@ -60,8 +60,7 @@ export default function SearchBar() {
   };
 
   const handleResultClick = (item) => {
-    const path =
-      item.media_type === "movie" ? `/movie/${item.id}` : `/tv/${item.id}`;
+    const path = item.media_type === "movie" ? `/movie/${item.id}` : `/tv/${item.id}`;
     router.push(path);
     setQuery("");
     setResults([]);
@@ -83,151 +82,71 @@ export default function SearchBar() {
     setIsOpen(false);
   };
 
-  const getImageUrl = (path) =>
-    path ? `https://image.tmdb.org/t/p/w92${path}` : "/placeholder.png";
-
   return (
     <div ref={searchRef} style={{ position: "relative", width: "100%" }}>
-      {/* ── Input wrapper ────────────────────────────── */}
-      <div
-        style={{
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <Search
-          size={16}
-          style={{
-            position: "absolute",
-            left: 14,
-            color: focused ? "#e50914" : "rgba(255,255,255,0.35)",
-            pointerEvents: "none",
-            zIndex: 1,
-            transition: "color 0.2s ease",
-            flexShrink: 0,
-          }}
-        />
-        <input
-          type="text"
-          placeholder="Search movies & TV shows..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => {
-            setFocused(true);
-            if (results.length > 0) setIsOpen(true);
-          }}
-          onBlur={() => setFocused(false)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleSubmit(e);
-          }}
-          style={{
-            width: "100%",
-            padding: "10px 40px 10px 40px",
-            background: focused
-              ? "rgba(255,255,255,0.07)"
-              : "rgba(255,255,255,0.04)",
-            border: `1px solid ${focused ? "rgba(229,9,20,0.4)" : "rgba(255,255,255,0.08)"}`,
-            borderRadius: "10px",
-            color: "rgba(255,255,255,0.9)",
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "14px",
-            fontWeight: "400",
-            outline: "none",
-            transition: "background 0.2s ease, border-color 0.2s ease",
-            letterSpacing: "0.01em",
-          }}
-        />
-        {query && (
-          <button
-            onClick={clearSearch}
-            aria-label="Clear search"
+      <form onSubmit={handleSubmit}>
+        <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+          <Search size={16} style={{ position: "absolute", left: 12, color: focused ? "var(--accent)" : "var(--text-tertiary)", pointerEvents: "none", zIndex: 1, transition: "color 0.2s ease" }} />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => { setFocused(true); if (results.length > 0) setIsOpen(true); }}
+            onBlur={() => setFocused(false)}
+            onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(e); }}
+            autoComplete="off"
+            autoFocus={autoFocus}
             style={{
-              position: "absolute",
-              right: 12,
-              background: "none",
-              border: "none",
-              color: "rgba(255,255,255,0.3)",
-              cursor: "pointer",
-              padding: "4px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1,
-              transition: "color 0.2s ease",
+              width: "100%",
+              padding: "8px 36px 8px 36px",
+              background: focused ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.04)",
+              border: `1px solid ${focused ? "var(--accent-border)" : "var(--border)"}`,
+              borderRadius: "var(--radius-lg)",
+              color: "var(--text-primary)",
+              fontSize: "var(--text-sm)",
+              fontFamily: "var(--font-sans)",
+              outline: "none",
+              transition: "all 0.2s ease",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.7)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.3)")
-            }
-          >
-            <X size={14} />
-          </button>
-        )}
-      </div>
+          />
+          {query && (
+            <button type="button" onClick={clearSearch} style={{ position: "absolute", right: 10, color: "var(--text-tertiary)", cursor: "pointer", padding: 4, display: "flex", transition: "color 0.2s ease" }} onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")} onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-tertiary)")}>
+              <X size={14} />
+            </button>
+          )}
+        </div>
+      </form>
 
-      {/* ── Dropdown ─────────────────────────────────── */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.99 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.99 }}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
             style={{
               position: "absolute",
               top: "calc(100% + 8px)",
               left: 0,
               right: 0,
-              background: "#0d0d0f",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "12px",
-              maxHeight: "400px",
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius-xl)",
+              maxHeight: "min(420px, 50vh)",
               overflowY: "auto",
               zIndex: 1000,
-              boxShadow:
-                "0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,193,60,0.08)",
+              boxShadow: "var(--shadow-xl)",
             }}
           >
             {loading ? (
-              <div
-                style={{
-                  padding: "20px",
-                  textAlign: "center",
-                  color: "rgba(255,255,255,0.35)",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "13px",
-                  letterSpacing: "0.02em",
-                }}
-              >
-                Searching...
-              </div>
+              <div style={{ padding: "24px 16px", textAlign: "center", color: "var(--text-tertiary)", fontSize: "var(--text-sm)" }}>Searching...</div>
             ) : results.length > 0 ? (
               results.map((item, index) => (
-                <SearchResult
-                  key={`${item.media_type}-${item.id}`}
-                  item={item}
-                  onClick={() => handleResultClick(item)}
-                  isLast={index === results.length - 1}
-                  getImageUrl={getImageUrl}
-                />
+                <SearchResult key={`${item.media_type}-${item.id}`} item={item} onClick={() => handleResultClick(item)} isLast={index === results.length - 1} />
               ))
             ) : (
-              <div
-                style={{
-                  padding: "20px",
-                  textAlign: "center",
-                  color: "rgba(255,255,255,0.28)",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "13px",
-                }}
-              >
-                No results found
-              </div>
+              <div style={{ padding: "24px 16px", textAlign: "center", color: "var(--text-tertiary)", fontSize: "var(--text-sm)" }}>No results found</div>
             )}
           </motion.div>
         )}
@@ -236,10 +155,12 @@ export default function SearchBar() {
   );
 }
 
-/* ── Search result row ─────────────────────────────── */
-function SearchResult({ item, onClick, isLast, getImageUrl }) {
+function SearchResult({ item, onClick, isLast }) {
   const [hovered, setHovered] = useState(false);
   const isTV = item.media_type === "tv";
+  const title = item.title || item.name;
+  const year = item.release_date || item.first_air_date ? new Date(item.release_date || item.first_air_date).getFullYear() : null;
+  const poster = item.poster_path ? `${IMG}/w92${item.poster_path}` : null;
 
   return (
     <div
@@ -249,123 +170,36 @@ function SearchResult({ item, onClick, isLast, getImageUrl }) {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "12px",
-        padding: "10px 12px",
+        gap: 12,
+        padding: "8px 12px",
         cursor: "pointer",
-        background: hovered ? "rgba(255,255,255,0.05)" : "transparent",
-        borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.04)",
+        background: hovered ? "rgba(255,255,255,0.04)" : "transparent",
+        borderBottom: isLast ? "none" : "1px solid var(--border)",
         transition: "background 0.15s ease",
       }}
     >
-      {/* Poster */}
-      <img
-        src={getImageUrl(item.poster_path)}
-        alt={item.title || item.name}
-        style={{
-          width: 40,
-          height: 60,
-          objectFit: "cover",
-          borderRadius: "6px",
-          flexShrink: 0,
-          background: "#111114",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
-          transform: hovered ? "scale(1.04)" : "scale(1)",
-          transition: "transform 0.2s ease",
-        }}
-      />
+      {poster ? (
+        <img src={poster} alt="" style={{ width: 40, height: 60, objectFit: "cover", borderRadius: "var(--radius-sm)", flexShrink: 0, background: "var(--bg-tertiary)" }} />
+      ) : (
+        <div style={{ width: 40, height: 60, borderRadius: "var(--radius-sm)", flexShrink: 0, background: "var(--bg-tertiary)" }} />
+      )}
 
-      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "14px",
-            fontWeight: "600",
-            color: hovered
-              ? "rgba(255,255,255,0.98)"
-              : "rgba(255,255,255,0.85)",
-            marginBottom: "5px",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            transition: "color 0.15s ease",
-          }}
-        >
-          {item.title || item.name}
+        <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--font-semibold)", color: hovered ? "var(--text-primary)" : "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", transition: "color 0.15s ease" }}>
+          {title}
         </div>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "7px",
-            flexWrap: "wrap",
-          }}
-        >
-          {/* Type badge */}
-          <span
-            style={{
-              display: "inline-block",
-              padding: "2px 7px",
-              background: isTV
-                ? "rgba(96,165,250,0.15)"
-                : "rgba(255,193,60,0.12)",
-              border: `1px solid ${isTV ? "rgba(96,165,250,0.3)" : "rgba(255,193,60,0.25)"}`,
-              borderRadius: "4px",
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "9px",
-              fontWeight: "700",
-              color: isTV ? "#60a5fa" : "#e50914",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-            }}
-          >
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 3 }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10, fontWeight: "var(--font-medium)", color: isTV ? "#60a5fa" : "var(--accent)" }}>
+            {isTV ? <Tv size={10} /> : <Film size={10} />}
             {isTV ? "TV" : "Movie"}
           </span>
-
-          {/* Year */}
-          {(item.release_date || item.first_air_date) && (
-            <span
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "12px",
-                fontWeight: "500",
-                color: "rgba(255,255,255,0.3)",
-                letterSpacing: "0.02em",
-              }}
-            >
-              {new Date(item.release_date || item.first_air_date).getFullYear()}
-            </span>
-          )}
-
-          {/* Rating */}
+          {year && <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{year}</span>}
           {item.vote_average > 0 && (
-            <span
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "12px",
-                fontWeight: "600",
-                color: "#e50914",
-                letterSpacing: "0.02em",
-              }}
-            >
-              ★ {item.vote_average.toFixed(1)}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 2, fontSize: 11, color: "var(--gold)", fontWeight: "var(--font-medium)" }}>
+              <Star size={10} fill="var(--gold)" /> {item.vote_average.toFixed(1)}
             </span>
           )}
         </div>
-      </div>
-
-      {/* Arrow hint on hover */}
-      <div
-        style={{
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.15s ease",
-          color: "rgba(255,193,60,0.6)",
-          flexShrink: 0,
-          fontSize: "16px",
-        }}
-      >
-        →
       </div>
     </div>
   );

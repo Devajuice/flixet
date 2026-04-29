@@ -1,307 +1,95 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Play,
-  Plus,
-  Info,
-  ChevronLeft,
-  ChevronRight,
-  Star,
-} from "lucide-react";
+import { Play, Info, ChevronRight, TrendingUp, Star, Clock } from "lucide-react";
+import MediaCard from "@/components/MediaCard";
+import ScrollRow from "@/components/ScrollRow";
 import ContinueWatchingSection from "@/components/ContinueWatchingSection";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const IMG = "https://image.tmdb.org/t/p";
 
-/* ── tiny helpers ─────────────────────────────────────────────────────────── */
-function SkeletonCard({ wide }) {
-  return (
-    <div
-      className="skeleton"
-      style={{
-        width: wide ? 280 : 150,
-        height: wide ? 158 : 225,
-        borderRadius: 10,
-        flexShrink: 0,
-      }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function MediaCard({ item, wide, type }) {
-  const [hovered, setHovered] = useState(false);
-  const slug = type || item.media_type || (item.title ? "movie" : "tv");
-  const href = `/${slug === "movie" ? "movie" : "tv"}/${item.id}`;
-  // poster cards: always use poster_path; wide (backdrop) cards: use backdrop
-  const img = wide
-    ? item.backdrop_path
-      ? `${IMG}/w500${item.backdrop_path}`
-      : item.poster_path
-        ? `${IMG}/w342${item.poster_path}`
-        : null
-    : item.poster_path
-      ? `${IMG}/w342${item.poster_path}`
-      : null;
-  const title = item.title || item.name;
+/* ── Quick genre pills ────────────────────────────────────────────── */
+function GenreQuickLinks() {
+  const genres = [
+    { name: "Action", slug: "action", icon: "🔥" },
+    { name: "Comedy", slug: "comedy", icon: "😂" },
+    { name: "Horror", slug: "horror", icon: "👻" },
+    { name: "Sci-Fi", slug: "sci-fi", icon: "🚀" },
+    { name: "Romance", slug: "romance", icon: "💕" },
+    { name: "Anime", slug: "", icon: "⛩️", href: "/anime" },
+    { name: "Thriller", slug: "thriller", icon: "🔪" },
+    { name: "Drama", slug: "drama", icon: "🎭" },
+  ];
 
   return (
-    <Link
-      href={href}
-      style={{ flexShrink: 0, display: "block", width: wide ? 280 : 150 }}
-    >
-      <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{
-          width: "100%",
-          height: wide ? 158 : 225,
-          borderRadius: 10,
-          overflow: "hidden",
-          position: "relative",
-          background: "#1a1a1a",
-          cursor: "pointer",
-          boxShadow: hovered
-            ? "0 16px 40px rgba(0,0,0,0.75)"
-            : "0 4px 14px rgba(0,0,0,0.5)",
-          transform: hovered ? "scale(1.05)" : "scale(1)",
-          transition: "transform 0.22s ease, box-shadow 0.22s ease",
-          zIndex: hovered ? 5 : 1,
-          isolation: "isolate",
-        }}
-      >
-        {img ? (
-          <img
-            src={img}
-            alt={title}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              display: "block",
-            }}
-            loading="lazy"
-          />
-        ) : (
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              background: "#222",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0 8px",
-            }}
-          >
-            <span
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 24 }}>
+      {genres.map((g) => {
+        const href = g.href || `/movies?genre=${g.slug}`;
+        return (
+          <Link key={g.name} href={href}>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.96 }}
               style={{
-                fontSize: 11,
-                color: "rgba(255,255,255,0.3)",
-                textAlign: "center",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "8px 16px",
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius-full)",
+                fontSize: "var(--text-sm)",
+                fontWeight: "var(--font-medium)",
+                color: "var(--text-secondary)",
+                cursor: "pointer",
+                textDecoration: "none",
+                transition: "all var(--transition-base)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "var(--accent-border)";
+                e.currentTarget.style.color = "var(--accent)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "var(--border)";
+                e.currentTarget.style.color = "var(--text-secondary)";
               }}
             >
-              {title}
-            </span>
-          </div>
-        )}
-        {/* gradient */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 55%)",
-            pointerEvents: "none",
-          }}
-        />
-
-        {/* rating badge */}
-        {item.vote_average > 0 && (
-          <div
-            style={{
-              position: "absolute",
-              top: 7,
-              left: 7,
-              background: "rgba(0,0,0,0.72)",
-              backdropFilter: "blur(6px)",
-              padding: "2px 6px",
-              borderRadius: 4,
-              fontSize: 11,
-              fontWeight: 700,
-              color: "#f5c518",
-            }}
-          >
-            ★ {item.vote_average.toFixed(1)}
-          </div>
-        )}
-
-        {/* title + play on hover */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: "8px 10px 10px",
-            opacity: hovered ? 1 : wide ? 0.8 : 0,
-            transition: "opacity 0.22s ease",
-          }}
-        >
-          <p
-            style={{
-              fontSize: wide ? 13 : 12,
-              fontWeight: 700,
-              color: "#fff",
-              lineHeight: 1.3,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              margin: 0,
-            }}
-          >
-            {title}
-          </p>
-        </div>
-
-        {/* play circle */}
-        {hovered && (
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              background: "rgba(229,9,20,0.92)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 4px 20px rgba(229,9,20,0.5)",
-            }}
-          >
-            <Play size={16} fill="white" color="white" />
-          </div>
-        )}
-      </div>
-    </Link>
+              <span style={{ fontSize: 14 }}>{g.icon}</span> {g.name}
+            </motion.div>
+          </Link>
+        );
+      })}
+    </div>
   );
 }
 
-function Row({ title, items, wide, loading, type }) {
-  const ref = useRef(null);
-  const scroll = (dir) =>
-    ref.current?.scrollBy({ left: dir * 600, behavior: "smooth" });
-
-  return (
-    <section style={{ marginBottom: 52 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 16,
-        }}
-      >
-        <h2 style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.01em" }}>
-          {title}
-        </h2>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            onClick={() => scroll(-1)}
-            aria-label="Scroll left"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              cursor: "pointer",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            onClick={() => scroll(1)}
-            aria-label="Scroll right"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              cursor: "pointer",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      </div>
-      {/* paddingBottom gives hover-scale room; overflow visible lets cards pop above siblings */}
-      <div
-        ref={ref}
-        className="scroll-row"
-        style={{ paddingBottom: 16, paddingTop: 8 }}
-      >
-        {loading
-          ? Array.from({ length: 12 }).map((_, i) => (
-              <SkeletonCard key={i} wide={wide} />
-            ))
-          : items.map((item) => (
-              <MediaCard key={item.id} item={item} wide={wide} type={type} />
-            ))}
-      </div>
-    </section>
-  );
-}
-
-/* ── Hero banner ──────────────────────────────────────────────────────────── */
+/* ── Hero banner ──────────────────────────────────────────────────── */
 function HeroBanner({ items }) {
   const [idx, setIdx] = useState(0);
   const item = items[idx];
 
   useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % items.length), 7000);
+    const t = setInterval(() => setIdx((i) => (i + 1) % items.length), 8000);
     return () => clearInterval(t);
   }, [items.length]);
 
   if (!item) return null;
-  const backdrop = item.backdrop_path
-    ? `${IMG}/original${item.backdrop_path}`
-    : null;
+  const backdrop = item.backdrop_path ? `${IMG}/original${item.backdrop_path}` : null;
   const title = item.title || item.name;
   const slug = item.media_type === "movie" ? "movie" : "tv";
 
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "92vh",
-        minHeight: 500,
-        overflow: "hidden",
-        marginBottom: 48,
-      }}
-    >
+    <div style={{ position: "relative", width: "100%", height: "clamp(320px, 65vh, 700px)", overflow: "hidden" }}>
+      {/* Background image */}
       <AnimatePresence mode="wait">
         <motion.div
           key={idx}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 1 }}
           style={{ position: "absolute", inset: 0 }}
         >
           {backdrop && (
@@ -311,20 +99,24 @@ function HeroBanner({ items }) {
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           )}
+          {/* Left-to-right fade */}
           <div
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to right, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 50%, transparent 100%)",
+                "linear-gradient(to right, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.5) 40%, transparent 70%)",
             }}
           />
+          {/* Bottom fade */}
           <div
             style={{
               position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(to top, #0a0a0a 0%, transparent 40%)",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "40%",
+              background: "linear-gradient(to top, var(--bg) 0%, transparent 100%)",
             }}
           />
         </motion.div>
@@ -337,48 +129,87 @@ function HeroBanner({ items }) {
           bottom: "15%",
           left: 0,
           right: 0,
-          padding: "0 40px",
+          padding: "0 var(--container-padding)",
+          maxWidth: 1400,
+          margin: "0 auto",
         }}
       >
         <AnimatePresence mode="wait">
           <motion.div
             key={idx}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.5 }}
+            style={{ maxWidth: 600 }}
           >
-            {item.vote_average > 0 && (
-              <div
+            {/* Meta badges */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+              <span
                 style={{
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
-                  gap: 6,
-                  marginBottom: 12,
+                  gap: 4,
+                  padding: "4px 10px",
+                  background: "rgba(229,9,20,0.15)",
+                  border: "1px solid rgba(229,9,20,0.3)",
+                  borderRadius: "var(--radius-md)",
+                  fontSize: "var(--text-xs)",
+                  fontWeight: "var(--font-bold)",
+                  color: "var(--accent)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
                 }}
               >
-                <Star size={14} fill="#f5c518" color="#f5c518" />
+                {item.media_type === "movie" ? "Movie" : "TV Show"}
+              </span>
+              {item.vote_average > 0 && (
                 <span
-                  style={{ fontSize: 13, fontWeight: 700, color: "#f5c518" }}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                    padding: "4px 10px",
+                    background: "rgba(245,197,24,0.12)",
+                    border: "1px solid rgba(245,197,24,0.25)",
+                    borderRadius: "var(--radius-md)",
+                    fontSize: "var(--text-xs)",
+                    fontWeight: "var(--font-bold)",
+                    color: "var(--gold)",
+                  }}
                 >
-                  {item.vote_average.toFixed(1)}
+                  <Star size={11} fill="currentColor" /> {item.vote_average.toFixed(1)}
                 </span>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
-                  / 10
+              )}
+              {(item.release_date || item.first_air_date) && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                    padding: "4px 10px",
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "var(--radius-md)",
+                    fontSize: "var(--text-xs)",
+                    fontWeight: "var(--font-medium)",
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  <Clock size={11} /> {new Date(item.release_date || item.first_air_date).getFullYear()}
                 </span>
-              </div>
-            )}
+              )}
+            </div>
 
             <h1
               style={{
-                fontFamily: "'Bebas Neue', sans-serif",
-                fontSize: "clamp(42px, 6vw, 88px)",
-                lineHeight: 1,
-                letterSpacing: "0.02em",
-                color: "#fff",
+                fontSize: "clamp(36px, 5vw, 64px)",
+                lineHeight: 1.05,
+                fontWeight: "var(--font-extrabold)",
+                letterSpacing: "-0.025em",
+                color: "var(--text-primary)",
                 marginBottom: 16,
-                maxWidth: 700,
-                textShadow: "0 4px 24px rgba(0,0,0,0.6)",
+                textShadow: "0 4px 24px rgba(0,0,0,0.5)",
               }}
             >
               {title}
@@ -387,9 +218,8 @@ function HeroBanner({ items }) {
             {item.overview && (
               <p
                 style={{
-                  fontSize: 15,
-                  color: "rgba(255,255,255,0.7)",
-                  maxWidth: 520,
+                  fontSize: "var(--text-sm)",
+                  color: "var(--text-secondary)",
                   lineHeight: 1.7,
                   marginBottom: 28,
                   overflow: "hidden",
@@ -407,22 +237,10 @@ function HeroBanner({ items }) {
                 <motion.button
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "13px 28px",
-                    background: "#e50914",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 8,
-                    fontSize: 15,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    letterSpacing: "0.01em",
-                  }}
+                  className="btn btn-primary"
+                  style={{ padding: "clamp(10px, 2vw, 14px) clamp(20px, 4vw, 32px)", fontSize: "clamp(var(--text-sm), 2.5vw, var(--text-base))", fontWeight: "var(--font-bold)" }}
                 >
-                  <Play size={18} fill="white" aria-hidden="true" /> Watch Now
+                  <Play size={18} fill="currentColor" /> Watch Now
                 </motion.button>
               </Link>
               <Link href={`/${slug}/${item.id}`}>
@@ -430,21 +248,22 @@ function HeroBanner({ items }) {
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
                   style={{
-                    display: "flex",
+                    display: "inline-flex",
                     alignItems: "center",
-                    gap: 8,
-                    padding: "13px 24px",
-                    background: "rgba(255,255,255,0.15)",
-                    color: "#fff",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    borderRadius: 8,
-                    fontSize: 15,
-                    fontWeight: 600,
+                    justifyContent: "center",
+                    gap: "var(--space-2)",
+                    padding: "clamp(10px, 2vw, 14px) clamp(16px, 3vw, 24px)",
+                    background: "rgba(255,255,255,0.08)",
+                    backdropFilter: "blur(8px)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "var(--radius-lg)",
+                    fontSize: "clamp(var(--text-sm), 2.5vw, var(--text-base))",
+                    fontWeight: "var(--font-bold)",
+                    color: "var(--text-primary)",
                     cursor: "pointer",
-                    backdropFilter: "blur(10px)",
                   }}
                 >
-                  <Info size={18} aria-hidden="true" /> More Info
+                  <Info size={18} /> More Info
                 </motion.button>
               </Link>
             </div>
@@ -452,20 +271,20 @@ function HeroBanner({ items }) {
         </AnimatePresence>
 
         {/* Dot nav */}
-        <div style={{ display: "flex", gap: 6, marginTop: 24 }}>
+        <div style={{ display: "flex", gap: 6, marginTop: 32 }}>
           {items.slice(0, 6).map((_, i) => (
             <button
               key={i}
               onClick={() => setIdx(i)}
-              aria-label={`Banner ${i + 1}`}
+              aria-label={`Slide ${i + 1}`}
               style={{
-                width: i === idx ? 24 : 8,
+                width: i === idx ? 28 : 8,
                 height: 4,
                 borderRadius: 4,
-                background: i === idx ? "#e50914" : "rgba(255,255,255,0.25)",
+                background: i === idx ? "var(--accent)" : "rgba(255,255,255,0.2)",
                 border: "none",
                 cursor: "pointer",
-                transition: "all 0.3s ease",
+                transition: "all var(--transition-base)",
               }}
             />
           ))}
@@ -475,7 +294,32 @@ function HeroBanner({ items }) {
   );
 }
 
-/* ── Page ─────────────────────────────────────────────────────────────────── */
+/* ── Section header ───────────────────────────────────────────────── */
+function SectionHeader({ title, icon, href }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+      {icon}
+      <h2
+        style={{
+          fontSize: "var(--text-xl)",
+          fontWeight: "var(--font-bold)",
+          color: "var(--text-primary)",
+          letterSpacing: "-0.01em",
+          margin: 0,
+        }}
+      >
+        {title}
+      </h2>
+      {href && (
+        <Link href={href} style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, fontSize: "var(--text-sm)", color: "var(--text-tertiary)", textDecoration: "none" }}>
+          View All <ChevronRight size={14} />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+/* ── Page ─────────────────────────────────────────────────────────── */
 export default function HomePage() {
   const [trending, setTrending] = useState([]);
   const [popularMovies, setPopMovies] = useState([]);
@@ -486,9 +330,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetches = [
-      fetch(
-        `https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`,
-      ),
+      fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`),
       fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`),
       fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}`),
       fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`),
@@ -510,55 +352,83 @@ export default function HomePage() {
   }, []);
 
   const heroItems = trending.filter((i) => i.backdrop_path).slice(0, 6);
+  const SkeletonCard = () => (
+    <div className="skeleton" style={{ width: 160, height: 240, borderRadius: "var(--radius-lg)", flexShrink: 0 }} />
+  );
+  const SkeletonWide = () => (
+    <div className="skeleton" style={{ width: 280, height: 158, borderRadius: "var(--radius-lg)", flexShrink: 0 }} />
+  );
 
   return (
-    <div style={{ marginTop: -40 }}>
+    <div>
       {/* Hero */}
       {loading ? (
-        <div
-          className="skeleton"
-          style={{
-            width: "100%",
-            height: "92vh",
-            minHeight: 500,
-            borderRadius: 0,
-          }}
-          aria-label="Loading featured content"
-          role="status"
-        />
+        <div className="skeleton" style={{ width: "100%", height: "80vh", minHeight: 480, borderRadius: 0 }} />
       ) : (
         heroItems.length > 0 && <HeroBanner items={heroItems} />
       )}
 
-      {/* Rows */}
-      <div className="container">
-        <Row title="🔥 Trending This Week" items={trending} loading={loading} />
-        <ContinueWatchingSection />
-        <Row
-          title="🎬 Popular Movies"
-          items={popularMovies}
-          loading={loading}
-          type="movie"
-        />
-        <Row
-          title="📺 Popular TV Shows"
-          items={popularTV}
-          loading={loading}
-          type="tv"
-          wide
-        />
-        <Row
-          title="⭐ Top Rated Movies"
-          items={topRated}
-          loading={loading}
-          type="movie"
-        />
-        <Row
-          title="💥 Action & Adventure"
-          items={action}
-          loading={loading}
-          type="movie"
-        />
+      {/* Content */}
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 var(--container-padding)" }}>
+        {/* Genre quick links */}
+        {!loading && <GenreQuickLinks />}
+
+        {/* Continue watching */}
+        <div style={{ marginTop: loading ? 0 : 40 }}>
+          <ContinueWatchingSection />
+        </div>
+
+        {/* Trending */}
+        <div style={{ marginTop: 40 }}>
+          <SectionHeader title="Trending This Week" icon={<TrendingUp size={20} color="var(--accent)" />} href="/movies" />
+          <ScrollRow>
+            {loading
+              ? Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)
+              : trending.map((item, i) => <MediaCard key={item.id} item={item} index={i} />)}
+          </ScrollRow>
+        </div>
+
+        {/* Popular Movies */}
+        <div style={{ marginTop: 40 }}>
+          <SectionHeader title="Popular Movies" icon={<Play size={20} color="var(--accent)" />} href="/movies" />
+          <ScrollRow>
+            {loading
+              ? Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)
+              : popularMovies.map((item, i) => <MediaCard key={item.id} item={item} type="movie" index={i} />)}
+          </ScrollRow>
+        </div>
+
+        {/* Popular TV */}
+        <div style={{ marginTop: 40 }}>
+          <SectionHeader title="Popular TV Shows" icon={<Info size={20} color="var(--accent)" />} href="/tv" />
+          <ScrollRow>
+            {loading
+              ? Array.from({ length: 10 }).map((_, i) => <SkeletonWide key={i} />)
+              : popularTV.map((item, i) => (
+                  <MediaCard key={item.id} item={item} type="tv" variant="backdrop" index={i} />
+                ))}
+          </ScrollRow>
+        </div>
+
+        {/* Top Rated */}
+        <div style={{ marginTop: 40 }}>
+          <SectionHeader title="Top Rated" icon={<Star size={20} color="var(--gold)" />} href="/movies" />
+          <ScrollRow>
+            {loading
+              ? Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)
+              : topRated.map((item, i) => <MediaCard key={item.id} item={item} type="movie" index={i} />)}
+          </ScrollRow>
+        </div>
+
+        {/* Action */}
+        <div style={{ marginTop: 40, marginBottom: 60 }}>
+          <SectionHeader title="Action & Adventure" icon={<span style={{ fontSize: 20 }}>🔥</span>} href="/movies?genre=action" />
+          <ScrollRow>
+            {loading
+              ? Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)
+              : action.map((item, i) => <MediaCard key={item.id} item={item} type="movie" index={i} />)}
+          </ScrollRow>
+        </div>
       </div>
     </div>
   );

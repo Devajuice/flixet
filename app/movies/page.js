@@ -3,16 +3,10 @@ import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Play,
-  SlidersHorizontal,
-  Sparkles,
-} from "lucide-react";
+import { SlidersHorizontal, Sparkles, TrendingUp, Star, Calendar, DollarSign, X } from "lucide-react";
+import MediaCard from "@/components/MediaCard";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
-const IMG = "https://image.tmdb.org/t/p";
 
 const GENRE_MAP = {
   action: 28,
@@ -35,355 +29,39 @@ const GENRE_NAMES = {
   16: "Animation",
 };
 const GENRES = [
-  { id: 28, name: "Action" },
-  { id: 35, name: "Comedy" },
-  { id: 18, name: "Drama" },
-  { id: 27, name: "Horror" },
-  { id: 878, name: "Sci-Fi" },
-  { id: 53, name: "Thriller" },
-  { id: 10749, name: "Romance" },
-  { id: 16, name: "Animation" },
+  { id: 28, name: "Action", icon: "💥" },
+  { id: 35, name: "Comedy", icon: "😄" },
+  { id: 18, name: "Drama", icon: "🎭" },
+  { id: 27, name: "Horror", icon: "👻" },
+  { id: 878, name: "Sci-Fi", icon: "🚀" },
+  { id: 53, name: "Thriller", icon: "🔪" },
+  { id: 10749, name: "Romance", icon: "❤️" },
+  { id: 16, name: "Animation", icon: "✨" },
 ];
 const SORT_OPTIONS = [
-  { value: "popularity.desc", label: "Most Popular" },
-  { value: "vote_average.desc", label: "Top Rated" },
-  { value: "release_date.desc", label: "Newest First" },
-  { value: "revenue.desc", label: "Highest Grossing" },
+  { value: "popularity.desc", label: "Most Popular", icon: TrendingUp },
+  { value: "vote_average.desc", label: "Top Rated", icon: Star },
+  { value: "release_date.desc", label: "Newest First", icon: Calendar },
+  { value: "revenue.desc", label: "Highest Grossing", icon: DollarSign },
+  { value: "vote_count.desc", label: "Most Votes", icon: Star },
 ];
-
-function MovieCard({ movie, index }) {
-  const [hovered, setHovered] = useState(false);
-  const img = movie.poster_path ? `${IMG}/w342${movie.poster_path}` : null;
-  return (
-    <Link href={`/movie/${movie.id}`}>
-      <motion.div
-        onHoverStart={() => setHovered(true)}
-        onHoverEnd={() => setHovered(false)}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: Math.min(index * 0.03, 0.4), duration: 0.3 }}
-        style={{
-          position: "relative",
-          borderRadius: 8,
-          overflow: "hidden",
-          background: "#1a1a1a",
-          cursor: "pointer",
-          aspectRatio: "2/3",
-          boxShadow: hovered
-            ? "0 20px 50px rgba(0,0,0,0.8)"
-            : "0 4px 16px rgba(0,0,0,0.4)",
-          transform: hovered ? "scale(1.04)" : "scale(1)",
-          transition: "transform 0.22s ease, box-shadow 0.22s ease",
-          zIndex: hovered ? 5 : 1,
-        }}
-      >
-        {img ? (
-          <img
-            src={img}
-            alt={movie.title}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            loading="lazy"
-          />
-        ) : (
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 12,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 12,
-                color: "rgba(255,255,255,0.3)",
-                textAlign: "center",
-              }}
-            >
-              {movie.title}
-            </span>
-          </div>
-        )}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(to top, rgba(0,0,0,0.95) 0%, transparent 55%)",
-            pointerEvents: "none",
-          }}
-        />
-        {movie.vote_average > 0 && (
-          <div
-            style={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              background: "rgba(0,0,0,0.75)",
-              backdropFilter: "blur(8px)",
-              padding: "3px 7px",
-              borderRadius: 5,
-              fontSize: 11,
-              fontWeight: 700,
-              color: "#f5c518",
-            }}
-          >
-            ★ {movie.vote_average.toFixed(1)}
-          </div>
-        )}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: "10px 10px 12px",
-          }}
-        >
-          <p
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#fff",
-              lineHeight: 1.3,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              marginBottom: 2,
-            }}
-          >
-            {movie.title}
-          </p>
-          {movie.release_date && (
-            <span
-              style={{
-                fontSize: 10,
-                color: "rgba(255,255,255,0.4)",
-                fontWeight: 500,
-              }}
-            >
-              {new Date(movie.release_date).getFullYear()}
-            </span>
-          )}
-        </div>
-        <AnimatePresence>
-          {hovered && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "rgba(229,9,20,0.12)",
-              }}
-            >
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: "50%",
-                  background: "rgba(229,9,20,0.9)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Play size={20} fill="white" color="white" />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </Link>
-  );
-}
-
-function GenreRow({ genreId, genreName }) {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const rowRef = useRef(null);
-  const scroll = (dir) =>
-    rowRef.current?.scrollBy({ left: dir * 600, behavior: "smooth" });
-
-  useEffect(() => {
-    fetch(
-      `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc`,
-    )
-      .then((r) => r.json())
-      .then((d) => {
-        setItems(d.results || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [genreId]);
-
-  return (
-    <section style={{ marginBottom: 52 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700 }}>{genreName}</h2>
-          <Link
-            href={`/movies?genre=${genreName.toLowerCase()}`}
-            style={{
-              fontSize: 12,
-              color: "#e50914",
-              fontWeight: 600,
-              letterSpacing: "0.01em",
-            }}
-          >
-            See all →
-          </Link>
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          {[ChevronLeft, ChevronRight].map((Icon, i) => (
-            <button
-              key={i}
-              onClick={() => scroll(i ? 1 : -1)}
-              aria-label={i ? "Scroll right" : "Scroll left"}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                cursor: "pointer",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Icon size={16} />
-            </button>
-          ))}
-        </div>
-      </div>
-      <div ref={rowRef} className="scroll-row">
-        {loading
-          ? Array.from({ length: 10 }).map((_, i) => (
-              <div
-                key={i}
-                className="skeleton"
-                style={{
-                  width: 140,
-                  height: 210,
-                  borderRadius: 8,
-                  flexShrink: 0,
-                }}
-                aria-hidden="true"
-              />
-            ))
-          : items.map((item) => (
-              <Link key={item.id} href={`/movie/${item.id}`}>
-                <motion.div
-                  whileHover={{ scale: 1.06 }}
-                  style={{
-                    width: 140,
-                    height: 210,
-                    borderRadius: 8,
-                    overflow: "hidden",
-                    flexShrink: 0,
-                    background: "#1a1a1a",
-                    cursor: "pointer",
-                    position: "relative",
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
-                  }}
-                >
-                  {item.poster_path ? (
-                    <img
-                      src={`${IMG}/w185${item.poster_path}`}
-                      alt={item.title}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        padding: 8,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 11,
-                          color: "rgba(255,255,255,0.3)",
-                          textAlign: "center",
-                        }}
-                      >
-                        {item.title}
-                      </span>
-                    </div>
-                  )}
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      background:
-                        "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%)",
-                    }}
-                  />
-                  {item.vote_average > 0 && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 6,
-                        right: 6,
-                        background: "rgba(0,0,0,0.75)",
-                        padding: "2px 6px",
-                        borderRadius: 4,
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: "#f5c518",
-                      }}
-                    >
-                      ★ {item.vote_average.toFixed(1)}
-                    </div>
-                  )}
-                  <p
-                    style={{
-                      position: "absolute",
-                      bottom: 8,
-                      left: 8,
-                      right: 8,
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: "#fff",
-                      margin: 0,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {item.title}
-                  </p>
-                </motion.div>
-              </Link>
-            ))}
-      </div>
-    </section>
-  );
-}
+const YEAR_OPTIONS = [
+  { value: "", label: "All Years" },
+  { value: "2026", label: "2026" },
+  { value: "2025", label: "2025" },
+  { value: "2024", label: "2024" },
+  { value: "2020-2023", label: "2020s" },
+  { value: "2010-2019", label: "2010s" },
+  { value: "2000-2009", label: "2000s" },
+  { value: "1990-1999", label: "1990s" },
+];
+const RATING_OPTIONS = [
+  { value: "", label: "Any Rating" },
+  { value: "9", label: "9+ ⭐" },
+  { value: "8", label: "8+ ⭐" },
+  { value: "7", label: "7+ ⭐" },
+  { value: "6", label: "6+ ⭐" },
+];
 
 function MoviesContent() {
   const searchParams = useSearchParams();
@@ -397,22 +75,32 @@ function MoviesContent() {
   const [sortBy, setSortBy] = useState("popularity.desc");
   const [activeGenre, setActiveGenre] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [yearRange, setYearRange] = useState("");
+  const [minRating, setMinRating] = useState("");
   const observerTarget = useRef(null);
 
+  const activeFilterCount = [activeGenre, yearRange, minRating, sortBy !== "popularity.desc"].filter(Boolean).length;
+
   const fetchMovies = useCallback(
-    async (page, reset = false, sort = sortBy, genre = activeGenre) => {
+    async (page, reset = false, sort = sortBy, genre = activeGenre, year = yearRange, rating = minRating) => {
       if (reset) setLoading(true);
       else setLoadingMore(true);
       try {
         let url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&page=${page}&sort_by=${sort}`;
         const gId = genre || (genreParam && GENRE_MAP[genreParam]);
         if (gId) url += `&with_genres=${gId}`;
+        if (year) {
+          const [start, end] = year.split("-");
+          url += `&primary_release_date.gte=${start}-01-01`;
+          url += `&primary_release_date.lte=${end || start}-12-31`;
+        }
+        if (rating) url += `&vote_average.gte=${rating}`;
         const res = await fetch(url);
         const data = await res.json();
         if (reset) {
           setMovies(data.results || []);
           setTotalResults(data.total_results || 0);
-        } else
+        } else {
           setMovies((prev) => {
             const ids = new Set(prev.map((m) => m.id));
             return [
@@ -420,6 +108,7 @@ function MoviesContent() {
               ...(data.results || []).filter((m) => !ids.has(m.id)),
             ];
           });
+        }
         setCurrentPage(page);
         setHasMore(page < data.total_pages && page < 500);
       } catch (e) {
@@ -429,21 +118,21 @@ function MoviesContent() {
         setLoadingMore(false);
       }
     },
-    [genreParam, sortBy, activeGenre],
+    [genreParam, sortBy, activeGenre, yearRange, minRating],
   );
 
   useEffect(() => {
     setMovies([]);
     setCurrentPage(1);
     setHasMore(true);
-    fetchMovies(1, true, sortBy, activeGenre);
-  }, [genreParam, sortBy, activeGenre]); // eslint-disable-line
+    fetchMovies(1, true, sortBy, activeGenre, yearRange, minRating);
+  }, [genreParam, sortBy, activeGenre, yearRange, minRating]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading && !loadingMore)
-          fetchMovies(currentPage + 1, false, sortBy, activeGenre);
+          fetchMovies(currentPage + 1, false, sortBy, activeGenre, yearRange, minRating);
       },
       { threshold: 0.1 },
     );
@@ -452,226 +141,236 @@ function MoviesContent() {
     return () => {
       if (t) observer.unobserve(t);
     };
-  }, [
-    hasMore,
-    loading,
-    loadingMore,
-    currentPage,
-    fetchMovies,
-    sortBy,
-    activeGenre,
-  ]);
-
-  const showRows = !genreParam && !activeGenre && sortBy === "popularity.desc";
+  }, [hasMore, loading, loadingMore, currentPage, fetchMovies, sortBy, activeGenre, yearRange, minRating]);
 
   return (
     <>
-      <style jsx>{`
-        .movies-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-          gap: 16px;
-          margin-bottom: 40px;
-        }
-        @media (max-width: 600px) {
-          .movies-grid {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-          }
-        }
-        @media (min-width: 1200px) {
-          .movies-grid {
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-            gap: 20px;
-          }
-        }
-      `}</style>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <h1 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: "var(--font-extrabold)", letterSpacing: "-0.02em", lineHeight: 1 }}>
+          {genreParam
+            ? genreParam
+                .split("-")
+                .map((w) => w[0].toUpperCase() + w.slice(1))
+                .join(" ") + " Movies"
+            : activeGenre
+              ? (GENRE_NAMES[activeGenre] || "") + " Movies"
+              : "Movies"}
+        </h1>
+        {totalResults > 0 && !loading && (
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)", marginTop: 4 }}>
+            {totalResults.toLocaleString()} titles
+          </p>
+        )}
+      </div>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: 32,
-          flexWrap: "wrap",
-          gap: 16,
-        }}
-      >
-        <div>
-          <h1
-            style={{
-              fontSize: "clamp(28px, 4vw, 48px)",
-              fontWeight: 800,
-              fontFamily: "'Bebas Neue', sans-serif",
-              letterSpacing: "0.02em",
-              lineHeight: 1,
-            }}
-          >
-            {genreParam
-              ? genreParam
-                  .split("-")
-                  .map((w) => w[0].toUpperCase() + w.slice(1))
-                  .join(" ") + " Movies"
-              : activeGenre
-                ? (GENRE_NAMES[activeGenre] || "") + " Movies"
-                : "Movies"}
-          </h1>
-          {totalResults > 0 && !loading && !showRows && (
-            <p
-              style={{
-                fontSize: 13,
-                color: "rgba(255,255,255,0.4)",
-                marginTop: 4,
-              }}
-            >
-              {totalResults.toLocaleString()} titles
-            </p>
+      {/* Filter bar */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 24 }}>
+        <button onClick={() => setShowFilters(true)} className="btn btn-secondary" style={{ background: showFilters || activeFilterCount > 0 ? "var(--accent)" : "rgba(255,255,255,0.08)", position: "relative" }}>
+          <SlidersHorizontal size={16} /> Filters
+          {activeFilterCount > 0 && (
+            <span style={{ position: "absolute", top: -6, right: -6, width: 18, height: 18, borderRadius: "50%", background: "#fff", color: "var(--accent)", fontSize: 10, fontWeight: "var(--font-bold)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {activeFilterCount}
+            </span>
           )}
-        </div>
-        <button
-          onClick={() => setShowFilters((v) => !v)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "10px 18px",
-            background: showFilters ? "#e50914" : "rgba(255,255,255,0.08)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            borderRadius: 8,
-            color: "#fff",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "background 0.2s",
-          }}
-        >
-          <SlidersHorizontal size={16} aria-hidden="true" /> Filters
         </button>
       </div>
 
+      {/* Filter modal */}
       <AnimatePresence>
         {showFilters && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            style={{ overflow: "hidden", marginBottom: 32 }}
-          >
-            <div
-              style={{
-                padding: 20,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 12,
-              }}
-            >
-              <p
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: "rgba(255,255,255,0.4)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  marginBottom: 12,
-                }}
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setShowFilters(false)}
+              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 9999 }}
+            />
+            <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10000, pointerEvents: "none", padding: 16 }}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="filter-modal"
+                style={{ width: "min(520px, 100%)", maxHeight: "calc(100vh - 32px)", overflowY: "auto", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", padding: "clamp(16px, 4vw, 32px)", boxShadow: "0 24px 80px rgba(0,0,0,0.5)", pointerEvents: "auto" }}
               >
-                Sort By
-              </p>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  flexWrap: "wrap",
-                  marginBottom: 20,
-                }}
-              >
-                {SORT_OPTIONS.map((opt) => (
+              {/* Header */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+                <h2 style={{ fontSize: "var(--text-xl)", fontWeight: "var(--font-bold)", margin: 0 }}>Filters</h2>
+                <button onClick={() => setShowFilters(false)} style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", color: "var(--text-tertiary)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}>
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Sort By */}
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                  <TrendingUp size={14} color="var(--accent)" />
+                  <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>Sort By</p>
+                </div>
+                <div className="filter-sort-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8 }}>
+                  {SORT_OPTIONS.map((opt) => {
+                    const Icon = opt.icon;
+                    return (
+                      <button
+                        key={opt.value}
+                        onClick={() => setSortBy(opt.value)}
+                        className="btn"
+                        style={{
+                          padding: "10px 14px",
+                          fontSize: "var(--text-sm)",
+                          background: sortBy === opt.value ? "var(--accent)" : "rgba(255,255,255,0.04)",
+                          border: `1px solid ${sortBy === opt.value ? "var(--accent)" : "var(--border)"}`,
+                          color: sortBy === opt.value ? "#fff" : "var(--text-secondary)",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          justifyContent: "flex-start",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        <Icon size={14} /> {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Genre */}
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                  <Sparkles size={14} color="var(--accent)" />
+                  <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>Genre</p>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                   <button
-                    key={opt.value}
-                    onClick={() => {
-                      setSortBy(opt.value);
-                      setShowFilters(false);
-                    }}
+                    onClick={() => setActiveGenre(null)}
+                    className="btn"
                     style={{
-                      padding: "7px 14px",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      background:
-                        sortBy === opt.value
-                          ? "#e50914"
-                          : "rgba(255,255,255,0.06)",
-                      border: `1px solid ${sortBy === opt.value ? "#e50914" : "rgba(255,255,255,0.1)"}`,
-                      color: "#fff",
+                      padding: "7px 12px",
+                      fontSize: "var(--text-sm)",
+                      background: !activeGenre ? "var(--accent)" : "rgba(255,255,255,0.04)",
+                      border: `1px solid ${!activeGenre ? "var(--accent)" : "var(--border)"}`,
+                      color: !activeGenre ? "#fff" : "var(--text-secondary)",
                       transition: "all 0.2s",
                     }}
                   >
-                    {opt.label}
+                    All
                   </button>
-                ))}
+                  {GENRES.map((g) => (
+                    <button
+                      key={g.id}
+                      onClick={() => setActiveGenre((prev) => (prev === g.id ? null : g.id))}
+                      className="btn"
+                      style={{
+                        padding: "7px 12px",
+                        fontSize: "var(--text-sm)",
+                        background: activeGenre === g.id ? "var(--accent)" : "rgba(255,255,255,0.04)",
+                        border: `1px solid ${activeGenre === g.id ? "var(--accent)" : "var(--border)"}`,
+                        color: activeGenre === g.id ? "#fff" : "var(--text-secondary)",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {g.name}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: "rgba(255,255,255,0.4)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  marginBottom: 12,
-                }}
-              >
-                Genre
-              </p>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {GENRES.map((g) => (
-                  <button
-                    key={g.id}
-                    onClick={() => {
-                      setActiveGenre((prev) => (prev === g.id ? null : g.id));
-                      setShowFilters(false);
-                    }}
-                    style={{
-                      padding: "7px 14px",
-                      borderRadius: 6,
-                      fontSize: 13,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      background:
-                        activeGenre === g.id
-                          ? "#e50914"
-                          : "rgba(255,255,255,0.06)",
-                      border: `1px solid ${activeGenre === g.id ? "#e50914" : "rgba(255,255,255,0.1)"}`,
-                      color: "#fff",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    {g.name}
-                  </button>
-                ))}
+
+              {/* Year */}
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                  <Calendar size={14} color="var(--accent)" />
+                  <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>Year</p>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {YEAR_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setYearRange(opt.value)}
+                      className="btn"
+                      style={{
+                        padding: "7px 12px",
+                        fontSize: "var(--text-sm)",
+                        background: yearRange === opt.value ? "var(--accent)" : "rgba(255,255,255,0.04)",
+                        border: `1px solid ${yearRange === opt.value ? "var(--accent)" : "var(--border)"}`,
+                        color: yearRange === opt.value ? "#fff" : "var(--text-secondary)",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
+
+              {/* Rating */}
+              <div style={{ marginBottom: 28 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                  <Star size={14} color="var(--accent)" />
+                  <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>Min Rating</p>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {RATING_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setMinRating(opt.value)}
+                      className="btn"
+                      style={{
+                        padding: "7px 12px",
+                        fontSize: "var(--text-sm)",
+                        background: minRating === opt.value ? "var(--accent)" : "rgba(255,255,255,0.04)",
+                        border: `1px solid ${minRating === opt.value ? "var(--accent)" : "var(--border)"}`,
+                        color: minRating === opt.value ? "#fff" : "var(--text-secondary)",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 20, borderTop: "1px solid var(--border)" }}>
+                <button
+                  onClick={() => {
+                    setSortBy("popularity.desc");
+                    setActiveGenre(null);
+                    setYearRange("");
+                    setMinRating("");
+                  }}
+                  className="btn"
+                  style={{ padding: "9px 18px", fontSize: "var(--text-sm)", background: "transparent", border: "1px solid var(--border)", color: "var(--text-tertiary)" }}
+                >
+                  Reset
+                </button>
+                <button onClick={() => setShowFilters(false)} className="btn btn-primary" style={{ padding: "9px 24px", fontSize: "var(--text-sm)" }}>
+                  Done
+                </button>
+              </div>
+             </motion.div>
             </div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
 
-      {showRows ? (
-        GENRES.map((g) => (
-          <GenreRow key={g.id} genreId={g.id} genreName={g.name} />
-        ))
-      ) : loading ? (
+      {loading ? (
         <div
-          className="movies-grid"
-          role="status"
-          aria-label="Loading movies"
-          aria-busy="true"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+            gap: 16,
+            marginBottom: 40,
+          }}
         >
           {Array.from({ length: 20 }).map((_, i) => (
             <div
               key={i}
               className="skeleton"
-              style={{ borderRadius: 8, aspectRatio: "2/3" }}
-              aria-hidden="true"
+              style={{ borderRadius: "var(--radius-lg)", aspectRatio: "2/3" }}
             />
           ))}
         </div>
@@ -680,35 +379,35 @@ function MoviesContent() {
           style={{
             textAlign: "center",
             padding: "80px 20px",
-            color: "rgba(255,255,255,0.4)",
+            color: "var(--text-tertiary)",
           }}
         >
-          <p style={{ fontSize: 18, fontWeight: 600 }}>No movies found</p>
+          <p style={{ fontSize: "var(--text-xl)", fontWeight: "var(--font-semibold)", marginBottom: 16 }}>No movies found</p>
           <button
             onClick={() => {
               setActiveGenre(null);
               setSortBy("popularity.desc");
+              setYearRange("");
+              setMinRating("");
             }}
-            style={{
-              marginTop: 16,
-              padding: "10px 22px",
-              background: "#e50914",
-              border: "none",
-              borderRadius: 8,
-              color: "#fff",
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
+            className="btn btn-primary"
           >
             Reset
           </button>
         </div>
       ) : (
         <>
-          <div className="movies-grid">
+          <div
+            className="movies-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+              gap: 16,
+              marginBottom: 40,
+            }}
+          >
             {movies.map((m, i) => (
-              <MovieCard key={m.id} movie={m} index={i} />
+              <MediaCard key={m.id} item={m} type="movie" index={i} />
             ))}
           </div>
           <div
@@ -720,7 +419,6 @@ function MoviesContent() {
               justifyContent: "center",
               marginTop: 20,
             }}
-            aria-live="polite"
           >
             {loadingMore && (
               <div
@@ -730,34 +428,26 @@ function MoviesContent() {
                   alignItems: "center",
                   gap: 10,
                 }}
-                role="status"
               >
                 <div
                   style={{
                     width: 28,
                     height: 28,
                     border: "3px solid rgba(229,9,20,0.2)",
-                    borderTopColor: "#e50914",
+                    borderTopColor: "var(--accent)",
                     borderRadius: "50%",
                     animation: "spin 0.9s linear infinite",
                   }}
-                  aria-hidden="true"
                 />
-                <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>
+                <p style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>
                   Loading more…
                 </p>
               </div>
             )}
             {!hasMore && movies.length > 0 && (
-              <div style={{ textAlign: "center" }} role="status">
-                <Sparkles size={16} color="#e50914" />
-                <p
-                  style={{
-                    fontSize: 12,
-                    color: "rgba(255,255,255,0.3)",
-                    marginTop: 6,
-                  }}
-                >
+              <div style={{ textAlign: "center" }}>
+                <Sparkles size={16} color="var(--accent)" />
+                <p style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)", marginTop: 6 }}>
                   All {movies.length} movies loaded
                 </p>
               </div>
@@ -765,6 +455,33 @@ function MoviesContent() {
           </div>
         </>
       )}
+
+      <style jsx global>{`
+        .movies-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          gap: 16px;
+          margin-bottom: 40px;
+        }
+        @media (max-width: 768px) {
+          .movies-grid {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+          }
+        }
+        @media (max-width: 480px) {
+          .movies-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+          }
+          .filter-modal {
+            max-height: 90vh !important;
+          }
+          .filter-sort-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+      `}</style>
     </>
   );
 }
@@ -786,7 +503,7 @@ export default function MoviesPage() {
               width: 40,
               height: 40,
               border: "4px solid rgba(229,9,20,0.2)",
-              borderTopColor: "#e50914",
+              borderTopColor: "var(--accent)",
               borderRadius: "50%",
               animation: "spin 0.9s linear infinite",
             }}

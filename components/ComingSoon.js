@@ -228,7 +228,7 @@ const s = {
   },
   sectionTitle: {
     fontFamily: "'DM Sans', sans-serif",
-    fontSize: "26px",
+    fontSize: "clamp(20px, 4vw, 26px)",
     fontWeight: "800",
     color: "rgba(255,255,255,0.92)",
     display: "flex",

@@ -205,8 +205,8 @@ export default function ContinueWatchingCard({ item }) {
           opacity: 1;
         }
         .cw-play-btn {
-          width: 32px;
-          height: 32px;
+          width: 44px;
+          height: 44px;
           background: rgba(255, 193, 60, 0.92);
           border-radius: 50%;
           display: flex;

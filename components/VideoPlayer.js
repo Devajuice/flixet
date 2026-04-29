@@ -1,256 +1,137 @@
 "use client";
-import { useState } from "react";
-import AdBlockerNotice from "./AdBlockerNotice";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Server, ChevronDown, ChevronUp } from "lucide-react";
 
-export default function VideoPlayer({ movieId, tmdbId }) {
-  const id = tmdbId || movieId;
+const SERVERS = {
+  movie: [
+    { label: "VidLink", url: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e50914&autoplay=true` },
+    { label: "VidPlus", url: (id) => `https://player.vidplus.to/embed/Movie/${id}` },
+    { label: "VidSrc", url: (id) => `https://vidsrc.me/embed/movie?tmdb=${id}` },
+    { label: "VidSrc.net", url: (id) => `https://vidsrc.net/embed/movie/${id}` },
+    { label: "2embed", url: (id) => `https://www.2embed.cc/embed/${id}` },
+  ],
+  tv: [
+    { label: "VidLink", url: (id, s, e) => `https://vidlink.pro/tv/${id}/${s}/${e}?primaryColor=e50914&autoplay=true&nextbutton=true` },
+    { label: "VidPlus", url: (id, s, e) => `https://player.vidplus.to/embed/tv/${id}/${s}/${e}` },
+    { label: "VidSrc", url: (id, s, e) => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` },
+    { label: "VidSrc.net", url: (id, s, e) => `https://vidsrc.net/embed/tv/${id}/${s}/${e}` },
+    { label: "2embed", url: (id, s, e) => `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
+  ],
+};
 
-  const servers = [
-    {
-      id: "vidsrccc",
-      name: "Server 1",
-      url: `https://vidsrc.cc/v2/embed/movie/${id}`,
-      color: "#ffc13c",
-    },
-    {
-      id: "vidlink",
-      name: "Server 2",
-      url: `https://vidlink.pro/movie/${id}?primaryColor=ffc13c&secondaryColor=0d0d0f&iconColor=ffc13c&autoplay=true`,
-      color: "#34d399",
-    },
-    {
-      id: "2embed",
-      name: "Server 3",
-      url: `https://www.2embed.cc/embed/${id}`,
-      color: "#60a5fa",
-    },
-    {
-      id: "vidsrcme",
-      name: "Server 4",
-      url: `https://vidsrc.me/embed/movie?tmdb=${id}`,
-      color: "#a78bfa",
-    },
-    {
-      id: "vidsrcnet",
-      name: "Server 5",
-      url: `https://vidsrc.net/embed/movie/${id}`,
-      color: "#f472b6",
-    },
-    {
-      id: "moviewp",
-      name: "Server 6",
-      url: `https://moviewp.com/se.php?video_id=${id}&tmdb=1`,
-      color: "#fb923c",
-    },
-  ];
+export default function VideoPlayer({
+  isOpen,
+  onClose,
+  type = "movie",
+  id,
+  title,
+  season,
+  episode,
+  onNextEpisode,
+  hasNext,
+}) {
+  const [activeServer, setActiveServer] = useState(0);
+  const [showServerMenu, setShowServerMenu] = useState(false);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
 
-  const [selectedServer, setSelectedServer] = useState(servers[0].id);
-
-  const currentServer = servers.find((s) => s.id === selectedServer);
-
-  const handleServerChange = (serverId) => {
-    setSelectedServer(serverId);
-  };
-
-  const handleIframeError = () => {
-    const currentIndex = servers.findIndex((s) => s.id === selectedServer);
-    const nextServer = servers[currentIndex + 1];
-    if (nextServer) {
-      setSelectedServer(nextServer.id);
+  useEffect(() => {
+    if (isOpen) {
+      setActiveServer(0);
+      setShowServerMenu(false);
+      setIframeLoaded(false);
     }
-  };
+  }, [isOpen, id, season, episode]);
 
-  const openInNewWindow = () => {
-    const width = 1280;
-    const height = 720;
-    const left = (window.screen.width - width) / 2;
-    const top = (window.screen.height - height) / 2;
-    window.open(
-      currentServer.url,
-      "_blank",
-      `width=${width},height=${height},left=${left},top=${top}`,
-    );
-  };
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  const servers = SERVERS[type] || SERVERS.movie;
+  const serverUrl = type === "tv" ? servers[activeServer]?.url(id, season, episode) : servers[activeServer]?.url(id);
+  const displayTitle = type === "tv" ? `${title} — S${season}E${episode}` : title;
+
+  if (!isOpen) return null;
 
   return (
-    <div style={styles.wrapper}>
-      <AdBlockerNotice />
-
-      <div style={styles.infoBanner}>
-        <span style={{ marginRight: "8px" }}>💡</span>
-        <span>
-          If video doesn't load within 15 seconds, try switching servers below.
-        </span>
-      </div>
-
-      <div style={styles.controls}>
-        <div style={styles.serverGrid}>
-          {servers.map((server) => (
-            <button
-              key={server.id}
-              onClick={() => handleServerChange(server.id)}
-              style={{
-                ...styles.serverBtn,
-                borderColor:
-                  selectedServer === server.id
-                    ? server.color
-                    : "rgba(255,255,255,0.08)",
-                background:
-                  selectedServer === server.id
-                    ? `${server.color}1a`
-                    : "rgba(255,255,255,0.03)",
-                color:
-                  selectedServer === server.id
-                    ? server.color
-                    : "rgba(255,255,255,0.5)",
-              }}
-            >
-              <div
-                style={{
-                  ...styles.serverDot,
-                  backgroundColor: server.color,
-                }}
-              />
-              {server.name}
-              {server.id === "vidsrccc" && (
-                <span
-                  style={{
-                    ...styles.defaultBadge,
-                    background: "#ffc13c",
-                    color: "#0d0d0f",
-                  }}
-                >
-                  Default
-                </span>
-              )}
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        style={{ position: "fixed", inset: 0, background: "#000", zIndex: 99999 }}
+      >
+        {/* Top bar */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "clamp(8px, 2vw, 14px) clamp(12px, 3vw, 18px)", background: "linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, flex: 1 }}>
+            <button onClick={onClose} style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s", flexShrink: 0 }} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.2)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}>
+              <X size={18} />
             </button>
-          ))}
+            <p style={{ fontSize: "clamp(13px, 3vw, 15px)", fontWeight: 600, color: "#fff", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayTitle}</p>
+          </div>
+
+          {/* Server selector */}
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <button onClick={() => setShowServerMenu((v) => !v)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "clamp(6px, 1.5vw, 7px) clamp(10px, 2vw, 12px)", borderRadius: "var(--radius-lg)", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontSize: "clamp(12px, 2.5vw, var(--text-sm))", fontWeight: "var(--font-medium)", cursor: "pointer" }}>
+              <Server size={14} />
+              <span className="server-label">{servers[activeServer].label}</span>
+              {showServerMenu ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+
+            <AnimatePresence>
+              {showServerMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "rgba(20,20,20,0.95)", backdropFilter: "blur(20px)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 6, minWidth: 160, boxShadow: "var(--shadow-xl)", zIndex: 20 }}
+                >
+                  {servers.map((s, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setActiveServer(i); setShowServerMenu(false); }}
+                      style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-md)", fontSize: "var(--text-sm)", textAlign: "left", cursor: "pointer", background: activeServer === i ? "var(--accent)" : "transparent", border: "none", color: activeServer === i ? "#fff" : "var(--text-secondary)", fontWeight: activeServer === i ? "var(--font-bold)" : "var(--font-medium)", display: "flex", alignItems: "center", gap: 8, transition: "all 0.15s" }}
+                    >
+                      {s.label}
+                      {activeServer === i && <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
-        <button
-          style={styles.openBtn}
-          onClick={openInNewWindow}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(255,193,60,0.2)";
-            e.currentTarget.style.borderColor = "#ffc13c";
-            e.currentTarget.style.color = "#ffc13c";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(255,193,60,0.08)";
-            e.currentTarget.style.borderColor = "rgba(255,193,60,0.3)";
-            e.currentTarget.style.color = "rgba(255,193,60,0.8)";
-          }}
-        >
-          🚀 Open in New Window
-        </button>
-      </div>
+        {/* Loading state */}
+        {!iframeLoaded && (
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#000", zIndex: 5 }}>
+            <div style={{ width: 48, height: 48, border: "3px solid rgba(229,9,20,0.2)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+            <p style={{ marginTop: 16, fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>Loading player...</p>
+          </div>
+        )}
 
-      <div style={styles.videoContainer}>
         <iframe
-          key={selectedServer}
-          style={styles.iframe}
-          src={currentServer.url}
+          key={`${activeServer}-${season}-${episode}`}
+          src={serverUrl}
+          style={{ width: "100%", height: "100%", border: "none", position: "relative", zIndex: 1 }}
           allowFullScreen
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="no-referrer-when-downgrade"
-          loading="lazy"
-          onError={handleIframeError}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          title={`Watch ${displayTitle}`}
+          onLoad={() => setIframeLoaded(true)}
         />
-      </div>
-    </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
-
-const styles = {
-  wrapper: {
-    width: "100%",
-    marginTop: "20px",
-    fontFamily: "'DM Sans', sans-serif",
-  },
-  infoBanner: {
-    background: "rgba(255,193,60,0.06)",
-    border: "1px solid rgba(255,193,60,0.2)",
-    borderLeft: "3px solid #ffc13c",
-    borderRadius: "8px",
-    padding: "12px 15px",
-    marginBottom: "15px",
-    display: "flex",
-    alignItems: "center",
-    fontSize: "13px",
-    color: "rgba(255,193,60,0.8)",
-    fontFamily: "'DM Sans', sans-serif",
-  },
-  controls: {
-    background: "rgba(255,255,255,0.02)",
-    border: "1px solid rgba(255,255,255,0.06)",
-    padding: "15px",
-    borderRadius: "12px",
-    marginBottom: "15px",
-    backdropFilter: "blur(10px)",
-  },
-  serverGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
-    gap: "8px",
-    marginBottom: "12px",
-  },
-  serverBtn: {
-    padding: "8px 12px",
-    border: "1px solid",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "12px",
-    fontWeight: "600",
-    transition: "all 0.2s ease",
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    letterSpacing: "0.02em",
-    fontFamily: "'DM Sans', sans-serif",
-  },
-  serverDot: {
-    width: "6px",
-    height: "6px",
-    borderRadius: "50%",
-    flexShrink: 0,
-  },
-  defaultBadge: {
-    fontSize: "9px",
-    fontWeight: "700",
-    borderRadius: "4px",
-    padding: "2px 5px",
-    marginLeft: "auto",
-    letterSpacing: "0.02em",
-  },
-  openBtn: {
-    width: "100%",
-    padding: "10px 20px",
-    background: "rgba(255,193,60,0.08)",
-    color: "rgba(255,193,60,0.8)",
-    border: "1px solid rgba(255,193,60,0.3)",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "13px",
-    fontWeight: "600",
-    transition: "all 0.2s ease",
-    fontFamily: "'DM Sans', sans-serif",
-    letterSpacing: "0.02em",
-  },
-  videoContainer: {
-    position: "relative",
-    width: "100%",
-    paddingBottom: "56.25%",
-    background: "#000",
-    borderRadius: "12px",
-    overflow: "hidden",
-    boxShadow: "0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,193,60,0.1)",
-  },
-  iframe: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    border: "none",
-  },
-};

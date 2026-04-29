@@ -1,8 +1,8 @@
-'use client';
-import Link from 'next/link';
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+"use client";
+import Link from "next/link";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 import {
   Film,
   Search as SearchIcon,
@@ -15,8 +15,8 @@ import {
   X,
   TrendingUp,
   ArrowLeft,
-} from 'lucide-react';
-import SearchBar from './SearchBar';
+} from "lucide-react";
+import SearchBar from "./SearchBar";
 
 export default function Header() {
   const pathname = usePathname();
@@ -37,14 +37,14 @@ export default function Header() {
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
     setShowMobileSearch(false);
     setShowMobileMenu(false);
-    document.body.classList.remove('menu-open');
+    document.body.classList.remove("menu-open");
   }, [pathname]);
 
   useEffect(() => {
@@ -65,665 +65,211 @@ export default function Header() {
       }
     };
     updatePositions();
-    window.addEventListener('resize', updatePositions);
-    window.addEventListener('scroll', updatePositions);
+    window.addEventListener("resize", updatePositions);
+    window.addEventListener("scroll", updatePositions);
     return () => {
-      window.removeEventListener('resize', updatePositions);
-      window.removeEventListener('scroll', updatePositions);
+      window.removeEventListener("resize", updatePositions);
+      window.removeEventListener("scroll", updatePositions);
     };
   }, []);
 
-  const movieGenres = [
-    'Action',
-    'Comedy',
-    'Drama',
-    'Horror',
-    'Sci-Fi',
-    'Thriller',
-    'Romance',
-    'Animation',
-  ];
+  const movieGenres = ["Action", "Comedy", "Drama", "Horror", "Sci-Fi", "Thriller", "Romance", "Animation"];
+  const tvGenres = ["Action & Adventure", "Comedy", "Drama", "Crime", "Documentary", "Sci-Fi & Fantasy", "Reality", "Kids"];
 
-  const tvGenres = [
-    'Action & Adventure',
-    'Comedy',
-    'Drama',
-    'Crime',
-    'Documentary',
-    'Sci-Fi & Fantasy',
-    'Reality',
-    'Kids',
+  const navLinks = [
+    { href: "/", label: "Home", icon: Home },
+    { href: "/movies", label: "Movies", icon: Film, ref: moviesButtonRef, dropdown: "movies" },
+    { href: "/tv", label: "TV Shows", icon: Tv, ref: tvButtonRef, dropdown: "tv" },
+    { href: "/anime", label: "Anime", icon: Sparkles },
+    { href: "/watchlist", label: "Watchlist", icon: Bookmark },
   ];
 
   return (
     <>
-      {/* ── Global styles ─────────────────────────────────── */}
+      <motion.header
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
+        style={{
+          background: "rgba(10,10,10,0.92)",
+          borderBottom: "1px solid var(--border)",
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          backdropFilter: "blur(20px)",
+        }}
+      >
+        <div className="header-inner">
+          <Link href="/" className="header-logo">
+            <div className="header-logo-icon">
+              <Film size={18} fill="white" color="white" strokeWidth={0} />
+            </div>
+            <span>Flixet</span>
+          </Link>
+
+          {!isMobile && (
+            <>
+              <nav className="header-nav">
+                {navLinks.map((link) => {
+                  if (link.dropdown) {
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        ref={link.ref}
+                        className="nav-link"
+                        onMouseEnter={() => link.dropdown === "movies" ? setShowMoviesMenu(true) : setShowTVMenu(true)}
+                        onMouseLeave={() => link.dropdown === "movies" ? setShowMoviesMenu(false) : setShowTVMenu(false)}
+                      >
+                        {link.label} <ChevronDown size={13} />
+                      </Link>
+                    );
+                  }
+                  return (
+                    <Link key={link.href} href={link.href} className="nav-link">
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              <div className="header-search">
+                <SearchBar />
+              </div>
+            </>
+          )}
+
+          {isMobile && (
+            <div className="mobile-actions">
+              <button
+                onClick={() => {
+                  setShowMobileSearch(true);
+                  document.body.classList.add("menu-open");
+                }}
+                aria-label="Search"
+                className="mobile-search-btn"
+              >
+                <SearchIcon size={18} />
+              </button>
+              <button
+                onClick={() => {
+                  setShowMobileMenu(true);
+                  document.body.classList.add("menu-open");
+                }}
+                aria-label="Open menu"
+                className="mobile-menu-btn"
+              >
+                <Menu size={20} strokeWidth={2} />
+              </button>
+            </div>
+          )}
+        </div>
+      </motion.header>
+
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
-
-        /* ── Dropdown portal ──────────────────────────────── */
-        .dropdown-portal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          z-index: 9999;
-        }
-
-        .dropdown-menu-container {
-          position: absolute;
-          pointer-events: auto;
-        }
-
-        .dropdown-menu {
-          background: rgba(13, 13, 15, 0.98);
-          border: 1px solid rgba(255, 193, 60, 0.18);
-          border-top: 2px solid #ffc13c;
-          border-radius: 12px;
-          padding: 18px;
-          min-width: 220px;
-          max-height: 400px;
-          overflow-y: auto;
-          box-shadow:
-            0 16px 48px rgba(0, 0, 0, 0.7),
-            0 0 0 1px rgba(255, 193, 60, 0.06);
-          backdrop-filter: blur(16px);
-          font-family: 'DM Sans', sans-serif;
-        }
-
-        .dropdown-menu::-webkit-scrollbar {
-          width: 4px;
-        }
-        .dropdown-menu::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.03);
-          border-radius: 2px;
-        }
-        .dropdown-menu::-webkit-scrollbar-thumb {
-          background: rgba(255, 193, 60, 0.4);
-          border-radius: 2px;
-        }
-
-        .dropdown-title {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px;
-          font-weight: 700;
-          color: #ffc13c;
-          margin-bottom: 12px;
-          text-transform: uppercase;
-          letter-spacing: 0.09em;
-          padding-bottom: 10px;
-          border-bottom: 1px solid rgba(255, 193, 60, 0.12);
-        }
-
-        .dropdown-items {
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-        }
-
-        .dropdown-all-link {
-          padding: 9px 14px;
-          background: rgba(255, 193, 60, 0.08);
-          border: 1px solid rgba(255, 193, 60, 0.2);
-          border-radius: 8px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 700;
-          color: #ffc13c;
-          display: block;
-          text-decoration: none;
-          margin-bottom: 8px;
-          transition:
-            background 0.2s ease,
-            padding-left 0.2s ease;
-        }
-
-        .dropdown-all-link:hover {
-          background: rgba(255, 193, 60, 0.18);
-          padding-left: 18px;
-        }
-
-        .dropdown-item {
-          position: relative;
-          padding: 9px 14px 9px 24px;
-          border-radius: 8px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 0.5);
-          display: block;
-          text-decoration: none;
-          transition:
-            color 0.2s ease,
-            padding-left 0.2s ease;
-        }
-
-        .dropdown-item::before {
-          content: '';
-          position: absolute;
-          left: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 4px;
-          height: 4px;
-          border-radius: 50%;
-          background: rgba(255, 193, 60, 0.3);
-          transition: background 0.2s ease;
-        }
-
-        .dropdown-item:hover {
-          color: #ffc13c;
-          padding-left: 28px;
-        }
-
-        .dropdown-item:hover::before {
-          background: #ffc13c;
-        }
-
-        /* ── Mobile search overlay ─────────────────────────── */
-        .mobile-search-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.97);
-          z-index: 99999;
-          backdrop-filter: blur(12px);
-          display: flex;
-          flex-direction: column;
-          font-family: 'DM Sans', sans-serif;
-        }
-
-        .mobile-search-header {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 16px;
-          background: rgba(13, 13, 15, 0.98);
-          border-bottom: 1px solid rgba(255, 193, 60, 0.12);
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .mobile-search-back-btn {
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(255, 193, 60, 0.08);
-          border: 1px solid rgba(255, 193, 60, 0.2);
-          border-radius: 50%;
-          color: #ffc13c;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          flex-shrink: 0;
-        }
-
-        .mobile-search-back-btn:active {
-          transform: scale(0.9);
-          background: rgba(255, 193, 60, 0.15);
-        }
-
-        .mobile-search-input-wrapper {
-          flex: 1;
-        }
-
-        .mobile-search-content {
-          flex: 1;
-          overflow-y: auto;
-          padding: 24px 16px 30px;
-        }
-
-        .mobile-search-suggestions {
-          margin-bottom: 30px;
-        }
-
-        .mobile-search-section-title {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px;
-          font-weight: 700;
-          color: #ffc13c;
-          text-transform: uppercase;
-          letter-spacing: 0.09em;
-          margin-bottom: 12px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .mobile-search-suggestion-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 13px 14px;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 10px;
-          margin-bottom: 6px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          text-decoration: none;
-          color: rgba(255, 255, 255, 0.5);
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-        }
-
-        .mobile-search-suggestion-item:active {
-          background: rgba(255, 193, 60, 0.08);
-          border-color: rgba(255, 193, 60, 0.2);
-          color: #ffc13c;
-        }
-
-        /* ── Mobile menu ───────────────────────────────────── */
-        .mobile-menu-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.75);
-          z-index: 99998;
-          backdrop-filter: blur(4px);
-        }
-
-        .mobile-menu-drawer {
-          position: fixed;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          width: 85%;
-          max-width: 340px;
-          background: linear-gradient(
-            180deg,
-            rgba(18, 18, 20, 0.99) 0%,
-            rgba(13, 13, 15, 0.98) 100%
-          );
-          z-index: 99999;
-          overflow-y: auto;
-          box-shadow: -4px 0 40px rgba(0, 0, 0, 0.8);
-          border-left: 1px solid rgba(255, 193, 60, 0.1);
-          font-family: 'DM Sans', sans-serif;
-        }
-
-        .mobile-menu-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 20px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-          background: rgba(255, 193, 60, 0.03);
-        }
-
-        .mobile-menu-title {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 18px;
-          font-weight: 800;
-          color: rgba(255, 255, 255, 0.88);
-          letter-spacing: -0.01em;
-        }
-
-        .mobile-menu-close {
-          width: 38px;
-          height: 38px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(255, 193, 60, 0.06);
-          border: 1px solid rgba(255, 193, 60, 0.15);
-          border-radius: 50%;
-          color: #ffc13c;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .mobile-menu-close:active {
-          transform: scale(0.9);
-          background: rgba(255, 193, 60, 0.12);
-        }
-
-        .mobile-menu-content {
-          padding: 20px;
-        }
-
-        .mobile-menu-section {
-          margin-bottom: 28px;
-        }
-
-        .mobile-menu-section-title {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px;
-          font-weight: 700;
-          color: #ffc13c;
-          text-transform: uppercase;
-          letter-spacing: 0.09em;
-          margin-bottom: 10px;
-          padding-left: 2px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .mobile-menu-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 11px 14px;
-          color: rgba(255, 255, 255, 0.5);
-          text-decoration: none;
-          border-radius: 10px;
-          transition:
-            color 0.2s ease,
-            padding-left 0.2s ease,
-            background 0.2s ease;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          margin-bottom: 2px;
-          background: transparent;
-          border: none;
-          width: 100%;
-          cursor: pointer;
-          text-align: left;
-        }
-
-        .mobile-menu-item:active,
-        .mobile-menu-item:hover {
-          color: #ffc13c;
-          padding-left: 18px;
-          background: rgba(255, 193, 60, 0.05);
-        }
-
-        .mobile-menu-item svg {
-          flex-shrink: 0;
-          opacity: 0.7;
-        }
-
-        .mobile-menu-divider {
-          height: 1px;
-          background: rgba(255, 255, 255, 0.06);
-          margin: 22px 0;
-        }
-
-        body.menu-open {
-          overflow: hidden;
-        }
-      `}</style>
-
-      {/* ── Header styles (global required for App Router) ── */}
-      <style jsx global>{`
-        .header {
-          background: linear-gradient(
-            180deg,
-            rgba(13, 13, 15, 0.99) 0%,
-            rgba(13, 13, 15, 0.96) 100%
-          );
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-          padding: 0;
-          position: sticky;
-          top: 0;
-          z-index: 1000;
-          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-          font-family: 'DM Sans', sans-serif;
-          backdrop-filter: blur(16px);
-        }
-
         .header-inner {
           max-width: 1400px;
           margin: 0 auto;
-          padding: 0 24px;
-          height: 68px;
+          padding: 0 var(--container-padding);
+          height: var(--header-height);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 24px;
+          gap: 20px;
         }
-
-        /* ── Logo ─── */
-        .logo-link {
+        .header-logo {
           display: inline-flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
           text-decoration: none;
-          color: #ffc13c;
           flex-shrink: 0;
         }
-
-        .logo-text {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 20px;
-          font-weight: 800;
-          letter-spacing: -0.03em;
-          color: rgba(255, 255, 255, 0.92);
-        }
-
-        /* ── Desktop nav ─── */
-        .desktop-nav {
+        .header-logo-icon {
+          width: 34px;
+          height: 34px;
+          border-radius: var(--radius-lg);
+          background: var(--accent);
           display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .nav-link {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 0.5) !important;
-          text-decoration: none;
-          padding: 8px 14px;
-          border-radius: 8px;
-          letter-spacing: 0.01em;
-          transition:
-            color 0.2s ease,
-            background 0.2s ease;
-        }
-
-        .nav-link:hover {
-          color: #ffc13c !important;
-          background: rgba(255, 193, 60, 0.06);
-        }
-
-        .dropdown-trigger {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 0.5) !important;
-          text-decoration: none;
-          padding: 8px 14px;
-          border-radius: 8px;
-          letter-spacing: 0.01em;
-          transition:
-            color 0.2s ease,
-            background 0.2s ease;
-          background: transparent;
-          border: none;
-          cursor: pointer;
-        }
-
-        .dropdown-trigger:hover {
-          color: #ffc13c !important;
-          background: rgba(255, 193, 60, 0.06);
-        }
-
-        /* ── Search button ─── */
-        .search-btn {
-          display: inline-flex !important;
-          align-items: center;
-          gap: 7px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 700;
-          color: #0d0d0f !important;
-          background: #ffc13c !important;
-          border: none;
-          padding: 9px 18px;
-          border-radius: 8px;
-          cursor: pointer;
-          letter-spacing: 0.01em;
-          transition:
-            opacity 0.2s ease,
-            transform 0.15s ease;
-          margin-left: 8px;
-        }
-
-        .search-btn:hover {
-          opacity: 0.88;
-          color: #0d0d0f !important;
-        }
-
-        /* ── Mobile hamburger ─── */
-        .hamburger-btn {
-          display: flex;
-          width: 42px;
-          height: 42px;
-          background: rgba(255, 193, 60, 0.06);
-          border: 1px solid rgba(255, 193, 60, 0.18);
-          border-radius: 10px;
           align-items: center;
           justify-content: center;
-          color: #ffc13c;
-          cursor: pointer;
-          transition: all 0.2s ease;
+        }
+        .header-logo span {
+          font-size: var(--text-xl);
+          font-weight: var(--font-extrabold);
+          letter-spacing: -0.03em;
+          color: var(--text-primary);
+        }
+        .header-nav {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+        }
+        .header-search {
+          position: relative;
+          width: 260px;
           flex-shrink: 0;
         }
-
-        .hamburger-btn:hover {
-          background: rgba(255, 193, 60, 0.12);
+        .mobile-menu-btn {
+          display: flex;
+          width: 40px;
+          height: 40px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          align-items: center;
+          justify-content: center;
+          color: var(--text-secondary);
+          cursor: pointer;
+          flex-shrink: 0;
         }
-
-        /* ── Expandable search bar ─── */
-        .search-expand {
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
-          overflow: visible;
-          background: rgba(13, 13, 15, 0.98);
+        .mobile-actions {
+          display: flex;
+          gap: 8px;
+          align-items: center;
         }
-
-        .search-expand-inner {
-          max-width: 640px;
-          margin: 0 auto;
-          padding: 14px 24px 18px;
+        .mobile-search-btn {
+          display: flex;
+          width: 40px;
+          height: 40px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          align-items: center;
+          justify-content: center;
+          color: var(--text-secondary);
+          cursor: pointer;
+          flex-shrink: 0;
         }
-
-        @media (max-width: 768px) {
-          .header-inner {
-            padding: 0 16px;
-            height: 60px;
+        @media (max-width: 1024px) {
+          .header-search {
+            width: 200px;
           }
-          .logo-text {
-            font-size: 18px;
+        }
+        @media (max-width: 768px) {
+          .header-nav, .header-search {
+            display: none;
+          }
+          .header-logo span {
+            font-size: var(--text-lg);
+          }
+          .header-logo-icon {
+            width: 30px;
+            height: 30px;
+          }
+          .header-logo-icon svg {
+            width: 16px;
+            height: 16px;
           }
         }
       `}</style>
 
-      {/* ── Header shell ──────────────────────────────────── */}
-      <motion.header
-        className="header"
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.45, ease: 'easeOut' }}
-      >
-        <div className="header-inner">
-          {/* Logo */}
-          <Link href="/" className="logo-link">
-            <Film size={26} strokeWidth={2.5} />
-            <span className="logo-text">Flixet</span>
-          </Link>
-
-          {/* Mobile hamburger */}
-          {isMobile && (
-            <button
-              className="hamburger-btn"
-              onClick={() => {
-                setShowMobileMenu(true);
-                document.body.classList.add('menu-open');
-              }}
-              aria-label="Open menu"
-            >
-              <Menu size={22} strokeWidth={2.5} />
-            </button>
-          )}
-
-          {/* Desktop nav */}
-          {!isMobile && (
-            <nav className="desktop-nav">
-              <Link href="/" className="nav-link">
-                Home
-              </Link>
-
-              <Link
-                href="/movies"
-                ref={moviesButtonRef}
-                className="dropdown-trigger"
-                onMouseEnter={() => setShowMoviesMenu(true)}
-                onMouseLeave={() => setShowMoviesMenu(false)}
-              >
-                Movies <ChevronDown size={14} />
-              </Link>
-
-              <Link
-                href="/tv"
-                ref={tvButtonRef}
-                className="dropdown-trigger"
-                onMouseEnter={() => setShowTVMenu(true)}
-                onMouseLeave={() => setShowTVMenu(false)}
-              >
-                TV Shows <ChevronDown size={14} />
-              </Link>
-
-              <Link href="/anime" className="nav-link">
-                Anime
-              </Link>
-              <Link href="/watchlist" className="nav-link">
-                Watchlist
-              </Link>
-
-              <motion.button
-                className="search-btn"
-                onClick={() => setShowSearch(!showSearch)}
-                whileTap={{ scale: 0.95 }}
-              >
-                <SearchIcon size={15} />
-                Search
-              </motion.button>
-            </nav>
-          )}
-        </div>
-
-        {/* Desktop expandable search */}
-        <AnimatePresence>
-          {showSearch && !isMobile && (
-            <motion.div
-              className="search-expand"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <div className="search-expand-inner">
-                <SearchBar />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.header>
-
-      {/* ── Dropdown portal (desktop) ──────────────────────── */}
+      {/* Dropdown portal */}
       {!isMobile && (
-        <div className="dropdown-portal">
+        <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 9999 }}>
           <AnimatePresence>
             {showMoviesMenu && (
               <motion.div
-                className="dropdown-menu-container"
-                style={{
-                  left: `${dropdownPositions.movies.left}px`,
-                  top: `${dropdownPositions.movies.top + 12}px`,
-                }}
+                style={{ position: "absolute", left: dropdownPositions.movies.left, top: dropdownPositions.movies.top + 12, pointerEvents: "auto" }}
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
@@ -731,40 +277,20 @@ export default function Header() {
                 onMouseEnter={() => setShowMoviesMenu(true)}
                 onMouseLeave={() => setShowMoviesMenu(false)}
               >
-                <div className="dropdown-menu">
-                  <div className="dropdown-title">Movie Genres</div>
-                  <div className="dropdown-items">
-                    <Link
-                      href="/movies"
-                      className="dropdown-all-link"
-                      onClick={() => setShowMoviesMenu(false)}
-                    >
-                      All Movies
-                    </Link>
-                    {movieGenres.map((genre) => (
-                      <Link
-                        key={genre}
-                        href={`/movies?genre=${genre.toLowerCase()}`}
-                        className="dropdown-item"
-                        onClick={() => setShowMoviesMenu(false)}
-                      >
-                        {genre}
-                      </Link>
-                    ))}
-                  </div>
+                <div style={{ background: "var(--bg-elevated)", border: "1px solid var(--border)", borderTop: "2px solid var(--accent)", borderRadius: "var(--radius-xl)", padding: 16, minWidth: 210, maxHeight: 380, overflowY: "auto", boxShadow: "var(--shadow-xl)" }}>
+                  <p style={{ fontSize: 10, fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.09em", paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>Movie Genres</p>
+                  <Link href="/movies" className="dropdown-all-link" onClick={() => setShowMoviesMenu(false)} style={{ display: "block", padding: "8px 12px", background: "rgba(229,9,20,0.08)", border: "1px solid rgba(229,9,20,0.2)", borderRadius: "var(--radius-lg)", fontSize: "var(--text-sm)", fontWeight: "var(--font-bold)", color: "var(--accent)", textDecoration: "none", marginBottom: 8 }}>All Movies</Link>
+                  {movieGenres.map((g) => (
+                    <Link key={g} href={`/movies?genre=${g.toLowerCase()}`} className="dropdown-item" onClick={() => setShowMoviesMenu(false)} style={{ position: "relative", display: "block", padding: "8px 12px 8px 22px", borderRadius: "var(--radius-lg)", fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)", color: "var(--text-secondary)", textDecoration: "none" }}>{g}</Link>
+                  ))}
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-
           <AnimatePresence>
             {showTVMenu && (
               <motion.div
-                className="dropdown-menu-container"
-                style={{
-                  left: `${dropdownPositions.tv.left}px`,
-                  top: `${dropdownPositions.tv.top + 12}px`,
-                }}
+                style={{ position: "absolute", left: dropdownPositions.tv.left, top: dropdownPositions.tv.top + 12, pointerEvents: "auto" }}
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
@@ -772,33 +298,13 @@ export default function Header() {
                 onMouseEnter={() => setShowTVMenu(true)}
                 onMouseLeave={() => setShowTVMenu(false)}
               >
-                <div className="dropdown-menu">
-                  <div className="dropdown-title">TV Genres</div>
-                  <div className="dropdown-items">
-                    <Link
-                      href="/tv"
-                      className="dropdown-all-link"
-                      onClick={() => setShowTVMenu(false)}
-                    >
-                      All TV Shows
-                    </Link>
-                    {tvGenres.map((genre) => {
-                      const slug = genre
-                        .toLowerCase()
-                        .replace(/ & /g, '-')
-                        .replace(/ /g, '-');
-                      return (
-                        <Link
-                          key={genre}
-                          href={`/tv?genre=${slug}`}
-                          className="dropdown-item"
-                          onClick={() => setShowTVMenu(false)}
-                        >
-                          {genre}
-                        </Link>
-                      );
-                    })}
-                  </div>
+                <div style={{ background: "var(--bg-elevated)", border: "1px solid var(--border)", borderTop: "2px solid var(--accent)", borderRadius: "var(--radius-xl)", padding: 16, minWidth: 210, maxHeight: 380, overflowY: "auto", boxShadow: "var(--shadow-xl)" }}>
+                  <p style={{ fontSize: 10, fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.09em", paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>TV Genres</p>
+                  <Link href="/tv" className="dropdown-all-link" onClick={() => setShowTVMenu(false)} style={{ display: "block", padding: "8px 12px", background: "rgba(229,9,20,0.08)", border: "1px solid rgba(229,9,20,0.2)", borderRadius: "var(--radius-lg)", fontSize: "var(--text-sm)", fontWeight: "var(--font-bold)", color: "var(--accent)", textDecoration: "none", marginBottom: 8 }}>All TV Shows</Link>
+                  {tvGenres.map((g) => {
+                    const slug = g.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-");
+                    return <Link key={g} href={`/tv?genre=${slug}`} className="dropdown-item" onClick={() => setShowTVMenu(false)} style={{ position: "relative", display: "block", padding: "8px 12px 8px 22px", borderRadius: "var(--radius-lg)", fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)", color: "var(--text-secondary)", textDecoration: "none" }}>{g}</Link>;
+                  })}
                 </div>
               </motion.div>
             )}
@@ -806,74 +312,22 @@ export default function Header() {
         </div>
       )}
 
-      {/* ── Mobile search overlay ──────────────────────────── */}
+      {/* Mobile search overlay */}
       <AnimatePresence>
         {showMobileSearch && isMobile && (
-          <motion.div
-            className="mobile-search-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            <div className="mobile-search-header">
-              <button
-                className="mobile-search-back-btn"
-                onClick={() => {
-                  setShowMobileSearch(false);
-                  document.body.classList.remove('menu-open');
-                }}
-                aria-label="Close search"
-              >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.97)", zIndex: 99999, backdropFilter: "blur(12px)", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, background: "var(--bg)", borderBottom: "1px solid var(--border)", boxShadow: "var(--shadow-lg)" }}>
+              <button onClick={() => { setShowMobileSearch(false); document.body.classList.remove("menu-open"); }} aria-label="Close search" style={{ width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(229,9,20,0.1)", border: "1px solid rgba(229,9,20,0.3)", borderRadius: "50%", color: "var(--accent)", cursor: "pointer", flexShrink: 0 }}>
                 <ArrowLeft size={20} />
               </button>
-              <div className="mobile-search-input-wrapper">
-                <SearchBar autoFocus />
-              </div>
+              <div style={{ flex: 1 }}><SearchBar autoFocus /></div>
             </div>
-
-            <div className="mobile-search-content">
-              <div className="mobile-search-suggestions">
-                <div className="mobile-search-section-title">
-                  <TrendingUp size={13} /> Trending Searches
-                </div>
-                {[
-                  'Deadpool & Wolverine',
-                  'Dune 2',
-                  'Oppenheimer',
-                  'The Last of Us',
-                ].map((item) => (
-                  <Link
-                    key={item}
-                    href={`/search?q=${encodeURIComponent(item)}`}
-                    className="mobile-search-suggestion-item"
-                    onClick={() => {
-                      setShowMobileSearch(false);
-                      document.body.classList.remove('menu-open');
-                    }}
-                  >
-                    <SearchIcon size={16} opacity={0.5} />
-                    <span>{item}</span>
-                  </Link>
-                ))}
-              </div>
-
-              <div className="mobile-search-suggestions">
-                <div className="mobile-search-section-title">
-                  <Sparkles size={13} /> Browse by Genre
-                </div>
-                {['Action', 'Comedy', 'Horror', 'Sci-Fi'].map((genre) => (
-                  <Link
-                    key={genre}
-                    href={`/movies?genre=${genre.toLowerCase()}`}
-                    className="mobile-search-suggestion-item"
-                    onClick={() => {
-                      setShowMobileSearch(false);
-                      document.body.classList.remove('menu-open');
-                    }}
-                  >
-                    <Film size={16} opacity={0.5} />
-                    <span>{genre} Movies</span>
+            <div style={{ flex: 1, overflowY: "auto", padding: "24px 16px 30px" }}>
+              <div style={{ marginBottom: 30 }}>
+                <p style={{ fontSize: 10, fontWeight: "var(--font-bold)", color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.09em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}><TrendingUp size={13} /> Trending Searches</p>
+                {["Deadpool & Wolverine", "Dune 2", "Oppenheimer", "The Last of Us"].map((item) => (
+                  <Link key={item} href={`/search?q=${encodeURIComponent(item)}`} onClick={() => { setShowMobileSearch(false); document.body.classList.remove("menu-open"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 14px", background: "rgba(255,255,255,0.02)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", marginBottom: 6, cursor: "pointer", textDecoration: "none", color: "var(--text-secondary)", fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)" }}>
+                    <SearchIcon size={16} opacity={0.5} /><span>{item}</span>
                   </Link>
                 ))}
               </div>
@@ -882,174 +336,46 @@ export default function Header() {
         )}
       </AnimatePresence>
 
-      {/* ── Mobile drawer menu ─────────────────────────────── */}
+      {/* Mobile drawer */}
       <AnimatePresence>
         {showMobileMenu && isMobile && (
           <>
-            <motion.div
-              className="mobile-menu-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => {
-                setShowMobileMenu(false);
-                document.body.classList.remove('menu-open');
-              }}
-            />
-            <motion.div
-              className="mobile-menu-drawer"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-            >
-              <div className="mobile-menu-header">
-                <span className="mobile-menu-title">Explore</span>
-                <button
-                  className="mobile-menu-close"
-                  onClick={() => {
-                    setShowMobileMenu(false);
-                    document.body.classList.remove('menu-open');
-                  }}
-                  aria-label="Close menu"
-                >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setShowMobileMenu(false); document.body.classList.remove("menu-open"); }} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 99998, backdropFilter: "blur(4px)" }} />
+            <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", damping: 26, stiffness: 220 }} style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: "85%", maxWidth: 340, background: "var(--bg)", zIndex: 99999, overflowY: "auto", boxShadow: "-4px 0 40px rgba(0,0,0,0.8)", borderLeft: "1px solid var(--border)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 20, borderBottom: "1px solid var(--border)" }}>
+                <span style={{ fontSize: "var(--text-lg)", fontWeight: "var(--font-bold)" }}>Explore</span>
+                <button onClick={() => { setShowMobileMenu(false); document.body.classList.remove("menu-open"); }} aria-label="Close menu" style={{ width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(229,9,20,0.1)", border: "1px solid rgba(229,9,20,0.2)", borderRadius: "50%", color: "var(--accent)", cursor: "pointer" }}>
                   <X size={20} />
                 </button>
               </div>
-
-              <div className="mobile-menu-content">
-                {/* Quick access */}
-                <div className="mobile-menu-section">
-                  <div className="mobile-menu-section-title">
-                    <TrendingUp size={11} /> Quick Access
-                  </div>
-                  <Link
-                    href="/"
-                    className="mobile-menu-item"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove('menu-open');
-                    }}
-                  >
-                    <Home size={18} />
-                    <span>Home</span>
-                  </Link>
-                  <button
-                    className="mobile-menu-item"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      setShowMobileSearch(true);
-                    }}
-                  >
-                    <SearchIcon size={18} />
-                    <span>Search Movies & TV</span>
-                  </button>
-                  <Link
-                    href="/watchlist"
-                    className="mobile-menu-item"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove('menu-open');
-                    }}
-                  >
-                    <Bookmark size={18} />
-                    <span>My Watchlist</span>
-                  </Link>
+              <div style={{ padding: 20 }}>
+                <div style={{ marginBottom: 28 }}>
+                  <p style={{ fontSize: 10, fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.09em", marginBottom: 10, paddingLeft: 2, display: "flex", alignItems: "center", gap: 6 }}><TrendingUp size={11} /> Quick Access</p>
+                  <Link href="/" onClick={() => { setShowMobileMenu(false); document.body.classList.remove("menu-open"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", color: "var(--text-secondary)", textDecoration: "none", borderRadius: "var(--radius-lg)", marginBottom: 2 }}><Home size={18} /> Home</Link>
+                  <button onClick={() => { setShowMobileMenu(false); setShowMobileSearch(true); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", color: "var(--text-secondary)", borderRadius: "var(--radius-lg)", marginBottom: 2, background: "transparent", border: "none", width: "100%", cursor: "pointer", textAlign: "left" }}><SearchIcon size={18} /> Search</button>
+                  <Link href="/watchlist" onClick={() => { setShowMobileMenu(false); document.body.classList.remove("menu-open"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", color: "var(--text-secondary)", textDecoration: "none", borderRadius: "var(--radius-lg)", marginBottom: 2 }}><Bookmark size={18} /> Watchlist</Link>
                 </div>
-
-                <div className="mobile-menu-divider" />
-
-                {/* Movies */}
-                <div className="mobile-menu-section">
-                  <div className="mobile-menu-section-title">
-                    <Film size={11} /> Movie Genres
-                  </div>
-                  <Link
-                    href="/movies"
-                    className="mobile-menu-item"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove('menu-open');
-                    }}
-                    style={{ color: '#ffc13c', fontWeight: 700 }}
-                  >
-                    <Film size={18} />
-                    <span>All Movies</span>
-                  </Link>
-                  {movieGenres.slice(0, 6).map((genre) => (
-                    <Link
-                      key={genre}
-                      href={`/movies?genre=${genre.toLowerCase()}`}
-                      className="mobile-menu-item"
-                      onClick={() => {
-                        setShowMobileMenu(false);
-                        document.body.classList.remove('menu-open');
-                      }}
-                    >
-                      {genre}
-                    </Link>
+                <div style={{ height: 1, background: "var(--border)", margin: "22px 0" }} />
+                <div style={{ marginBottom: 28 }}>
+                  <p style={{ fontSize: 10, fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.09em", marginBottom: 10, paddingLeft: 2, display: "flex", alignItems: "center", gap: 6 }}><Film size={11} /> Movie Genres</p>
+                  <Link href="/movies" onClick={() => { setShowMobileMenu(false); document.body.classList.remove("menu-open"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", color: "var(--accent)", textDecoration: "none", borderRadius: "var(--radius-lg)", marginBottom: 2, fontWeight: "var(--font-bold)" }}><Film size={18} /> All Movies</Link>
+                  {movieGenres.slice(0, 6).map((g) => (
+                    <Link key={g} href={`/movies?genre=${g.toLowerCase()}`} onClick={() => { setShowMobileMenu(false); document.body.classList.remove("menu-open"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", color: "var(--text-secondary)", textDecoration: "none", borderRadius: "var(--radius-lg)", marginBottom: 2 }}>{g}</Link>
                   ))}
                 </div>
-
-                <div className="mobile-menu-divider" />
-
-                {/* TV */}
-                <div className="mobile-menu-section">
-                  <div className="mobile-menu-section-title">
-                    <Tv size={11} /> TV Shows
-                  </div>
-                  <Link
-                    href="/tv"
-                    className="mobile-menu-item"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove('menu-open');
-                    }}
-                    style={{ color: '#ffc13c', fontWeight: 700 }}
-                  >
-                    <Tv size={18} />
-                    <span>All TV Shows</span>
-                  </Link>
-                  {tvGenres.slice(0, 6).map((genre) => {
-                    const slug = genre
-                      .toLowerCase()
-                      .replace(/ & /g, '-')
-                      .replace(/ /g, '-');
-                    return (
-                      <Link
-                        key={genre}
-                        href={`/tv?genre=${slug}`}
-                        className="mobile-menu-item"
-                        onClick={() => {
-                          setShowMobileMenu(false);
-                          document.body.classList.remove('menu-open');
-                        }}
-                      >
-                        {genre}
-                      </Link>
-                    );
+                <div style={{ height: 1, background: "var(--border)", margin: "22px 0" }} />
+                <div style={{ marginBottom: 28 }}>
+                  <p style={{ fontSize: 10, fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.09em", marginBottom: 10, paddingLeft: 2, display: "flex", alignItems: "center", gap: 6 }}><Tv size={11} /> TV Shows</p>
+                  <Link href="/tv" onClick={() => { setShowMobileMenu(false); document.body.classList.remove("menu-open"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", color: "var(--accent)", textDecoration: "none", borderRadius: "var(--radius-lg)", marginBottom: 2, fontWeight: "var(--font-bold)" }}><Tv size={18} /> All TV Shows</Link>
+                  {tvGenres.slice(0, 6).map((g) => {
+                    const slug = g.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-");
+                    return <Link key={g} href={`/tv?genre=${slug}`} onClick={() => { setShowMobileMenu(false); document.body.classList.remove("menu-open"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", color: "var(--text-secondary)", textDecoration: "none", borderRadius: "var(--radius-lg)", marginBottom: 2 }}>{g}</Link>;
                   })}
                 </div>
-
-                <div className="mobile-menu-divider" />
-
-                {/* Anime */}
-                <div className="mobile-menu-section">
-                  <div className="mobile-menu-section-title">
-                    <Sparkles size={11} /> Anime
-                  </div>
-                  <Link
-                    href="/anime"
-                    className="mobile-menu-item"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove('menu-open');
-                    }}
-                    style={{ color: '#ffc13c', fontWeight: 700 }}
-                  >
-                    <Sparkles size={18} />
-                    <span>Browse Anime</span>
-                  </Link>
+                <div style={{ height: 1, background: "var(--border)", margin: "22px 0" }} />
+                <div>
+                  <p style={{ fontSize: 10, fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.09em", marginBottom: 10, paddingLeft: 2, display: "flex", alignItems: "center", gap: 6 }}><Sparkles size={11} /> Anime</p>
+                  <Link href="/anime" onClick={() => { setShowMobileMenu(false); document.body.classList.remove("menu-open"); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", color: "var(--accent)", textDecoration: "none", borderRadius: "var(--radius-lg)", marginBottom: 2, fontWeight: "var(--font-bold)" }}><Sparkles size={18} /> Browse Anime</Link>
                 </div>
               </div>
             </motion.div>
