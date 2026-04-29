@@ -12,10 +12,11 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 🔄 **Multiple Servers** - Switch between streaming sources if one doesn't work
 - 📺 **TV Show Support** - Full season and episode selection with OMDB ratings
 - 🎨 **Modern UI** - Beautiful dark interface with gold accent design system
-- ⚡ **Fast Performance** - Built with Next.js 15 for optimal speed
+- ⚡ **Fast Performance** - Built with Next.js 16 with Turbopack
 - 🎯 **Advanced Filters** - Filter by genre, year, rating, and more
 - 🚀 **Coming Soon** - Dedicated pages for upcoming movies and airing TV shows
 - ♾️ **Infinite Scroll** - Seamlessly load more content as you browse
+- 🎞️ **Continue Watching** - Pick up right where you left off with episode tracking
 
 ## To Do
 
@@ -23,21 +24,22 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - [x] ~~Infinite Scroll~~
 - [x] ~~Coming Soon Section~~
 - [x] ~~Advanced Filters~~
+- [x] ~~Mobile Responsive Design~~
+- [x] ~~Make Watchlist page better~~
 - [ ] Performance Optimizations
 - [ ] Random Movie Picker
-- [x] ~~Make Watchlist page better~~
 
 ## 🛠️ Tech Stack
 
-- **Framework:** Next.js 15 (App Router)
+- **Framework:** Next.js 16 (App Router) with Turbopack
 - **Language:** JavaScript/React
-- **Styling:** Inline styles + CSS-in-JS (styled-jsx for pseudo-states)
+- **Styling:** Inline styles + CSS-in-JS (styled-jsx) + Global CSS with design tokens
 - **Animation:** Framer Motion
 - **State Management:** React Context API
 - **Icons:** Lucide React
 - **API:** TMDb (The Movie Database) + OMDB
 - **Deployment:** Vercel
-- **Storage:** LocalStorage for watchlist persistence
+- **Storage:** LocalStorage for watchlist and continue watching persistence
 
 ## 🚀 Getting Started
 
@@ -90,37 +92,34 @@ Navigate to [http://localhost:3000](http://localhost:3000)
 ```bash
 Flixet/
 ├── app/
-│   ├── movie/[id]/           # Movie detail & player pages
-│   ├── tv/[id]/              # TV show detail & player pages
+│   ├── movie/[id]/           # Movie detail page
+│   ├── tv/[id]/              # TV show detail page (episodes, seasons, metadata)
+│   ├── movies/               # Browse movies with filters
+│   ├── tv/                   # Browse TV shows with filters
+│   ├── anime/                # Browse anime
 │   ├── coming-soon/
 │   │   ├── movies/           # Upcoming movies page
 │   │   └── tv/               # On-the-air TV shows page
 │   ├── watchlist/            # Watchlist page
 │   ├── search/               # Search results page
+│   ├── page.js               # Home page
+│   ├── globals.css           # Global styles, design tokens, media queries
 │   └── layout.js             # Root layout
 ├── components/
-│   ├── Header.js             # Navigation header
-│   ├── Footer.js             # Footer component
-│   ├── MovieCard.js          # Movie card component
-│   ├── TVCard.js             # TV show card component
-│   ├── MediaGrid.js          # Shared grid engine for all media types
-│   ├── MovieGrid.js          # Movie grid (wraps MediaGrid)
-│   ├── TVGrid.js             # TV grid (wraps MediaGrid)
-│   ├── AnimeGrid.js          # Anime grid (wraps MediaGrid)
-│   ├── ComingSoon.js         # Coming soon section (used on movies/tv pages)
-│   ├── ComingSoonPage.js     # Full coming soon page (used at /coming-soon/*)
-│   ├── EpisodeSelector.js    # Season/episode picker with OMDB ratings
-│   ├── SearchResults.js      # Search results with correct card routing
-│   ├── AdvancedFilters.js    # Genre, year, rating filters
+│   ├── Header.js             # Responsive navigation header
+│   ├── Footer.js             # Footer with links and disclaimer
+│   ├── SearchBar.js          # Search input with dropdown
+│   ├── ScrollRow.js          # Horizontal scrollable row
+│   ├── MediaCard.js          # Universal media card (movie/TV)
 │   ├── CastSection.js        # Cast display component
+│   ├── VideoPlayer.js        # Embedded video player
 │   ├── WatchlistButton.js    # Add/remove watchlist button
-│   ├── WatchlistCard.js      # Watchlist item card
-│   ├── SearchBar.js          # Search input component
-│   └── VideoPlayer.js        # Embedded video player
+│   └── ContinueWatchingSection.js  # Resume watching section
 ├── context/
-│   └── WatchlistContext.js   # Watchlist state management
-├── public/                   # Static assets
-└── styles/                   # Global styles
+│   ├── WatchlistContext.js   # Watchlist state management
+│   └── ContinueWatchingContext.js  # Continue watching state
+├── public/                   # Static assets (icons, images)
+└── .env.local                # Environment variables
 ```
 
 ## 🎯 Key Features Explained
@@ -131,6 +130,12 @@ Flixet/
 - **Quick Access**: Add/remove items with one click from any page
 - **Smart Management**: Automatically prevents duplicates
 - **Visual Feedback**: See which items are already in your watchlist
+
+### Continue Watching
+
+- **Episode Tracking**: Remembers the last season and episode for TV shows
+- **Deep Linking**: Clicking a continue watching item takes you directly to the right episode
+- **Progress Simulation**: Tracks viewing progress for quick resuming
 
 ### Search Functionality
 
@@ -154,9 +159,20 @@ Flixet/
 
 ### Episode Selector
 
-- **Season & Episode Picker**: Full season/episode navigation for all TV shows
+- **Season & Episode Navigation**: Full season/episode selection with arrow navigation
 - **OMDB Ratings**: Individual episode ratings fetched and cached per episode
 - **Optimized Fetching**: `useCallback` memoization prevents duplicate API calls
+- **Deep Link Support**: URL query params (`?season=1&episode=3`) for direct episode access
+
+### Responsive Design
+
+- **Mobile-first approach**: All components optimized for touch interaction
+- **CSS Media Queries**: Breakpoints at 1024px, 768px, and 480px
+- **Design Tokens**: Consistent theming via CSS custom properties (`--accent`, `--bg`, `--radius-*`)
+- **Touch-friendly**: Minimum 40px tap targets on all interactive elements
+- **Bottom Sheet Filter**: Filter modal converts to bottom sheet on very small screens
+- **Responsive Grids**: Browse grids adapt from 4-column → 2-column → 1-column
+- **Overflow Handling**: Long titles and metadata properly truncate on all screen sizes
 
 ## 🌐 Deployment
 
@@ -234,6 +250,30 @@ Built this while learning:
 - Inline styles vs CSS-in-JS scoping in Next.js
 - Infinite scroll with IntersectionObserver
 - Third-party API integration (TMDb + OMDB)
+- CSS custom properties for design systems
+- Responsive design with media queries and fluid typography
+
+## 🎨 Design System
+
+Flixet uses a consistent design system defined in `app/globals.css`:
+
+### Color Tokens
+- `--bg`, `--bg-secondary`, `--bg-tertiary`, `--bg-elevated` - Dark theme backgrounds
+- `--text-primary`, `--text-secondary`, `--text-tertiary`, `--text-muted` - Text hierarchy
+- `--accent` (#e50914), `--accent-hover` - Primary accent (Netflix-style red)
+- `--gold` (#f5c518), `--gold-subtle`, `--gold-border` - IMDB-style ratings
+- `--border`, `--border-hover` - Border colors
+
+### Typography
+- Font: Inter (300–900 weights)
+- Scale: `--text-xs` (0.75rem) → `--text-4xl` (2.25rem)
+- Weights: `--font-light` through `--font-extrabold`
+
+### Spacing & Layout
+- `--space-1` → `--space-20` - Consistent spacing scale
+- `--radius-sm` → `--radius-full` - Border radius tokens
+- `--shadow-sm` → `--shadow-xl` - Shadow depth tokens
+- `--transition-fast`, `--transition-base`, `--transition-slow` - Animation timing
 
 ---
 
