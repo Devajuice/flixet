@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   createContext,
@@ -6,24 +6,24 @@ import {
   useState,
   useEffect,
   useCallback,
-} from 'react';
+} from "react";
 
 const ContinueWatchingContext = createContext();
 
 // Helper function to format seconds to MM:SS or HH:MM:SS
 const formatTime = (seconds) => {
-  if (!seconds || seconds < 0) return '0:00';
+  if (!seconds || seconds < 0) return "0:00";
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = Math.floor(seconds % 60);
 
   if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${secs
       .toString()
-      .padStart(2, '0')}`;
+      .padStart(2, "0")}`;
   }
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  return `${minutes}:${secs.toString().padStart(2, "0")}`;
 };
 
 export function ContinueWatchingProvider({ children }) {
@@ -31,7 +31,7 @@ export function ContinueWatchingProvider({ children }) {
 
   // Load from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('continueWatching');
+    const saved = localStorage.getItem("continueWatching");
     if (saved) {
       setContinueWatching(JSON.parse(saved));
     }
@@ -39,14 +39,14 @@ export function ContinueWatchingProvider({ children }) {
 
   // Save to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('continueWatching', JSON.stringify(continueWatching));
+    localStorage.setItem("continueWatching", JSON.stringify(continueWatching));
   }, [continueWatching]);
 
   const addToContinueWatching = useCallback((item) => {
     setContinueWatching((prev) => {
       // Remove existing entry for this movie/show
       const filtered = prev.filter(
-        (i) => !(i.id === item.id && i.type === item.type)
+        (i) => !(i.id === item.id && i.type === item.type),
       );
 
       // Add new entry at the beginning (most recent first)
@@ -62,22 +62,22 @@ export function ContinueWatchingProvider({ children }) {
 
   const removeFromContinueWatching = useCallback((id, type) => {
     setContinueWatching((prev) =>
-      prev.filter((item) => !(item.id === id && item.type === type))
+      prev.filter((item) => !(item.id === id && item.type === type)),
     );
   }, []);
 
   const clearContinueWatching = useCallback(() => {
     setContinueWatching([]);
-    localStorage.removeItem('continueWatching');
+    localStorage.removeItem("continueWatching");
   }, []);
 
   const getProgress = useCallback(
     (id, type) => {
       return continueWatching.find(
-        (item) => item.id === id && item.type === type
+        (item) => item.id === id && item.type === type,
       );
     },
-    [continueWatching]
+    [continueWatching],
   );
 
   return (
@@ -100,7 +100,7 @@ export function useContinueWatching() {
   const context = useContext(ContinueWatchingContext);
   if (!context) {
     throw new Error(
-      'useContinueWatching must be used within ContinueWatchingProvider'
+      "useContinueWatching must be used within ContinueWatchingProvider",
     );
   }
   return context;

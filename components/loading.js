@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Film } from 'lucide-react';
+import { Film } from "lucide-react";
 
 export default function Loading() {
   return (
@@ -95,11 +95,11 @@ export default function Loading() {
           gap: 28px;
           position: relative;
           overflow: hidden;
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
         }
 
         .ldg-container::before {
-          content: '';
+          content: "";
           position: absolute;
           top: 50%;
           left: 50%;
@@ -164,7 +164,7 @@ export default function Loading() {
         }
 
         .ldg-title {
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
           font-size: 20px;
           font-weight: 800;
           color: rgba(255, 255, 255, 0.88);
@@ -173,7 +173,7 @@ export default function Loading() {
         }
 
         .ldg-subtitle {
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
           font-size: 12px;
           font-weight: 600;
           color: rgba(255, 255, 255, 0.25);

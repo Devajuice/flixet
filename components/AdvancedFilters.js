@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom'; // ✅ Added
-import { motion, AnimatePresence } from 'framer-motion';
-import { SlidersHorizontal, X } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom"; // ✅ Added
+import { motion, AnimatePresence } from "framer-motion";
+import { SlidersHorizontal, X } from "lucide-react";
 
 export default function AdvancedFilters({
-  type = 'movie',
+  type = "movie",
   onFilterChange,
   initialFilters = {},
 }) {
   const [showFilters, setShowFilters] = useState(false);
   const [mounted, setMounted] = useState(false); // ✅ Added
   const [filters, setFilters] = useState({
-    sort_by: 'popularity.desc',
-    with_genres: '',
+    sort_by: "popularity.desc",
+    with_genres: "",
     ...initialFilters,
   });
 
@@ -24,56 +24,56 @@ export default function AdvancedFilters({
   }, []);
 
   const sortOptions = [
-    { value: 'popularity.desc', label: 'Most Popular' },
-    { value: 'popularity.asc', label: 'Least Popular' },
-    { value: 'vote_average.desc', label: 'Highest Rated' },
-    { value: 'vote_average.asc', label: 'Lowest Rated' },
-    { value: 'primary_release_date.desc', label: 'Newest First' },
-    { value: 'primary_release_date.asc', label: 'Oldest First' },
-    { value: 'title.asc', label: 'A-Z' },
-    { value: 'title.desc', label: 'Z-A' },
+    { value: "popularity.desc", label: "Most Popular" },
+    { value: "popularity.asc", label: "Least Popular" },
+    { value: "vote_average.desc", label: "Highest Rated" },
+    { value: "vote_average.asc", label: "Lowest Rated" },
+    { value: "primary_release_date.desc", label: "Newest First" },
+    { value: "primary_release_date.asc", label: "Oldest First" },
+    { value: "title.asc", label: "A-Z" },
+    { value: "title.desc", label: "Z-A" },
   ];
 
   const genres =
-    type === 'movie'
+    type === "movie"
       ? [
-          { id: 28, name: 'Action' },
-          { id: 12, name: 'Adventure' },
-          { id: 16, name: 'Animation' },
-          { id: 35, name: 'Comedy' },
-          { id: 80, name: 'Crime' },
-          { id: 99, name: 'Documentary' },
-          { id: 18, name: 'Drama' },
-          { id: 10751, name: 'Family' },
-          { id: 14, name: 'Fantasy' },
-          { id: 36, name: 'History' },
-          { id: 27, name: 'Horror' },
-          { id: 10402, name: 'Music' },
-          { id: 9648, name: 'Mystery' },
-          { id: 10749, name: 'Romance' },
-          { id: 878, name: 'Science Fiction' },
-          { id: 10770, name: 'TV Movie' },
-          { id: 53, name: 'Thriller' },
-          { id: 10752, name: 'War' },
-          { id: 37, name: 'Western' },
+          { id: 28, name: "Action" },
+          { id: 12, name: "Adventure" },
+          { id: 16, name: "Animation" },
+          { id: 35, name: "Comedy" },
+          { id: 80, name: "Crime" },
+          { id: 99, name: "Documentary" },
+          { id: 18, name: "Drama" },
+          { id: 10751, name: "Family" },
+          { id: 14, name: "Fantasy" },
+          { id: 36, name: "History" },
+          { id: 27, name: "Horror" },
+          { id: 10402, name: "Music" },
+          { id: 9648, name: "Mystery" },
+          { id: 10749, name: "Romance" },
+          { id: 878, name: "Science Fiction" },
+          { id: 10770, name: "TV Movie" },
+          { id: 53, name: "Thriller" },
+          { id: 10752, name: "War" },
+          { id: 37, name: "Western" },
         ]
       : [
-          { id: 10759, name: 'Action & Adventure' },
-          { id: 16, name: 'Animation' },
-          { id: 35, name: 'Comedy' },
-          { id: 80, name: 'Crime' },
-          { id: 99, name: 'Documentary' },
-          { id: 18, name: 'Drama' },
-          { id: 10751, name: 'Family' },
-          { id: 10762, name: 'Kids' },
-          { id: 9648, name: 'Mystery' },
-          { id: 10763, name: 'News' },
-          { id: 10764, name: 'Reality' },
-          { id: 10765, name: 'Sci-Fi & Fantasy' },
-          { id: 10766, name: 'Soap' },
-          { id: 10767, name: 'Talk' },
-          { id: 10768, name: 'War & Politics' },
-          { id: 37, name: 'Western' },
+          { id: 10759, name: "Action & Adventure" },
+          { id: 16, name: "Animation" },
+          { id: 35, name: "Comedy" },
+          { id: 80, name: "Crime" },
+          { id: 99, name: "Documentary" },
+          { id: 18, name: "Drama" },
+          { id: 10751, name: "Family" },
+          { id: 10762, name: "Kids" },
+          { id: 9648, name: "Mystery" },
+          { id: 10763, name: "News" },
+          { id: 10764, name: "Reality" },
+          { id: 10765, name: "Sci-Fi & Fantasy" },
+          { id: 10766, name: "Soap" },
+          { id: 10767, name: "Talk" },
+          { id: 10768, name: "War & Politics" },
+          { id: 37, name: "Western" },
         ];
 
   const handleFilterChange = (key, value) => {
@@ -83,7 +83,7 @@ export default function AdvancedFilters({
 
   const applyFilters = () => {
     const cleanFilters = Object.fromEntries(
-      Object.entries(filters).filter(([_, v]) => v !== '')
+      Object.entries(filters).filter(([_, v]) => v !== ""),
     );
     onFilterChange(cleanFilters);
     setShowFilters(false);
@@ -91,22 +91,22 @@ export default function AdvancedFilters({
 
   const resetFilters = () => {
     const defaultFilters = {
-      sort_by: 'popularity.desc',
-      with_genres: '',
+      sort_by: "popularity.desc",
+      with_genres: "",
     };
     setFilters(defaultFilters);
-    onFilterChange({ sort_by: 'popularity.desc' });
+    onFilterChange({ sort_by: "popularity.desc" });
   };
 
   const activeFilterCount = () => {
     let count = 0;
 
     if (filters.with_genres) {
-      const genreCount = filters.with_genres.split(',').filter(Boolean).length;
+      const genreCount = filters.with_genres.split(",").filter(Boolean).length;
       count += genreCount;
     }
 
-    if (filters.sort_by && filters.sort_by !== 'popularity.desc') {
+    if (filters.sort_by && filters.sort_by !== "popularity.desc") {
       count += 1;
     }
 
@@ -467,7 +467,7 @@ export default function AdvancedFilters({
                   className="filter-select"
                   value={filters.sort_by}
                   onChange={(e) =>
-                    handleFilterChange('sort_by', e.target.value)
+                    handleFilterChange("sort_by", e.target.value)
                   }
                 >
                   {sortOptions.map((option) => (
@@ -484,15 +484,15 @@ export default function AdvancedFilters({
                 <div className="filter-grid">
                   {genres.map((genre) => {
                     const isActive = filters.with_genres.includes(
-                      genre.id.toString()
+                      genre.id.toString(),
                     );
                     return (
                       <div
                         key={genre.id}
-                        className={`genre-chip ${isActive ? 'active' : ''}`}
+                        className={`genre-chip ${isActive ? "active" : ""}`}
                         onClick={() => {
                           const currentGenres = filters.with_genres
-                            .split(',')
+                            .split(",")
                             .filter(Boolean);
                           const genreId = genre.id.toString();
 
@@ -501,8 +501,8 @@ export default function AdvancedFilters({
                             : [...currentGenres, genreId];
 
                           handleFilterChange(
-                            'with_genres',
-                            newGenres.join(',')
+                            "with_genres",
+                            newGenres.join(","),
                           );
                         }}
                       >
@@ -578,7 +578,7 @@ export default function AdvancedFilters({
 
       {/* ✅ Render modal as Portal to document.body */}
       {mounted &&
-        typeof document !== 'undefined' &&
+        typeof document !== "undefined" &&
         createPortal(modalContent, document.body)}
     </>
   );

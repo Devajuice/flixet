@@ -30,14 +30,57 @@ const IMG = "https://image.tmdb.org/t/p";
 function Skeleton() {
   return (
     <div>
-      <div className="skeleton" style={{ width: "100%", height: "70vh", minHeight: 400, borderRadius: 0 }} />
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 var(--container-padding)" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 40, marginTop: -80, position: "relative", zIndex: 1 }}>
-          <div className="skeleton" style={{ borderRadius: "var(--radius-xl)", aspectRatio: "2/3" }} />
+      <div
+        className="skeleton"
+        style={{
+          width: "100%",
+          height: "70vh",
+          minHeight: 400,
+          borderRadius: 0,
+        }}
+      />
+      <div
+        style={{
+          maxWidth: 1400,
+          margin: "0 auto",
+          padding: "0 var(--container-padding)",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "260px 1fr",
+            gap: 40,
+            marginTop: -80,
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <div
+            className="skeleton"
+            style={{ borderRadius: "var(--radius-xl)", aspectRatio: "2/3" }}
+          />
           <div style={{ paddingTop: 80 }}>
-            <div className="skeleton" style={{ height: 52, width: "60%", marginBottom: 16, borderRadius: "var(--radius-lg)" }} />
+            <div
+              className="skeleton"
+              style={{
+                height: 52,
+                width: "60%",
+                marginBottom: 16,
+                borderRadius: "var(--radius-lg)",
+              }}
+            />
             {[100, 80, 65].map((w, i) => (
-              <div key={i} className="skeleton" style={{ height: 13, width: `${w}%`, marginBottom: 10, borderRadius: "var(--radius-md)" }} />
+              <div
+                key={i}
+                className="skeleton"
+                style={{
+                  height: 13,
+                  width: `${w}%`,
+                  marginBottom: 10,
+                  borderRadius: "var(--radius-md)",
+                }}
+              />
             ))}
           </div>
         </div>
@@ -57,12 +100,46 @@ function ScoreRing({ score, size = 56 }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
       <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth="3" strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="rgba(255,255,255,0.1)"
+          strokeWidth="3"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth="3"
+          strokeDasharray={circ}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          style={{ transition: "stroke-dashoffset 1s ease" }}
+        />
       </svg>
       <div>
-        <span style={{ fontSize: "var(--text-lg)", fontWeight: "var(--font-bold)", color: "var(--text-primary)" }}>{score.toFixed(1)}</span>
-        <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", display: "block" }}>TMDB</span>
+        <span
+          style={{
+            fontSize: "var(--text-lg)",
+            fontWeight: "var(--font-bold)",
+            color: "var(--text-primary)",
+          }}
+        >
+          {score.toFixed(1)}
+        </span>
+        <span
+          style={{
+            fontSize: "var(--text-xs)",
+            color: "var(--text-tertiary)",
+            display: "block",
+          }}
+        >
+          TMDB
+        </span>
       </div>
     </div>
   );
@@ -71,11 +148,45 @@ function ScoreRing({ score, size = 56 }) {
 /* ── Info card ──────────────────────────────────────────────── */
 function InfoCard({ icon, label, value }) {
   return (
-    <div className="tv-info-card" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)" }}>
+    <div
+      className="tv-info-card"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "14px 16px",
+        background: "rgba(255,255,255,0.03)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--radius-lg)",
+      }}
+    >
       <div style={{ color: "var(--accent)", flexShrink: 0 }}>{icon}</div>
       <div style={{ minWidth: 0 }}>
-        <p style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", margin: 0, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</p>
-        <p className="tv-info-card-value" style={{ fontSize: "var(--text-sm)", fontWeight: "var(--font-semibold)", color: "var(--text-secondary)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</p>
+        <p
+          style={{
+            fontSize: "var(--text-xs)",
+            color: "var(--text-tertiary)",
+            margin: 0,
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+          }}
+        >
+          {label}
+        </p>
+        <p
+          className="tv-info-card-value"
+          style={{
+            fontSize: "var(--text-sm)",
+            fontWeight: "var(--font-semibold)",
+            color: "var(--text-secondary)",
+            margin: 0,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {value}
+        </p>
       </div>
     </div>
   );
@@ -102,15 +213,64 @@ function CastCard({ actor }) {
           transform: hovered ? "translateY(-4px)" : "none",
         }}
       >
-        <div style={{ width: 84, height: 84, borderRadius: "var(--radius-full)", overflow: "hidden", background: "var(--bg-tertiary)", margin: "0 auto 8px" }}>
+        <div
+          style={{
+            width: 84,
+            height: 84,
+            borderRadius: "var(--radius-full)",
+            overflow: "hidden",
+            background: "var(--bg-tertiary)",
+            margin: "0 auto 8px",
+          }}
+        >
           {actor.profile_path ? (
-            <img src={`${IMG}/w185${actor.profile_path}`} alt={actor.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
+            <img
+              src={`${IMG}/w185${actor.profile_path}`}
+              alt={actor.name}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              loading="lazy"
+            />
           ) : (
-            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "var(--text-muted)" }}>👤</div>
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 24,
+                color: "var(--text-muted)",
+              }}
+            >
+              👤
+            </div>
           )}
         </div>
-        <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-semibold)", color: "var(--text-primary)", margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{actor.name}</p>
-        <p style={{ fontSize: 10, color: "var(--text-tertiary)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{actor.character}</p>
+        <p
+          style={{
+            fontSize: "var(--text-xs)",
+            fontWeight: "var(--font-semibold)",
+            color: "var(--text-primary)",
+            margin: "0 0 2px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {actor.name}
+        </p>
+        <p
+          style={{
+            fontSize: 10,
+            color: "var(--text-tertiary)",
+            margin: 0,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {actor.character}
+        </p>
       </div>
     </Link>
   );
@@ -125,7 +285,13 @@ function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
     return h > 0 ? `${h}h ${min}m` : `${min}m`;
   };
   const rt = formatRT(ep.runtime);
-  const air = ep.air_date ? new Date(ep.air_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : null;
+  const air = ep.air_date
+    ? new Date(ep.air_date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
   const isFuture = ep.air_date && new Date(ep.air_date) > new Date();
 
   return (
@@ -136,12 +302,19 @@ function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
       transition={{ delay: Math.min(index * 0.03, 0.4) }}
       tabIndex={0}
       role="button"
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       className={`episode-card ${isActive ? "active" : ""} ${isFuture ? "future" : ""}`}
     >
       {/* Episode number */}
       <div className="episode-ep-num">
-        <span className="episode-num-text">{String(ep.episode_number).padStart(2, "0")}</span>
+        <span className="episode-num-text">
+          {String(ep.episode_number).padStart(2, "0")}
+        </span>
       </div>
 
       {/* Thumbnail */}
@@ -149,11 +322,15 @@ function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
         {ep.still_path ? (
           <img src={`${IMG}/w300${ep.still_path}`} alt="" loading="lazy" />
         ) : (
-          <div className="episode-thumb-placeholder"><Play size={20} color="var(--text-muted)" /></div>
+          <div className="episode-thumb-placeholder">
+            <Play size={20} color="var(--text-muted)" />
+          </div>
         )}
         {isActive && !isFuture && (
           <div className="episode-thumb-overlay">
-            <div className="episode-play-btn"><Play size={16} fill="white" color="white" strokeWidth={0} /></div>
+            <div className="episode-play-btn">
+              <Play size={16} fill="white" color="white" strokeWidth={0} />
+            </div>
           </div>
         )}
         {isFuture && (
@@ -166,11 +343,16 @@ function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
       {/* Info */}
       <div className="episode-info">
         <div className="episode-header-row">
-          <p className="episode-title">{ep.name || `Episode ${ep.episode_number}`}</p>
+          <p className="episode-title">
+            {ep.name || `Episode ${ep.episode_number}`}
+          </p>
           <div className="episode-ratings">
             {ep.vote_average > 0 && (
-              <span className={`episode-rating ${ep.vote_average >= 7 ? "high" : ep.vote_average >= 5 ? "mid" : "low"}`}>
-                <Star size={10} fill="currentColor" />{ep.vote_average.toFixed(1)}
+              <span
+                className={`episode-rating ${ep.vote_average >= 7 ? "high" : ep.vote_average >= 5 ? "mid" : "low"}`}
+              >
+                <Star size={10} fill="currentColor" />
+                {ep.vote_average.toFixed(1)}
               </span>
             )}
             {omdb?.rating && (
@@ -187,7 +369,12 @@ function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
 
         <div className="episode-meta-row">
           {air && <span className="episode-meta">{air}</span>}
-          {rt && <span className="episode-meta"><Clock size={10} />{rt}</span>}
+          {rt && (
+            <span className="episode-meta">
+              <Clock size={10} />
+              {rt}
+            </span>
+          )}
           {isFuture && <span className="episode-meta upcoming">Upcoming</span>}
         </div>
       </div>
@@ -223,20 +410,32 @@ function TVShowDetailsContent({ params }) {
     setError(null);
     setShowImdb(undefined);
     Promise.all([
-      fetch(`https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations,watch%2Fproviders`),
-      fetch(`https://api.themoviedb.org/3/tv/${showId}/external_ids?api_key=${API_KEY}`),
+      fetch(
+        `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations,watch%2Fproviders`,
+      ),
+      fetch(
+        `https://api.themoviedb.org/3/tv/${showId}/external_ids?api_key=${API_KEY}`,
+      ),
     ])
       .then((rs) => Promise.all(rs.map((r) => r.json())))
       .then(([showData, extData]) => {
-        if (showData.success === false || showData.status_code) throw new Error(showData.status_message || "Failed to fetch show data");
+        if (showData.success === false || showData.status_code)
+          throw new Error(
+            showData.status_message || "Failed to fetch show data",
+          );
         setShow(showData);
         setExternalIds(extData);
-        const validSeasons = showData.seasons?.filter((s) => s.season_number > 0) || [];
+        const validSeasons =
+          showData.seasons?.filter((s) => s.season_number > 0) || [];
         if (validSeasons.length > 0) {
           const paramSeason = seasonParam ? parseInt(seasonParam, 10) : null;
           const paramEpisode = episodeParam ? parseInt(episodeParam, 10) : null;
-          const isValidSeason = paramSeason && validSeasons.some((s) => s.season_number === paramSeason);
-          setSelSeason(isValidSeason ? paramSeason : validSeasons[0].season_number);
+          const isValidSeason =
+            paramSeason &&
+            validSeasons.some((s) => s.season_number === paramSeason);
+          setSelSeason(
+            isValidSeason ? paramSeason : validSeasons[0].season_number,
+          );
           setSelEpisode(paramEpisode && paramEpisode > 0 ? paramEpisode : 1);
         }
       })
@@ -246,16 +445,26 @@ function TVShowDetailsContent({ params }) {
 
   useEffect(() => {
     if (!OMDB_KEY || !externalIds?.imdb_id) return;
-    fetch(`https://www.omdbapi.com/?i=${externalIds.imdb_id}&apikey=${OMDB_KEY}`)
+    fetch(
+      `https://www.omdbapi.com/?i=${externalIds.imdb_id}&apikey=${OMDB_KEY}`,
+    )
       .then((r) => r.json())
-      .then((d) => setShowImdb(d.imdbRating && d.imdbRating !== "N/A" ? { rating: d.imdbRating, votes: d.imdbVotes } : null))
+      .then((d) =>
+        setShowImdb(
+          d.imdbRating && d.imdbRating !== "N/A"
+            ? { rating: d.imdbRating, votes: d.imdbVotes }
+            : null,
+        ),
+      )
       .catch(() => setShowImdb(null));
   }, [externalIds]);
 
   useEffect(() => {
     if (selSeason === null) return;
     setLoadingSeason(true);
-    fetch(`https://api.themoviedb.org/3/tv/${showId}/season/${selSeason}?api_key=${API_KEY}`)
+    fetch(
+      `https://api.themoviedb.org/3/tv/${showId}/season/${selSeason}?api_key=${API_KEY}`,
+    )
       .then((r) => r.json())
       .then((d) => setSeasonData(d))
       .catch(console.error)
@@ -267,94 +476,274 @@ function TVShowDetailsContent({ params }) {
     seasonData.episodes.forEach((ep) => {
       const key = `S${selSeason}E${ep.episode_number}`;
       if (omdbCache[key] !== undefined) return;
-      fetch(`https://www.omdbapi.com/?i=${externalIds.imdb_id}&Season=${selSeason}&Episode=${ep.episode_number}&apikey=${OMDB_KEY}`)
+      fetch(
+        `https://www.omdbapi.com/?i=${externalIds.imdb_id}&Season=${selSeason}&Episode=${ep.episode_number}&apikey=${OMDB_KEY}`,
+      )
         .then((r) => r.json())
-        .then((d) => setOmdbCache((prev) => ({ ...prev, [key]: d.imdbRating && d.imdbRating !== "N/A" ? { rating: d.imdbRating } : null })))
-        .catch(() => setOmdbCache((prev) => ({ ...prev, [`S${selSeason}E${ep.episode_number}`]: null })));
+        .then((d) =>
+          setOmdbCache((prev) => ({
+            ...prev,
+            [key]:
+              d.imdbRating && d.imdbRating !== "N/A"
+                ? { rating: d.imdbRating }
+                : null,
+          })),
+        )
+        .catch(() =>
+          setOmdbCache((prev) => ({
+            ...prev,
+            [`S${selSeason}E${ep.episode_number}`]: null,
+          })),
+        );
     });
   }, [seasonData, externalIds, selSeason, omdbCache]);
 
   useEffect(() => {
     if (showPlayer && show) {
-      const ep = seasonData?.episodes?.find((e) => e.episode_number === selEpisode);
-      addToContinueWatching({ id: show.id, type: "tv", name: show.name, poster_path: show.poster_path, backdrop_path: show.backdrop_path, season: selSeason, episode: selEpisode, runtime: ep?.runtime || show.episode_run_time?.[0] || 45, progress: 15 });
+      const ep = seasonData?.episodes?.find(
+        (e) => e.episode_number === selEpisode,
+      );
+      addToContinueWatching({
+        id: show.id,
+        type: "tv",
+        name: show.name,
+        poster_path: show.poster_path,
+        backdrop_path: show.backdrop_path,
+        season: selSeason,
+        episode: selEpisode,
+        runtime: ep?.runtime || show.episode_run_time?.[0] || 45,
+        progress: 15,
+      });
     }
-  }, [showPlayer, selSeason, selEpisode, show, seasonData, addToContinueWatching]);
+  }, [
+    showPlayer,
+    selSeason,
+    selEpisode,
+    show,
+    seasonData,
+    addToContinueWatching,
+  ]);
 
   if (loading) return <Skeleton />;
   if (error || !show)
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "70vh", textAlign: "center", padding: 20 }}>
-        <p style={{ fontSize: "var(--text-2xl)", fontWeight: "var(--font-bold)", color: "var(--accent)", marginBottom: 12 }}>{error ? "Error" : "Not Found"}</p>
-        <p style={{ color: "var(--text-tertiary)", marginBottom: 24 }}>{error || "This TV show doesn't exist."}</p>
-        <Link href="/tv"><button className="btn btn-primary">Back to TV Shows</button></Link>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "70vh",
+          textAlign: "center",
+          padding: 20,
+        }}
+      >
+        <p
+          style={{
+            fontSize: "var(--text-2xl)",
+            fontWeight: "var(--font-bold)",
+            color: "var(--accent)",
+            marginBottom: 12,
+          }}
+        >
+          {error ? "Error" : "Not Found"}
+        </p>
+        <p style={{ color: "var(--text-tertiary)", marginBottom: 24 }}>
+          {error || "This TV show doesn't exist."}
+        </p>
+        <Link href="/tv">
+          <button className="btn btn-primary">Back to TV Shows</button>
+        </Link>
       </div>
     );
 
-  const backdrop = show.backdrop_path ? `${IMG}/original${show.backdrop_path}` : null;
+  const backdrop = show.backdrop_path
+    ? `${IMG}/original${show.backdrop_path}`
+    : null;
   const poster = show.poster_path ? `${IMG}/w500${show.poster_path}` : null;
   const cast = show.credits?.cast?.slice(0, 16) || [];
   const validSeasons = show.seasons?.filter((s) => s.season_number > 0) || [];
-  const watchProviders = (show["watch/providers"] ?? show["watch%2Fproviders"])?.results?.IN;
+  const watchProviders = (show["watch/providers"] ?? show["watch%2Fproviders"])
+    ?.results?.IN;
   const creators = show.created_by || [];
   const tagline = show.tagline;
 
   const episodes = seasonData?.episodes || [];
-  const currentEpIdx = episodes.findIndex((e) => e.episode_number === selEpisode);
+  const currentEpIdx = episodes.findIndex(
+    (e) => e.episode_number === selEpisode,
+  );
   const hasNext = currentEpIdx < episodes.length - 1;
-  const currentSeasonIdx = validSeasons.findIndex((s) => s.season_number === selSeason);
+  const currentSeasonIdx = validSeasons.findIndex(
+    (s) => s.season_number === selSeason,
+  );
   const hasNextSeason = currentSeasonIdx < validSeasons.length - 1;
   const canGoNext = hasNext || hasNextSeason;
 
   const handleNextEpisode = () => {
     if (!seasonData?.episodes) return;
-    const idx = seasonData.episodes.findIndex((e) => e.episode_number === selEpisode);
+    const idx = seasonData.episodes.findIndex(
+      (e) => e.episode_number === selEpisode,
+    );
     if (idx < seasonData.episodes.length - 1) {
       setSelEpisode(seasonData.episodes[idx + 1].episode_number);
     } else {
       const vs = show.seasons?.filter((s) => s.season_number > 0) || [];
       const sIdx = vs.findIndex((s) => s.season_number === selSeason);
-      if (sIdx < vs.length - 1) { setSelSeason(vs[sIdx + 1].season_number); setSelEpisode(1); }
+      if (sIdx < vs.length - 1) {
+        setSelSeason(vs[sIdx + 1].season_number);
+        setSelEpisode(1);
+      }
     }
     setShowPlayer(false);
     setTimeout(() => setShowPlayer(true), 300);
   };
 
-  const trailer = show.videos?.results?.find((v) => v.type === "Trailer" && v.site === "YouTube") || show.videos?.results?.find((v) => v.site === "YouTube");
-  const status = show.status === "Ended" ? "Ended" : show.status === "Returning Series" ? "Returning" : show.status === "Canceled" ? "Canceled" : "Ongoing";
-  const statusColor = show.status === "Returning Series" ? "#22c55e" : show.status === "Ended" ? "var(--text-tertiary)" : show.status === "Canceled" ? "#ef4444" : "#3b82f6";
+  const trailer =
+    show.videos?.results?.find(
+      (v) => v.type === "Trailer" && v.site === "YouTube",
+    ) || show.videos?.results?.find((v) => v.site === "YouTube");
+  const status =
+    show.status === "Ended"
+      ? "Ended"
+      : show.status === "Returning Series"
+        ? "Returning"
+        : show.status === "Canceled"
+          ? "Canceled"
+          : "Ongoing";
+  const statusColor =
+    show.status === "Returning Series"
+      ? "#22c55e"
+      : show.status === "Ended"
+        ? "var(--text-tertiary)"
+        : show.status === "Canceled"
+          ? "#ef4444"
+          : "#3b82f6";
 
   return (
     <>
-      <VideoPlayer isOpen={showPlayer} onClose={() => setShowPlayer(false)} type="tv" id={showId} title={show.name} season={selSeason} episode={selEpisode} onNextEpisode={canGoNext ? handleNextEpisode : null} hasNext={canGoNext} />
+      <VideoPlayer
+        isOpen={showPlayer}
+        onClose={() => setShowPlayer(false)}
+        type="tv"
+        id={showId}
+        title={show.name}
+        season={selSeason}
+        episode={selEpisode}
+        onNextEpisode={canGoNext ? handleNextEpisode : null}
+        hasNext={canGoNext}
+      />
 
       {/* Trailer modal */}
       <AnimatePresence>
         {showTrailer && trailer && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowTrailer(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: "min(900px, 95vw)", aspectRatio: "16/9", borderRadius: "var(--radius-xl)", overflow: "hidden", background: "#000" }}>
-              <iframe src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&rel=0`} allow="autoplay; encrypted-media" allowFullScreen style={{ width: "100%", height: "100%", border: "none" }} />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowTrailer(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.92)",
+              zIndex: 10000,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 16,
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                width: "100%",
+                maxWidth: "min(900px, 95vw)",
+                aspectRatio: "16/9",
+                borderRadius: "var(--radius-xl)",
+                overflow: "hidden",
+                background: "#000",
+              }}
+            >
+              <iframe
+                src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&rel=0`}
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+                style={{ width: "100%", height: "100%", border: "none" }}
+              />
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Backdrop hero */}
-      <div style={{ position: "relative", width: "100%", height: "clamp(280px, 50vh, 500px)", overflow: "hidden" }}>
-        {backdrop && <img src={backdrop} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, var(--bg) 0%, rgba(10,10,10,0.6) 50%, rgba(10,10,10,0.3) 100%)" }} />
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "clamp(280px, 50vh, 500px)",
+          overflow: "hidden",
+        }}
+      >
+        {backdrop && (
+          <img
+            src={backdrop}
+            alt=""
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        )}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to top, var(--bg) 0%, rgba(10,10,10,0.6) 50%, rgba(10,10,10,0.3) 100%)",
+          }}
+        />
       </div>
 
       {/* Detail content — poster + info */}
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 var(--container-padding)" }}>
+      <div
+        style={{
+          maxWidth: 1400,
+          margin: "0 auto",
+          padding: "0 var(--container-padding)",
+        }}
+      >
         <div className="tv-detail-grid">
           {/* Poster */}
           <div style={{ position: "relative" }}>
             <div className="tv-poster-wrapper">
               {poster ? (
-                <img src={poster} alt={`${show.name} poster`} style={{ width: "100%", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-xl)", display: "block" }} loading="lazy" />
+                <img
+                  src={poster}
+                  alt={`${show.name} poster`}
+                  style={{
+                    width: "100%",
+                    borderRadius: "var(--radius-xl)",
+                    boxShadow: "var(--shadow-xl)",
+                    display: "block",
+                  }}
+                  loading="lazy"
+                />
               ) : (
-                <div style={{ width: "100%", aspectRatio: "2/3", borderRadius: "var(--radius-xl)", background: "var(--bg-tertiary)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: 48, boxShadow: "var(--shadow-xl)" }}>📺</div>
+                <div
+                  style={{
+                    width: "100%",
+                    aspectRatio: "2/3",
+                    borderRadius: "var(--radius-xl)",
+                    background: "var(--bg-tertiary)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--text-muted)",
+                    fontSize: 48,
+                    boxShadow: "var(--shadow-xl)",
+                  }}
+                >
+                  📺
+                </div>
               )}
             </div>
           </div>
@@ -362,107 +751,412 @@ function TVShowDetailsContent({ params }) {
           {/* Info */}
           <div className="tv-info-section">
             {/* Status + Genres */}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12, alignItems: "center" }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", background: `${statusColor}18`, border: `1px solid ${statusColor}40`, borderRadius: "var(--radius-md)", fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: statusColor }}>{status}</span>
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                flexWrap: "wrap",
+                marginBottom: 12,
+                alignItems: "center",
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "4px 10px",
+                  background: `${statusColor}18`,
+                  border: `1px solid ${statusColor}40`,
+                  borderRadius: "var(--radius-md)",
+                  fontSize: "var(--text-xs)",
+                  fontWeight: "var(--font-bold)",
+                  color: statusColor,
+                }}
+              >
+                {status}
+              </span>
               {show.genres?.slice(0, 3).map((g) => (
-                <span key={g.id} className="genre-pill">{g.name}</span>
+                <span key={g.id} className="genre-pill">
+                  {g.name}
+                </span>
               ))}
             </div>
 
-            <h1 className="tv-show-title" style={{ fontSize: "clamp(28px, 4vw, 48px)", lineHeight: 1.1, fontWeight: "var(--font-extrabold)", letterSpacing: "-0.025em", color: "var(--text-primary)", marginBottom: 12 }}>{show.name}</h1>
+            <h1
+              className="tv-show-title"
+              style={{
+                fontSize: "clamp(28px, 4vw, 48px)",
+                lineHeight: 1.1,
+                fontWeight: "var(--font-extrabold)",
+                letterSpacing: "-0.025em",
+                color: "var(--text-primary)",
+                marginBottom: 12,
+              }}
+            >
+              {show.name}
+            </h1>
 
-            {tagline && <p style={{ fontSize: "var(--text-base)", color: "var(--text-tertiary)", fontStyle: "italic", marginBottom: 20 }}>{tagline}</p>}
+            {tagline && (
+              <p
+                style={{
+                  fontSize: "var(--text-base)",
+                  color: "var(--text-tertiary)",
+                  fontStyle: "italic",
+                  marginBottom: 20,
+                }}
+              >
+                {tagline}
+              </p>
+            )}
 
             {/* Scores + Meta */}
-            <div className="tv-scores-row" style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 28 }}>
+            <div
+              className="tv-scores-row"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 20,
+                flexWrap: "wrap",
+                marginBottom: 28,
+              }}
+            >
               <ScoreRing score={show.vote_average || 0} />
               {showImdb && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ background: "var(--gold)", color: "#000", fontSize: 10, fontWeight: 900, padding: "2px 6px", borderRadius: "var(--radius-sm)" }}>IMDb</span>
-                  <span style={{ fontSize: "var(--text-base)", fontWeight: "var(--font-bold)", color: "var(--gold)" }}>{showImdb.rating}</span>
-                  {showImdb.votes && <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>({showImdb.votes})</span>}
+                  <span
+                    style={{
+                      background: "var(--gold)",
+                      color: "#000",
+                      fontSize: 10,
+                      fontWeight: 900,
+                      padding: "2px 6px",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    IMDb
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "var(--text-base)",
+                      fontWeight: "var(--font-bold)",
+                      color: "var(--gold)",
+                    }}
+                  >
+                    {showImdb.rating}
+                  </span>
+                  {showImdb.votes && (
+                    <span
+                      style={{
+                        fontSize: "var(--text-xs)",
+                        color: "var(--text-tertiary)",
+                      }}
+                    >
+                      ({showImdb.votes})
+                    </span>
+                  )}
                 </div>
               )}
-              <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  flexWrap: "wrap",
+                }}
+              >
                 {show.first_air_date && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text-secondary)" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      color: "var(--text-secondary)",
+                    }}
+                  >
                     <Calendar size={14} />
-                    <span style={{ fontSize: "var(--text-sm)" }}>{new Date(show.first_air_date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+                    <span style={{ fontSize: "var(--text-sm)" }}>
+                      {new Date(show.first_air_date).toLocaleDateString(
+                        "en-US",
+                        { year: "numeric", month: "long", day: "numeric" },
+                      )}
+                    </span>
                   </div>
                 )}
                 {validSeasons.length > 0 && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text-secondary)" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      color: "var(--text-secondary)",
+                    }}
+                  >
                     <Tv size={14} />
-                    <span style={{ fontSize: "var(--text-sm)" }}>{validSeasons.length} Season{validSeasons.length !== 1 ? "s" : ""}</span>
+                    <span style={{ fontSize: "var(--text-sm)" }}>
+                      {validSeasons.length} Season
+                      {validSeasons.length !== 1 ? "s" : ""}
+                    </span>
                   </div>
                 )}
                 {show.number_of_episodes && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text-secondary)" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      color: "var(--text-secondary)",
+                    }}
+                  >
                     <Film size={14} />
-                    <span style={{ fontSize: "var(--text-sm)" }}>{show.number_of_episodes} Episodes</span>
+                    <span style={{ fontSize: "var(--text-sm)" }}>
+                      {show.number_of_episodes} Episodes
+                    </span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Action buttons */}
-            <div className="tv-actions-row" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 32 }}>
-              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setShowPlayer(true)} disabled={!selSeason || !selEpisode} className="btn btn-primary" style={{ padding: "clamp(10px, 2vw, 14px) clamp(20px, 4vw, 32px)", fontSize: "clamp(var(--text-sm), 2.5vw, var(--text-base))", fontWeight: "var(--font-bold)", opacity: !selSeason || !selEpisode ? 0.5 : 1 }}>
-                <Play size={18} fill="currentColor" /> Play S{selSeason}E{selEpisode}
+            <div
+              className="tv-actions-row"
+              style={{
+                display: "flex",
+                gap: 10,
+                alignItems: "center",
+                flexWrap: "wrap",
+                marginBottom: 32,
+              }}
+            >
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setShowPlayer(true)}
+                disabled={!selSeason || !selEpisode}
+                className="btn btn-primary"
+                style={{
+                  padding: "clamp(10px, 2vw, 14px) clamp(20px, 4vw, 32px)",
+                  fontSize: "clamp(var(--text-sm), 2.5vw, var(--text-base))",
+                  fontWeight: "var(--font-bold)",
+                  opacity: !selSeason || !selEpisode ? 0.5 : 1,
+                }}
+              >
+                <Play size={18} fill="currentColor" /> Play S{selSeason}E
+                {selEpisode}
               </motion.button>
               {trailer && (
-                <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setShowTrailer(true)} className="btn btn-secondary" style={{ padding: "clamp(10px, 2vw, 14px) clamp(16px, 3vw, 24px)" }}>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setShowTrailer(true)}
+                  className="btn btn-secondary"
+                  style={{
+                    padding: "clamp(10px, 2vw, 14px) clamp(16px, 3vw, 24px)",
+                  }}
+                >
                   <Film size={16} /> Trailer
                 </motion.button>
               )}
-              <WatchlistButton item={{ id: show.id, type: "tv", name: show.name, poster_path: show.poster_path, vote_average: show.vote_average, first_air_date: show.first_air_date }} variant="large" />
+              <WatchlistButton
+                item={{
+                  id: show.id,
+                  type: "tv",
+                  name: show.name,
+                  poster_path: show.poster_path,
+                  vote_average: show.vote_average,
+                  first_air_date: show.first_air_date,
+                }}
+                variant="large"
+              />
             </div>
 
             {/* Overview */}
             {show.overview && (
-              <p style={{ fontSize: "clamp(var(--text-sm), 2.5vw, var(--text-base))", lineHeight: 1.85, color: "var(--text-secondary)", marginBottom: 32, maxWidth: 720 }}>{show.overview}</p>
+              <p
+                style={{
+                  fontSize: "clamp(var(--text-sm), 2.5vw, var(--text-base))",
+                  lineHeight: 1.85,
+                  color: "var(--text-secondary)",
+                  marginBottom: 32,
+                  maxWidth: 720,
+                }}
+              >
+                {show.overview}
+              </p>
             )}
 
             {/* Metadata cards */}
-            <div className="tv-meta-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 32 }}>
-              {creators.length > 0 && <InfoCard icon={<Film size={18} />} label="Creator" value={creators.map((c) => c.name).join(", ")} />}
-              {show.networks?.length > 0 && <InfoCard icon={<Tv size={18} />} label="Network" value={show.networks.slice(0, 2).map((n) => n.name).join(", ")} />}
+            <div
+              className="tv-meta-grid"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                gap: 12,
+                marginBottom: 32,
+              }}
+            >
+              {creators.length > 0 && (
+                <InfoCard
+                  icon={<Film size={18} />}
+                  label="Creator"
+                  value={creators.map((c) => c.name).join(", ")}
+                />
+              )}
+              {show.networks?.length > 0 && (
+                <InfoCard
+                  icon={<Tv size={18} />}
+                  label="Network"
+                  value={show.networks
+                    .slice(0, 2)
+                    .map((n) => n.name)
+                    .join(", ")}
+                />
+              )}
               {show.original_language && (
-                <InfoCard icon={<Globe size={18} />} label="Language" value={new Intl.DisplayNames(["en"], { type: "language" }).of(show.original_language) || show.original_language} />
+                <InfoCard
+                  icon={<Globe size={18} />}
+                  label="Language"
+                  value={
+                    new Intl.DisplayNames(["en"], { type: "language" }).of(
+                      show.original_language,
+                    ) || show.original_language
+                  }
+                />
               )}
-              {show.status && <InfoCard icon={<Star size={18} />} label="Status" value={show.status} />}
+              {show.status && (
+                <InfoCard
+                  icon={<Star size={18} />}
+                  label="Status"
+                  value={show.status}
+                />
+              )}
               {show.last_air_date && (
-                <InfoCard icon={<Calendar size={18} />} label="Last Aired" value={new Date(show.last_air_date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })} />
+                <InfoCard
+                  icon={<Calendar size={18} />}
+                  label="Last Aired"
+                  value={new Date(show.last_air_date).toLocaleDateString(
+                    "en-US",
+                    { year: "numeric", month: "long", day: "numeric" },
+                  )}
+                />
               )}
-              {show.in_production && <InfoCard icon={<Globe size={18} />} label="Production" value="In Production" />}
+              {show.in_production && (
+                <InfoCard
+                  icon={<Globe size={18} />}
+                  label="Production"
+                  value="In Production"
+                />
+              )}
             </div>
 
             {/* Watch providers */}
             {watchProviders?.flatrate?.length > 0 && (
               <div style={{ marginBottom: 32 }}>
-                <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Available On</p>
+                <p
+                  style={{
+                    fontSize: "var(--text-xs)",
+                    fontWeight: "var(--font-bold)",
+                    color: "var(--text-tertiary)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                    marginBottom: 10,
+                  }}
+                >
+                  Available On
+                </p>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                   {watchProviders.flatrate.map((p) => (
-                    <img key={p.provider_id} src={`${IMG}/w92${p.logo_path}`} alt={p.provider_name} title={p.provider_name} style={{ width: 36, height: 36, borderRadius: "var(--radius-md)", objectFit: "cover", border: "1px solid var(--border)" }} />
+                    <img
+                      key={p.provider_id}
+                      src={`${IMG}/w92${p.logo_path}`}
+                      alt={p.provider_name}
+                      title={p.provider_name}
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: "var(--radius-md)",
+                        objectFit: "cover",
+                        border: "1px solid var(--border)",
+                      }}
+                    />
                   ))}
                 </div>
               </div>
             )}
 
             {/* External links */}
-            <div className="tv-external-links" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 40 }}>
+            <div
+              className="tv-external-links"
+              style={{
+                display: "flex",
+                gap: 12,
+                flexWrap: "wrap",
+                marginBottom: 40,
+              }}
+            >
               {externalIds?.imdb_id && (
-                <a href={`https://www.imdb.com/title/${externalIds.imdb_id}/`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(245,197,24,0.08)", border: "1px solid rgba(245,197,24,0.2)", borderRadius: "var(--radius-lg)", color: "var(--gold)", fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)", textDecoration: "none" }}>
+                <a
+                  href={`https://www.imdb.com/title/${externalIds.imdb_id}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "8px 14px",
+                    background: "rgba(245,197,24,0.08)",
+                    border: "1px solid rgba(245,197,24,0.2)",
+                    borderRadius: "var(--radius-lg)",
+                    color: "var(--gold)",
+                    fontSize: "var(--text-sm)",
+                    fontWeight: "var(--font-medium)",
+                    textDecoration: "none",
+                  }}
+                >
                   IMDb <ExternalLink size={13} />
                 </a>
               )}
               {externalIds?.tvdb_id && (
-                <a href={`https://www.thetvdb.com/series/${externalIds.tvdb_id}`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", color: "var(--text-secondary)", fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)", textDecoration: "none" }}>
+                <a
+                  href={`https://www.thetvdb.com/series/${externalIds.tvdb_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "8px 14px",
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "var(--radius-lg)",
+                    color: "var(--text-secondary)",
+                    fontSize: "var(--text-sm)",
+                    fontWeight: "var(--font-medium)",
+                    textDecoration: "none",
+                  }}
+                >
                   TVDb <ExternalLink size={13} />
                 </a>
               )}
               {show.homepage && (
-                <a href={show.homepage} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", color: "var(--text-secondary)", fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)", textDecoration: "none" }}>
+                <a
+                  href={show.homepage}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "8px 14px",
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "var(--radius-lg)",
+                    color: "var(--text-secondary)",
+                    fontSize: "var(--text-sm)",
+                    fontWeight: "var(--font-medium)",
+                    textDecoration: "none",
+                  }}
+                >
                   Official Site <ExternalLink size={13} />
                 </a>
               )}
@@ -472,13 +1166,48 @@ function TVShowDetailsContent({ params }) {
             {validSeasons.length > 0 && (
               <div className="tv-season-section">
                 {/* Header */}
-                <div className="tv-episode-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-    <div className="score-ring" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <h3 style={{ fontSize: "var(--text-lg)", fontWeight: "var(--font-bold)", color: "var(--text-primary)", margin: 0 }}>Episodes</h3>
-                    <span style={{ fontSize: "var(--text-sm)", color: "var(--text-muted)", fontWeight: "var(--font-medium)" }}>Season {selSeason}</span>
+                <div
+                  className="tv-episode-header"
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 20,
+                  }}
+                >
+                  <div
+                    className="score-ring"
+                    style={{ display: "flex", alignItems: "center", gap: 10 }}
+                  >
+                    <h3
+                      style={{
+                        fontSize: "var(--text-lg)",
+                        fontWeight: "var(--font-bold)",
+                        color: "var(--text-primary)",
+                        margin: 0,
+                      }}
+                    >
+                      Episodes
+                    </h3>
+                    <span
+                      style={{
+                        fontSize: "var(--text-sm)",
+                        color: "var(--text-muted)",
+                        fontWeight: "var(--font-medium)",
+                      }}
+                    >
+                      Season {selSeason}
+                    </span>
                   </div>
                   {episodes.length > 0 && (
-                    <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>{episodes.length} episodes</span>
+                    <span
+                      style={{
+                        fontSize: "var(--text-xs)",
+                        color: "var(--text-tertiary)",
+                      }}
+                    >
+                      {episodes.length} episodes
+                    </span>
                   )}
                 </div>
 
@@ -487,8 +1216,13 @@ function TVShowDetailsContent({ params }) {
                   <button
                     className="season-nav-btn"
                     onClick={() => {
-                      const idx = validSeasons.findIndex((s) => s.season_number === selSeason);
-                      if (idx > 0) { setSelSeason(validSeasons[idx - 1].season_number); setSelEpisode(1); }
+                      const idx = validSeasons.findIndex(
+                        (s) => s.season_number === selSeason,
+                      );
+                      if (idx > 0) {
+                        setSelSeason(validSeasons[idx - 1].season_number);
+                        setSelEpisode(1);
+                      }
                     }}
                     disabled={currentSeasonIdx === 0}
                   >
@@ -499,12 +1233,19 @@ function TVShowDetailsContent({ params }) {
                     {validSeasons.map((s) => (
                       <motion.button
                         key={s.id}
-                        onClick={() => { setSelSeason(s.season_number); setSelEpisode(1); }}
+                        onClick={() => {
+                          setSelSeason(s.season_number);
+                          setSelEpisode(1);
+                        }}
                         whileTap={{ scale: 0.96 }}
                         className={`season-btn ${selSeason === s.season_number ? "active" : ""}`}
                       >
                         {s.season_number}
-                        {s.episode_count && <span className="season-count">({s.episode_count})</span>}
+                        {s.episode_count && (
+                          <span className="season-count">
+                            ({s.episode_count})
+                          </span>
+                        )}
                       </motion.button>
                     ))}
                   </div>
@@ -512,8 +1253,13 @@ function TVShowDetailsContent({ params }) {
                   <button
                     className="season-nav-btn"
                     onClick={() => {
-                      const idx = validSeasons.findIndex((s) => s.season_number === selSeason);
-                      if (idx < validSeasons.length - 1) { setSelSeason(validSeasons[idx + 1].season_number); setSelEpisode(1); }
+                      const idx = validSeasons.findIndex(
+                        (s) => s.season_number === selSeason,
+                      );
+                      if (idx < validSeasons.length - 1) {
+                        setSelSeason(validSeasons[idx + 1].season_number);
+                        setSelEpisode(1);
+                      }
                     }}
                     disabled={!hasNextSeason}
                   >
@@ -525,19 +1271,40 @@ function TVShowDetailsContent({ params }) {
                 {loadingSeason ? (
                   <div className="episodes-list-loading">
                     {Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i} className="skeleton" style={{ height: 110, borderRadius: "var(--radius-lg)" }} />
+                      <div
+                        key={i}
+                        className="skeleton"
+                        style={{
+                          height: 110,
+                          borderRadius: "var(--radius-lg)",
+                        }}
+                      />
                     ))}
                   </div>
                 ) : episodes.length > 0 ? (
                   <div className="episodes-list">
                     {episodes.map((ep, idx) => (
-                      <EpisodeCard key={ep.id} ep={ep} isActive={selEpisode === ep.episode_number} onClick={() => setSelEpisode(ep.episode_number)} omdb={omdbCache[`S${selSeason}E${ep.episode_number}`]} index={idx} />
+                      <EpisodeCard
+                        key={ep.id}
+                        ep={ep}
+                        isActive={selEpisode === ep.episode_number}
+                        onClick={() => setSelEpisode(ep.episode_number)}
+                        omdb={omdbCache[`S${selSeason}E${ep.episode_number}`]}
+                        index={idx}
+                      />
                     ))}
                   </div>
                 ) : (
                   <div className="episodes-empty">
                     <Tv size={32} style={{ marginBottom: 12, opacity: 0.3 }} />
-                    <p style={{ fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)" }}>No episodes available</p>
+                    <p
+                      style={{
+                        fontSize: "var(--text-sm)",
+                        fontWeight: "var(--font-medium)",
+                      }}
+                    >
+                      No episodes available
+                    </p>
                   </div>
                 )}
               </div>
@@ -548,18 +1315,32 @@ function TVShowDetailsContent({ params }) {
         {/* Cast */}
         {cast.length > 0 && (
           <ScrollRow title="Top Cast">
-            {cast.map((actor) => <CastCard key={actor.id} actor={actor} />)}
+            {cast.map((actor) => (
+              <CastCard key={actor.id} actor={actor} />
+            ))}
           </ScrollRow>
         )}
 
         {/* Recommendations */}
-        {show.recommendations?.results?.filter((s) => s.poster_path).slice(0, 16).length > 0 && (
-          <ScrollRow title="More Like This" style={{ marginTop: 40, marginBottom: 60 }}>
-            {show.recommendations.results.filter((s) => s.poster_path).slice(0, 16).map((s) => <MediaCard key={s.id} item={s} type="tv" />)}
+        {show.recommendations?.results
+          ?.filter((s) => s.poster_path)
+          .slice(0, 16).length > 0 && (
+          <ScrollRow
+            title="More Like This"
+            style={{ marginTop: 40, marginBottom: 60 }}
+          >
+            {show.recommendations.results
+              .filter((s) => s.poster_path)
+              .slice(0, 16)
+              .map((s) => (
+                <MediaCard key={s.id} item={s} type="tv" />
+              ))}
           </ScrollRow>
         )}
 
-        {cast.length === 0 && (!show.recommendations?.results?.length) && <div style={{ height: 60 }} />}
+        {cast.length === 0 && !show.recommendations?.results?.length && (
+          <div style={{ height: 60 }} />
+        )}
       </div>
 
       <style jsx global>{`
@@ -659,7 +1440,7 @@ function TVShowDetailsContent({ params }) {
           width: 34px;
           height: 34px;
           border-radius: var(--radius-md);
-          background: rgba(255,255,255,0.04);
+          background: rgba(255, 255, 255, 0.04);
           border: 1px solid var(--border);
           color: var(--text-secondary);
           cursor: pointer;
@@ -681,7 +1462,7 @@ function TVShowDetailsContent({ params }) {
           gap: 6px;
           overflow-x: auto;
           scrollbar-width: none;
-          msOverflowStyle: none;
+          msoverflowstyle: none;
           -webkit-overflow-scrolling: touch;
           padding: 2px 0;
         }
@@ -691,8 +1472,8 @@ function TVShowDetailsContent({ params }) {
           font-size: var(--text-sm);
           font-weight: var(--font-semibold);
           cursor: pointer;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           color: var(--text-secondary);
           transition: all 0.2s;
           white-space: nowrap;
@@ -716,8 +1497,8 @@ function TVShowDetailsContent({ params }) {
           padding: 16px;
           border-radius: var(--radius-lg);
           cursor: pointer;
-          background: rgba(255,255,255,0.02);
-          border: 1px solid rgba(255,255,255,0.06);
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.06);
           transition: all 0.2s ease;
           align-items: flex-start;
           opacity: 1;
@@ -771,13 +1552,13 @@ function TVShowDetailsContent({ params }) {
         .episode-thumb-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(0,0,0,0.5);
+          background: rgba(0, 0, 0, 0.5);
           display: flex;
           align-items: center;
           justify-content: center;
         }
         .episode-thumb-overlay.future-overlay {
-          background: rgba(0,0,0,0.6);
+          background: rgba(0, 0, 0, 0.6);
         }
         .episode-play-btn {
           width: 36px;
@@ -827,9 +1608,15 @@ function TVShowDetailsContent({ params }) {
           font-size: 11px;
           font-weight: var(--font-bold);
         }
-        .episode-rating.high { color: #22c55e; }
-        .episode-rating.mid { color: #f5c518; }
-        .episode-rating.low { color: #ef4444; }
+        .episode-rating.high {
+          color: #22c55e;
+        }
+        .episode-rating.mid {
+          color: #f5c518;
+        }
+        .episode-rating.low {
+          color: #ef4444;
+        }
         .episode-rating.omdb {
           color: var(--gold);
           background: var(--gold-subtle);

@@ -32,10 +32,10 @@ export default function ContinueWatchingCard({ item }) {
   const timestamp = getTimestamp();
   const episodeInfo = getEpisodeInfo();
 
-  const imageUrl = item.backdrop_path
-    ? `https://image.tmdb.org/t/p/w500${item.backdrop_path}`
-    : item.poster_path
-      ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+  const imageUrl = item.poster_path
+    ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
+    : item.backdrop_path
+      ? `https://image.tmdb.org/t/p/w500${item.backdrop_path}`
       : '/placeholder.jpg';
 
   const linkUrl =
@@ -44,20 +44,38 @@ export default function ContinueWatchingCard({ item }) {
       : `/movie/${item.id}`;
 
   return (
-    <Link href={linkUrl} className="cw-card-link">
-      <div className="cw-card">
-        {/* ── Remove button ──────────────────────── */}
-        <button
-          onClick={handleRemove}
-          className="cw-remove"
-          aria-label="Remove"
-        >
-          <X size={10} />
-        </button>
+    <div className="cw-card-link" style={{ position: 'relative' }}>
+      {/* ── Remove button ──────────────────────── */}
+      <button
+        onClick={handleRemove}
+        className="cw-remove"
+        aria-label="Remove"
+        style={{
+          position: 'absolute',
+          top: 6,
+          right: 6,
+          zIndex: 20,
+          background: 'rgba(0, 0, 0, 0.65)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '50%',
+          width: 18,
+          height: 18,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          color: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(4px)',
+        }}
+      >
+        <X size={10} />
+      </button>
 
-        {/* ── Thumbnail ──────────────────────────── */}
-        <div className="cw-thumb">
-          <img src={imageUrl} alt={item.title || item.name} loading="lazy" />
+      <Link href={linkUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <div className="cw-card">
+          {/* ── Thumbnail ──────────────────────────── */}
+          <div className="cw-thumb">
+            <img src={imageUrl} alt={item.title || item.name} loading="lazy" />
 
           {/* Play circle */}
           <div className="cw-play-overlay">
@@ -157,7 +175,7 @@ export default function ContinueWatchingCard({ item }) {
         /* ── Thumb ───────────────────────────────── */
         .cw-thumb {
           position: relative;
-          aspect-ratio: 16 / 9;
+          aspect-ratio: 2 / 3;
           overflow: hidden;
           background: #111114;
         }
@@ -305,7 +323,8 @@ export default function ContinueWatchingCard({ item }) {
           letter-spacing: 0.05em;
           text-transform: uppercase;
         }
-      `}</style>
-    </Link>
+       `}</style>
+      </Link>
+    </div>
   );
 }

@@ -3,7 +3,14 @@ import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { SlidersHorizontal, Sparkles, TrendingUp, Star, Calendar, X } from "lucide-react";
+import {
+  SlidersHorizontal,
+  Sparkles,
+  TrendingUp,
+  Star,
+  Calendar,
+  X,
+} from "lucide-react";
 import MediaCard from "@/components/MediaCard";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
@@ -77,10 +84,22 @@ function TVContent() {
   const [yearRange, setYearRange] = useState("");
   const [minRating, setMinRating] = useState("");
 
-  const activeFilterCount = [activeGenre, yearRange, minRating, sortBy !== "popularity.desc"].filter(Boolean).length;
+  const activeFilterCount = [
+    activeGenre,
+    yearRange,
+    minRating,
+    sortBy !== "popularity.desc",
+  ].filter(Boolean).length;
 
   const fetchShows = useCallback(
-    async (page, reset = false, sort = sortBy, genre = activeGenre, year = yearRange, rating = minRating) => {
+    async (
+      page,
+      reset = false,
+      sort = sortBy,
+      genre = activeGenre,
+      year = yearRange,
+      rating = minRating,
+    ) => {
       if (reset) setLoading(true);
       else setLoadingMore(true);
       try {
@@ -130,7 +149,14 @@ function TVContent() {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading && !loadingMore)
-          fetchShows(currentPage + 1, false, sortBy, activeGenre, yearRange, minRating);
+          fetchShows(
+            currentPage + 1,
+            false,
+            sortBy,
+            activeGenre,
+            yearRange,
+            minRating,
+          );
       },
       { threshold: 0.1 },
     );
@@ -139,12 +165,35 @@ function TVContent() {
     return () => {
       if (t) observer.unobserve(t);
     };
-  }, [hasMore, loading, loadingMore, currentPage, fetchShows, sortBy, activeGenre, yearRange, minRating]);
+  }, [
+    hasMore,
+    loading,
+    loadingMore,
+    currentPage,
+    fetchShows,
+    sortBy,
+    activeGenre,
+    yearRange,
+    minRating,
+  ]);
 
   return (
-    <>
+    <div
+      style={{
+        maxWidth: 1400,
+        margin: "0 auto",
+        padding: "0 var(--container-padding)",
+      }}
+    >
       <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <h1 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: "var(--font-extrabold)", letterSpacing: "-0.02em", lineHeight: 1 }}>
+        <h1
+          style={{
+            fontSize: "clamp(32px, 5vw, 52px)",
+            fontWeight: "var(--font-extrabold)",
+            letterSpacing: "-0.02em",
+            lineHeight: 1,
+          }}
+        >
           {genreParam
             ? genreParam
                 .split("-")
@@ -155,18 +204,56 @@ function TVContent() {
               : "TV Shows"}
         </h1>
         {totalResults > 0 && !loading && (
-          <p style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)", marginTop: 4 }}>
+          <p
+            style={{
+              fontSize: "var(--text-sm)",
+              color: "var(--text-tertiary)",
+              marginTop: 4,
+            }}
+          >
             {totalResults.toLocaleString()} titles
           </p>
         )}
       </div>
 
       {/* Filter bar */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 24 }}>
-        <button onClick={() => setShowFilters(true)} className="btn btn-secondary" style={{ background: showFilters || activeFilterCount > 0 ? "var(--accent)" : "rgba(255,255,255,0.08)", position: "relative" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 24,
+        }}
+      >
+        <button
+          onClick={() => setShowFilters(true)}
+          className="btn btn-secondary"
+          style={{
+            background:
+              showFilters || activeFilterCount > 0
+                ? "var(--accent)"
+                : "rgba(255,255,255,0.08)",
+            position: "relative",
+          }}
+        >
           <SlidersHorizontal size={16} /> Filters
           {activeFilterCount > 0 && (
-            <span style={{ position: "absolute", top: -6, right: -6, width: 18, height: 18, borderRadius: "50%", background: "#fff", color: "var(--accent)", fontSize: 10, fontWeight: "var(--font-bold)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span
+              style={{
+                position: "absolute",
+                top: -6,
+                right: -6,
+                width: 18,
+                height: 18,
+                borderRadius: "50%",
+                background: "#fff",
+                color: "var(--accent)",
+                fontSize: 10,
+                fontWeight: "var(--font-bold)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               {activeFilterCount}
             </span>
           )}
@@ -183,173 +270,368 @@ function TVContent() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setShowFilters(false)}
-              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", zIndex: 9999 }}
+              style={{
+                position: "fixed",
+                inset: 0,
+                background: "rgba(0,0,0,0.6)",
+                backdropFilter: "blur(8px)",
+                zIndex: 9999,
+              }}
             />
-            <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10000, pointerEvents: "none", padding: 16 }}>
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 10000,
+                pointerEvents: "none",
+                padding: 16,
+              }}
+            >
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
                 className="filter-modal"
-                style={{ width: "min(520px, 100%)", maxHeight: "calc(100vh - 32px)", overflowY: "auto", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", padding: "clamp(16px, 4vw, 32px)", boxShadow: "0 24px 80px rgba(0,0,0,0.5)", pointerEvents: "auto" }}
+                style={{
+                  width: "min(520px, 100%)",
+                  maxHeight: "calc(100vh - 32px)",
+                  overflowY: "auto",
+                  background: "var(--bg)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--radius-xl)",
+                  padding: "clamp(16px, 4vw, 32px)",
+                  boxShadow: "0 24px 80px rgba(0,0,0,0.5)",
+                  pointerEvents: "auto",
+                }}
               >
-              {/* Header */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-                <h2 style={{ fontSize: "var(--text-xl)", fontWeight: "var(--font-bold)", margin: 0 }}>Filters</h2>
-                <button onClick={() => setShowFilters(false)} style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", color: "var(--text-tertiary)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}>
-                  <X size={16} />
-                </button>
-              </div>
-
-              {/* Sort By */}
-              <div style={{ marginBottom: 24 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                  <TrendingUp size={14} color="var(--accent)" />
-                  <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>Sort By</p>
+                {/* Header */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: 28,
+                  }}
+                >
+                  <h2
+                    style={{
+                      fontSize: "var(--text-xl)",
+                      fontWeight: "var(--font-bold)",
+                      margin: 0,
+                    }}
+                  >
+                    Filters
+                  </h2>
+                  <button
+                    onClick={() => setShowFilters(false)}
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: "50%",
+                      background: "rgba(255,255,255,0.06)",
+                      border: "1px solid var(--border)",
+                      color: "var(--text-tertiary)",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "all 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background =
+                        "rgba(255,255,255,0.1)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background =
+                        "rgba(255,255,255,0.06)";
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
-                <div className="filter-sort-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8 }}>
-                  {SORT_OPTIONS.map((opt) => {
-                    const Icon = opt.icon;
-                    return (
+
+                {/* Sort By */}
+                <div style={{ marginBottom: 24 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <TrendingUp size={14} color="var(--accent)" />
+                    <p
+                      style={{
+                        fontSize: "var(--text-xs)",
+                        fontWeight: "var(--font-bold)",
+                        color: "var(--text-tertiary)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                        margin: 0,
+                      }}
+                    >
+                      Sort By
+                    </p>
+                  </div>
+                  <div
+                    className="filter-sort-grid"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(auto-fill, minmax(140px, 1fr))",
+                      gap: 8,
+                    }}
+                  >
+                    {SORT_OPTIONS.map((opt) => {
+                      const Icon = opt.icon;
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={() => setSortBy(opt.value)}
+                          className="btn"
+                          style={{
+                            padding: "10px 14px",
+                            fontSize: "var(--text-sm)",
+                            background:
+                              sortBy === opt.value
+                                ? "var(--accent)"
+                                : "rgba(255,255,255,0.04)",
+                            border: `1px solid ${sortBy === opt.value ? "var(--accent)" : "var(--border)"}`,
+                            color:
+                              sortBy === opt.value
+                                ? "#fff"
+                                : "var(--text-secondary)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            justifyContent: "flex-start",
+                            transition: "all 0.2s",
+                          }}
+                        >
+                          <Icon size={14} /> {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Genre */}
+                <div style={{ marginBottom: 24 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <Sparkles size={14} color="var(--accent)" />
+                    <p
+                      style={{
+                        fontSize: "var(--text-xs)",
+                        fontWeight: "var(--font-bold)",
+                        color: "var(--text-tertiary)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                        margin: 0,
+                      }}
+                    >
+                      Genre
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <button
+                      onClick={() => setActiveGenre(null)}
+                      className="btn"
+                      style={{
+                        padding: "7px 12px",
+                        fontSize: "var(--text-sm)",
+                        background: !activeGenre
+                          ? "var(--accent)"
+                          : "rgba(255,255,255,0.04)",
+                        border: `1px solid ${!activeGenre ? "var(--accent)" : "var(--border)"}`,
+                        color: !activeGenre ? "#fff" : "var(--text-secondary)",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      All
+                    </button>
+                    {GENRES.map((g) => (
                       <button
-                        key={opt.value}
-                        onClick={() => setSortBy(opt.value)}
+                        key={g.id}
+                        onClick={() =>
+                          setActiveGenre((prev) =>
+                            prev === g.id ? null : g.id,
+                          )
+                        }
                         className="btn"
                         style={{
-                          padding: "10px 14px",
+                          padding: "7px 12px",
                           fontSize: "var(--text-sm)",
-                          background: sortBy === opt.value ? "var(--accent)" : "rgba(255,255,255,0.04)",
-                          border: `1px solid ${sortBy === opt.value ? "var(--accent)" : "var(--border)"}`,
-                          color: sortBy === opt.value ? "#fff" : "var(--text-secondary)",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                          justifyContent: "flex-start",
+                          background:
+                            activeGenre === g.id
+                              ? "var(--accent)"
+                              : "rgba(255,255,255,0.04)",
+                          border: `1px solid ${activeGenre === g.id ? "var(--accent)" : "var(--border)"}`,
+                          color:
+                            activeGenre === g.id
+                              ? "#fff"
+                              : "var(--text-secondary)",
                           transition: "all 0.2s",
                         }}
                       >
-                        <Icon size={14} /> {opt.label}
+                        {g.name}
                       </button>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Genre */}
-              <div style={{ marginBottom: 24 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                  <Sparkles size={14} color="var(--accent)" />
-                  <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>Genre</p>
-                </div>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  <button
-                    onClick={() => setActiveGenre(null)}
-                    className="btn"
+                {/* Year */}
+                <div style={{ marginBottom: 24 }}>
+                  <div
                     style={{
-                      padding: "7px 12px",
-                      fontSize: "var(--text-sm)",
-                      background: !activeGenre ? "var(--accent)" : "rgba(255,255,255,0.04)",
-                      border: `1px solid ${!activeGenre ? "var(--accent)" : "var(--border)"}`,
-                      color: !activeGenre ? "#fff" : "var(--text-secondary)",
-                      transition: "all 0.2s",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 10,
                     }}
                   >
-                    All
-                  </button>
-                  {GENRES.map((g) => (
-                    <button
-                      key={g.id}
-                      onClick={() => setActiveGenre((prev) => (prev === g.id ? null : g.id))}
-                      className="btn"
+                    <Calendar size={14} color="var(--accent)" />
+                    <p
                       style={{
-                        padding: "7px 12px",
-                        fontSize: "var(--text-sm)",
-                        background: activeGenre === g.id ? "var(--accent)" : "rgba(255,255,255,0.04)",
-                        border: `1px solid ${activeGenre === g.id ? "var(--accent)" : "var(--border)"}`,
-                        color: activeGenre === g.id ? "#fff" : "var(--text-secondary)",
-                        transition: "all 0.2s",
+                        fontSize: "var(--text-xs)",
+                        fontWeight: "var(--font-bold)",
+                        color: "var(--text-tertiary)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                        margin: 0,
                       }}
                     >
-                      {g.name}
-                    </button>
-                  ))}
+                      Year
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {YEAR_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setYearRange(opt.value)}
+                        className="btn"
+                        style={{
+                          padding: "7px 12px",
+                          fontSize: "var(--text-sm)",
+                          background:
+                            yearRange === opt.value
+                              ? "var(--accent)"
+                              : "rgba(255,255,255,0.04)",
+                          border: `1px solid ${yearRange === opt.value ? "var(--accent)" : "var(--border)"}`,
+                          color:
+                            yearRange === opt.value
+                              ? "#fff"
+                              : "var(--text-secondary)",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Year */}
-              <div style={{ marginBottom: 24 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                  <Calendar size={14} color="var(--accent)" />
-                  <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>Year</p>
-                </div>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {YEAR_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setYearRange(opt.value)}
-                      className="btn"
+                {/* Rating */}
+                <div style={{ marginBottom: 28 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <Star size={14} color="var(--accent)" />
+                    <p
                       style={{
-                        padding: "7px 12px",
-                        fontSize: "var(--text-sm)",
-                        background: yearRange === opt.value ? "var(--accent)" : "rgba(255,255,255,0.04)",
-                        border: `1px solid ${yearRange === opt.value ? "var(--accent)" : "var(--border)"}`,
-                        color: yearRange === opt.value ? "#fff" : "var(--text-secondary)",
-                        transition: "all 0.2s",
+                        fontSize: "var(--text-xs)",
+                        fontWeight: "var(--font-bold)",
+                        color: "var(--text-tertiary)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                        margin: 0,
                       }}
                     >
-                      {opt.label}
-                    </button>
-                  ))}
+                      Min Rating
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {RATING_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setMinRating(opt.value)}
+                        className="btn"
+                        style={{
+                          padding: "7px 12px",
+                          fontSize: "var(--text-sm)",
+                          background:
+                            minRating === opt.value
+                              ? "var(--accent)"
+                              : "rgba(255,255,255,0.04)",
+                          border: `1px solid ${minRating === opt.value ? "var(--accent)" : "var(--border)"}`,
+                          color:
+                            minRating === opt.value
+                              ? "#fff"
+                              : "var(--text-secondary)",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Rating */}
-              <div style={{ marginBottom: 28 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                  <Star size={14} color="var(--accent)" />
-                  <p style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>Min Rating</p>
-                </div>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {RATING_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setMinRating(opt.value)}
-                      className="btn"
-                      style={{
-                        padding: "7px 12px",
-                        fontSize: "var(--text-sm)",
-                        background: minRating === opt.value ? "var(--accent)" : "rgba(255,255,255,0.04)",
-                        border: `1px solid ${minRating === opt.value ? "var(--accent)" : "var(--border)"}`,
-                        color: minRating === opt.value ? "#fff" : "var(--text-secondary)",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 20, borderTop: "1px solid var(--border)" }}>
-                <button
-                  onClick={() => {
-                    setSortBy("popularity.desc");
-                    setActiveGenre(null);
-                    setYearRange("");
-                    setMinRating("");
+                {/* Actions */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    paddingTop: 20,
+                    borderTop: "1px solid var(--border)",
                   }}
-                  className="btn"
-                  style={{ padding: "9px 18px", fontSize: "var(--text-sm)", background: "transparent", border: "1px solid var(--border)", color: "var(--text-tertiary)" }}
                 >
-                  Reset
-                </button>
-                <button onClick={() => setShowFilters(false)} className="btn btn-primary" style={{ padding: "9px 24px", fontSize: "var(--text-sm)" }}>
-                  Done
-                </button>
-              </div>
-             </motion.div>
+                  <button
+                    onClick={() => {
+                      setSortBy("popularity.desc");
+                      setActiveGenre(null);
+                      setYearRange("");
+                      setMinRating("");
+                    }}
+                    className="btn"
+                    style={{
+                      padding: "9px 18px",
+                      fontSize: "var(--text-sm)",
+                      background: "transparent",
+                      border: "1px solid var(--border)",
+                      color: "var(--text-tertiary)",
+                    }}
+                  >
+                    Reset
+                  </button>
+                  <button
+                    onClick={() => setShowFilters(false)}
+                    className="btn btn-primary"
+                    style={{ padding: "9px 24px", fontSize: "var(--text-sm)" }}
+                  >
+                    Done
+                  </button>
+                </div>
+              </motion.div>
             </div>
           </>
         )}
@@ -373,8 +655,22 @@ function TVContent() {
           ))}
         </div>
       ) : shows.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--text-tertiary)" }}>
-          <p style={{ fontSize: "var(--text-xl)", fontWeight: "var(--font-semibold)", marginBottom: 16 }}>No TV shows found</p>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "80px 20px",
+            color: "var(--text-tertiary)",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "var(--text-xl)",
+              fontWeight: "var(--font-semibold)",
+              marginBottom: 16,
+            }}
+          >
+            No TV shows found
+          </p>
           <button
             onClick={() => {
               setActiveGenre(null);
@@ -389,15 +685,7 @@ function TVContent() {
         </div>
       ) : (
         <>
-          <div
-            className="tv-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-              gap: 16,
-              marginBottom: 40,
-            }}
-          >
+          <div className="tv-grid">
             {shows.map((s, i) => (
               <MediaCard key={s.id} item={s} type="tv" index={i} />
             ))}
@@ -413,7 +701,14 @@ function TVContent() {
             }}
           >
             {loadingMore && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
                 <div
                   style={{
                     width: 28,
@@ -424,13 +719,26 @@ function TVContent() {
                     animation: "spin 0.9s linear infinite",
                   }}
                 />
-                <p style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>Loading more…</p>
+                <p
+                  style={{
+                    fontSize: "var(--text-sm)",
+                    color: "var(--text-tertiary)",
+                  }}
+                >
+                  Loading more…
+                </p>
               </div>
             )}
             {!hasMore && shows.length > 0 && (
               <div style={{ textAlign: "center" }}>
                 <Sparkles size={16} color="var(--accent)" />
-                <p style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)", marginTop: 6 }}>
+                <p
+                  style={{
+                    fontSize: "var(--text-sm)",
+                    color: "var(--text-tertiary)",
+                    marginTop: 6,
+                  }}
+                >
                   All {shows.length} TV shows loaded
                 </p>
               </div>
@@ -448,13 +756,11 @@ function TVContent() {
         }
         @media (max-width: 768px) {
           .tv-grid {
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 12px;
           }
         }
         @media (max-width: 480px) {
           .tv-grid {
-            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
           }
           .filter-modal {
@@ -465,7 +771,7 @@ function TVContent() {
           }
         }
       `}</style>
-    </>
+    </div>
   );
 }
 
@@ -473,7 +779,14 @@ export default function TVPage() {
   return (
     <Suspense
       fallback={
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "60vh",
+          }}
+        >
           <div
             style={{
               width: 40,

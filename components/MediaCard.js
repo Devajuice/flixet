@@ -23,7 +23,7 @@ export default function MediaCard({ item, type, index, variant = "poster", showR
     ? `${IMG}${variant === "backdrop" ? "/w780" : "/w342"}${imgPath}`
     : null;
 
-  const width = variant === "backdrop" ? 280 : 160;
+  const width = variant === "backdrop" ? 240 : 140;
 
   const handleRemove = (e) => {
     e.preventDefault();

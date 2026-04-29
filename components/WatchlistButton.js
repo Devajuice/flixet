@@ -5,7 +5,9 @@ import { motion } from "framer-motion";
 
 export default function WatchlistButton({ item, variant = "default" }) {
   const { watchlist, addToWatchlist, removeFromWatchlist } = useWatchlist();
-  const isInWatchlist = watchlist.some((w) => w.id === item.id && w.type === item.type);
+  const isInWatchlist = watchlist.some(
+    (w) => w.id === item.id && w.type === item.type,
+  );
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -30,7 +32,9 @@ export default function WatchlistButton({ item, variant = "default" }) {
           justifyContent: "center",
           gap: 8,
           padding: "13px 24px",
-          background: isInWatchlist ? "var(--accent)" : "rgba(255,255,255,0.06)",
+          background: isInWatchlist
+            ? "var(--accent)"
+            : "rgba(255,255,255,0.06)",
           color: isInWatchlist ? "#fff" : "var(--text-secondary)",
           border: isInWatchlist ? "none" : "1px solid var(--border)",
           borderRadius: "var(--radius-lg)",

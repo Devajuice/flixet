@@ -1,7 +1,7 @@
-'use client';
-import { motion } from 'framer-motion';
-import { getImageUrl } from '@/lib/tmdb';
-import { User } from 'lucide-react';
+"use client";
+import { motion } from "framer-motion";
+import { getImageUrl } from "@/lib/tmdb";
+import { User } from "lucide-react";
 
 export default function CastSection({ cast }) {
   if (!cast || cast.length === 0) return null;
@@ -11,12 +11,12 @@ export default function CastSection({ cast }) {
       <style jsx global>{`
         .cast-section {
           margin-top: 50px;
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
         }
 
         /* ── Section title ─────────────────────────────── */
         .cast-title {
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
           font-size: 15px;
           font-weight: 700;
           color: rgba(255, 255, 255, 0.88);
@@ -29,7 +29,7 @@ export default function CastSection({ cast }) {
         }
 
         .cast-title::after {
-          content: '';
+          content: "";
           flex: 1;
           height: 1px;
           background: rgba(255, 255, 255, 0.06);
@@ -96,7 +96,7 @@ export default function CastSection({ cast }) {
         }
 
         .cast-name {
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
           font-size: 13px;
           font-weight: 700;
           color: rgba(255, 255, 255, 0.88);
@@ -108,7 +108,7 @@ export default function CastSection({ cast }) {
         }
 
         .cast-character {
-          font-family: 'DM Sans', sans-serif;
+          font-family: "DM Sans", sans-serif;
           font-size: 11px;
           font-weight: 500;
           color: rgba(255, 255, 255, 0.35);
@@ -148,7 +148,7 @@ export default function CastSection({ cast }) {
               <div className="cast-img-wrap">
                 {member.profile_path ? (
                   <img
-                    src={getImageUrl(member.profile_path, 'w185')}
+                    src={getImageUrl(member.profile_path, "w185")}
                     alt={member.name}
                     className="cast-img"
                   />
@@ -164,7 +164,7 @@ export default function CastSection({ cast }) {
                 <p className="cast-character">
                   {member.character ||
                     member.roles?.[0]?.character ||
-                    'Unknown Role'}
+                    "Unknown Role"}
                 </p>
               </div>
             </motion.div>

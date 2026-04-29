@@ -7,13 +7,22 @@ export default function SearchResults({ movies }) {
 
   return (
     <motion.div
-      style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 16 }}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+        gap: 16,
+      }}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
       {movies.map((item, i) => (
-        <MediaCard key={`${item.media_type}-${item.id}`} item={item} type={item.media_type === "tv" ? "tv" : "movie"} index={i} />
+        <MediaCard
+          key={`${item.media_type}-${item.id}`}
+          item={item}
+          type={item.media_type === "tv" ? "tv" : "movie"}
+          index={i}
+        />
       ))}
     </motion.div>
   );

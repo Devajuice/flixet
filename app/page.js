@@ -352,11 +352,11 @@ export default function HomePage() {
   }, []);
 
   const heroItems = trending.filter((i) => i.backdrop_path).slice(0, 6);
-  const SkeletonCard = () => (
-    <div className="skeleton" style={{ width: 160, height: 240, borderRadius: "var(--radius-lg)", flexShrink: 0 }} />
+   const SkeletonCard = () => (
+    <div className="skeleton" style={{ width: 140, height: 210, borderRadius: "var(--radius-lg)", flexShrink: 0 }} />
   );
   const SkeletonWide = () => (
-    <div className="skeleton" style={{ width: 280, height: 158, borderRadius: "var(--radius-lg)", flexShrink: 0 }} />
+    <div className="skeleton" style={{ width: 240, height: 135, borderRadius: "var(--radius-lg)", flexShrink: 0 }} />
   );
 
   return (

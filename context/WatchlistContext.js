@@ -1,5 +1,5 @@
-'use client';
-import { createContext, useContext, useState, useEffect } from 'react';
+"use client";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const WatchlistContext = createContext();
 
@@ -9,12 +9,12 @@ export function WatchlistProvider({ children }) {
 
   // Load watchlist from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem('watchlist');
+    const stored = localStorage.getItem("watchlist");
     if (stored) {
       try {
         setWatchlist(JSON.parse(stored));
       } catch (error) {
-        console.error('Error loading watchlist:', error);
+        console.error("Error loading watchlist:", error);
       }
     }
     setLoading(false);
@@ -23,7 +23,7 @@ export function WatchlistProvider({ children }) {
   // Save to localStorage whenever watchlist changes
   useEffect(() => {
     if (!loading) {
-      localStorage.setItem('watchlist', JSON.stringify(watchlist));
+      localStorage.setItem("watchlist", JSON.stringify(watchlist));
     }
   }, [watchlist, loading]);
 
@@ -41,7 +41,7 @@ export function WatchlistProvider({ children }) {
   // Remove item from watchlist
   const removeFromWatchlist = (id, type) => {
     setWatchlist((prev) =>
-      prev.filter((item) => !(item.id === id && item.type === type))
+      prev.filter((item) => !(item.id === id && item.type === type)),
     );
   };
 
@@ -74,7 +74,7 @@ export function WatchlistProvider({ children }) {
 export function useWatchlist() {
   const context = useContext(WatchlistContext);
   if (!context) {
-    throw new Error('useWatchlist must be used within WatchlistProvider');
+    throw new Error("useWatchlist must be used within WatchlistProvider");
   }
   return context;
 }

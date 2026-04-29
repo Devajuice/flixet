@@ -11,57 +11,40 @@ export default function ContinueWatchingSection() {
       <style jsx global>{`
         .cw-section {
           margin: 32px 0;
-          font-family: "DM Sans", sans-serif;
         }
-
-        /* ── Header ──────────────────────────────── */
         .cw-header {
-          margin-bottom: 14px;
-        }
-        .cw-section-title {
-          font-family: "DM Sans", sans-serif;
-          font-size: 15px;
-          font-weight: 700;
-          color: rgba(255, 255, 255, 0.88);
-          text-transform: uppercase;
-          letter-spacing: 0.09em;
-          margin: 0 0 3px;
+          margin-bottom: 16px;
           display: flex;
           align-items: center;
           gap: 10px;
         }
-        .cw-section-title::after {
-          content: "";
-          flex: 1;
-          height: 1px;
-          background: rgba(255, 255, 255, 0.06);
+        .cw-title {
+          font-size: var(--text-xl);
+          font-weight: var(--font-bold);
+          color: var(--text-primary);
+          letter-spacing: -0.01em;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
         .cw-subtitle {
-          font-family: "DM Sans", sans-serif;
-          font-size: 12px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 0.25);
-          margin: 0;
-          letter-spacing: 0.04em;
+          font-size: var(--text-xs);
+          color: var(--text-tertiary);
+          margin-left: auto;
         }
-
-        /* ── Horizontal scroll row ───────────────── */
         .cw-row {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
           gap: 12px;
         }
-
         @media (max-width: 768px) {
           .cw-row {
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 10px;
           }
         }
-
         @media (max-width: 480px) {
           .cw-row {
-            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
           }
         }
@@ -69,7 +52,10 @@ export default function ContinueWatchingSection() {
 
       <section className="cw-section">
         <div className="cw-header">
-          <h2 className="cw-section-title">Continue Watching</h2>
+          <h2 className="cw-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Continue Watching
+          </h2>
           <p className="cw-subtitle">Pick up where you left off</p>
         </div>
         <div className="cw-row">

@@ -32,11 +32,13 @@ export default function MediaGrid({
           );
           gap: 20px;
           margin-bottom: 60px;
+          padding: 0 4px;
         }
 
         @media (min-width: 1024px) {
           .media-grid {
             gap: 24px;
+            padding: 0 8px;
           }
         }
 
@@ -44,12 +46,14 @@ export default function MediaGrid({
           .media-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
+            padding: 0 2px;
           }
         }
 
         @media (max-width: 480px) {
           .media-grid {
             gap: 10px;
+            padding: 0;
           }
         }
       `}</style>
