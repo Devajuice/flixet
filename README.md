@@ -17,6 +17,10 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 🚀 **Coming Soon** - Dedicated pages for upcoming movies and airing TV shows
 - ♾️ **Infinite Scroll** - Seamlessly load more content as you browse
 - 🎞️ **Continue Watching** - Pick up right where you left off with episode tracking
+- 🖼️ **Optimized Images** - Next.js Image component for automatic optimization
+- ♿️ **Accessibility** - Focus states, skip-to-content, reduced-motion support
+- 💫 **Loading Skeletons** - Smooth loading states with shimmer animations
+- ⌨️ **Debounced Search** - Optimized search input with 300ms delay
 
 ## To Do
 
@@ -26,20 +30,24 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - [x] ~~Advanced Filters~~
 - [x] ~~Mobile Responsive Design~~
 - [x] ~~Make Watchlist page better~~
-- [ ] Performance Optimizations
+- [x] ~~Next.js Image Optimization~~
+- [x] ~~Accessibility Improvements~~
+- [x] ~~Loading Skeleton States~~
+- [x] ~~Debounced Search~~
 - [ ] Random Movie Picker
 
 ## 🛠️ Tech Stack
 
 - **Framework:** Next.js 16 (App Router) with Turbopack
 - **Language:** JavaScript/React
-- **Styling:** Inline styles + CSS-in-JS (styled-jsx) + Global CSS with design tokens
+- **Styling:** In-line styles + CSS-in-JS (styled-jsx) + Global CSS with design tokens
 - **Animation:** Framer Motion
 - **State Management:** React Context API
 - **Icons:** Lucide React
-- **API:** TMDb (The Movie Database) + OMDB
+- **API:** TMDB (The Movie Database) + OMDB
 - **Deployment:** Vercel
 - **Storage:** LocalStorage for watchlist and continue watching persistence
+- **Image Optimization:** Next.js Image component with automatic WebP/AVIF conversion
 
 ## 🚀 Getting Started
 
@@ -108,13 +116,15 @@ Flixet/
 ├── components/
 │   ├── Header.js             # Responsive navigation header
 │   ├── Footer.js             # Footer with links and disclaimer
-│   ├── SearchBar.js          # Search input with dropdown
-│   ├── ScrollRow.js          # Horizontal scrollable row
-│   ├── MediaCard.js          # Universal media card (movie/TV)
+│   ├── SearchBar.js          # Search input with dropdown (debounced)
+│   ├── ScrollRow.js          # Horizontal scrollable row (mobile padding)
+│   ├── MediaCard.js          # Universal media card (Next.js Image)
 │   ├── CastSection.js        # Cast display component
 │   ├── VideoPlayer.js        # Embedded video player
 │   ├── WatchlistButton.js    # Add/remove watchlist button
-│   └── ContinueWatchingSection.js  # Resume watching section
+│   ├── ContinueWatchingSection.js  # Resume watching section
+│   ├── Skeleton.js          # Reusable loading skeleton components
+│   └── SearchResults.js     # Search results grid
 ├── context/
 │   ├── WatchlistContext.js   # Watchlist state management
 │   └── ContinueWatchingContext.js  # Continue watching state
@@ -173,6 +183,22 @@ Flixet/
 - **Bottom Sheet Filter**: Filter modal converts to bottom sheet on very small screens
 - **Responsive Grids**: Browse grids adapt from 4-column → 2-column → 1-column
 - **Overflow Handling**: Long titles and metadata properly truncate on all screen sizes
+- **Mobile Padding**: Consistent container padding across all pages (search, movies, TV shows)
+
+### Accessibility
+
+- **Keyboard Navigation**: `:focus-visible` styles for all interactive elements
+- **Skip to Content**: Hidden link for screen readers to skip navigation
+- **ARIA Labels**: Proper labeling on search input, buttons, and controls
+- **Reduced Motion**: Respects `prefers-reduced-motion` user setting
+- **Screen Reader Support**: `.sr-only` utility class for screen reader-only content
+
+### Performance Optimizations
+
+- **Image Optimization**: Next.js Image component with automatic WebP/AVIF conversion
+- **Debounced Search**: 300ms delay prevents unnecessary API calls while typing
+- **Loading Skeletons**: Reusable skeleton components with shimmer animations
+- **Memoized Callbacks**: `useCallback` for expensive operations like fetch functions
 
 ## 🌐 Deployment
 
