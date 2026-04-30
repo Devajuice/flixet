@@ -1,13 +1,21 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, X } from "lucide-react";
 import WatchlistButton from "./WatchlistButton";
 
 const IMG = "https://image.tmdb.org/t/p";
 
-export default function MediaCard({ item, type, index, variant = "poster", showRemove, onRemove }) {
+export default function MediaCard({
+  item,
+  type,
+  index,
+  variant = "poster",
+  showRemove,
+  onRemove,
+}) {
   const [hovered, setHovered] = useState(false);
 
   const mediaType = type || item.media_type || (item.title ? "movie" : "tv");
@@ -40,6 +48,7 @@ export default function MediaCard({ item, type, index, variant = "poster", showR
       transition={{ delay: Math.min((index || 0) * 0.04, 0.4), duration: 0.3 }}
       style={{
         width,
+        margin: "0 auto",
         position: "relative",
         borderRadius: "var(--radius-lg)",
         overflow: "hidden",
@@ -53,13 +62,16 @@ export default function MediaCard({ item, type, index, variant = "poster", showR
       }}
     >
       {imgSrc ? (
-        <img
+        <Image
           src={imgSrc}
           alt={title}
-          loading="lazy"
+          fill
+          sizes={
+            variant === "backdrop"
+              ? "(max-width: 768px) 240px, 240px"
+              : "(max-width: 768px) 140px, 140px"
+          }
           style={{
-            width: "100%",
-            height: "100%",
             objectFit: "cover",
             display: "block",
             transition: "all var(--transition-slow)",
@@ -79,7 +91,13 @@ export default function MediaCard({ item, type, index, variant = "poster", showR
             padding: "var(--space-3)",
           }}
         >
-          <span style={{ fontSize: "var(--text-xs)", color: "var(--text-muted)", textAlign: "center" }}>
+          <span
+            style={{
+              fontSize: "var(--text-xs)",
+              color: "var(--text-muted)",
+              textAlign: "center",
+            }}
+          >
             {title}
           </span>
         </div>
@@ -148,7 +166,14 @@ export default function MediaCard({ item, type, index, variant = "poster", showR
 
         {/* Remove button (watchlist) */}
         {showRemove && (
-          <div style={{ position: "absolute", top: "var(--space-2)", right: "var(--space-2)", pointerEvents: "auto" }}>
+          <div
+            style={{
+              position: "absolute",
+              top: "var(--space-2)",
+              right: "var(--space-2)",
+              pointerEvents: "auto",
+            }}
+          >
             <motion.button
               onClick={handleRemove}
               whileHover={{ scale: 1.1 }}
@@ -224,7 +249,12 @@ export default function MediaCard({ item, type, index, variant = "poster", showR
             {title}
           </p>
           {(item.release_date || item.first_air_date) && (
-            <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>
+            <span
+              style={{
+                fontSize: "var(--text-xs)",
+                color: "var(--text-tertiary)",
+              }}
+            >
               {new Date(item.release_date || item.first_air_date).getFullYear()}
             </span>
           )}

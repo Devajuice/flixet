@@ -9,8 +9,10 @@ export default function SearchResults({ movies }) {
     <motion.div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
         gap: 16,
+        padding: "0 var(--container-padding)",
+        justifyItems: "center",
       }}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}

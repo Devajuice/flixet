@@ -13,77 +13,21 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import WatchlistButton from "@/components/WatchlistButton";
 import VideoPlayer from "@/components/VideoPlayer";
 import MediaCard from "@/components/MediaCard";
 import ScrollRow from "@/components/ScrollRow";
+import {
+  Skeleton as SkeletonEl,
+  SkeletonTitle,
+  SkeletonText,
+} from "@/components/Skeleton";
 import { useContinueWatching } from "@/context/ContinueWatchingContext";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
 const IMG = "https://image.tmdb.org/t/p";
-
-function Skeleton() {
-  return (
-    <div>
-      <div
-        className="skeleton"
-        style={{
-          width: "100%",
-          height: "70vh",
-          minHeight: 400,
-          borderRadius: 0,
-        }}
-      />
-      <div
-        style={{
-          maxWidth: 1400,
-          margin: "0 auto",
-          padding: "0 var(--container-padding)",
-        }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "260px 1fr",
-            gap: 40,
-            marginTop: -80,
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
-          <div
-            className="skeleton"
-            style={{ borderRadius: "var(--radius-xl)", aspectRatio: "2/3" }}
-          />
-          <div style={{ paddingTop: 80 }}>
-            <div
-              className="skeleton"
-              style={{
-                height: 52,
-                width: "60%",
-                marginBottom: 16,
-                borderRadius: "var(--radius-lg)",
-              }}
-            />
-            {[100, 85, 70].map((w, i) => (
-              <div
-                key={i}
-                className="skeleton"
-                style={{
-                  height: 13,
-                  width: `${w}%`,
-                  marginBottom: 10,
-                  borderRadius: "var(--radius-md)",
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function ScoreRing({ score, size = 56 }) {
   const pct = Math.round((score / 10) * 100);
@@ -211,12 +155,22 @@ function CastCard({ actor }) {
           }}
         >
           {actor.profile_path ? (
-            <img
-              src={`${IMG}/w185${actor.profile_path}`}
-              alt={actor.name}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              loading="lazy"
-            />
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "100%",
+                aspectRatio: "1/1",
+              }}
+            >
+              <Image
+                src={`${IMG}/w185${actor.profile_path}`}
+                alt={actor.name}
+                fill
+                sizes="84px"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
           ) : (
             <div
               style={{
@@ -329,7 +283,10 @@ export default function MovieDetails({ params }) {
     if (!showPlayer) hasAdded.current = false;
   }, [showPlayer, movie, addToContinueWatching]);
 
-  if (loading) return <Skeleton />;
+  if (loading)
+    return (
+      <SkeletonEl width="100%" height="70vh" minHeight={400} borderRadius={0} />
+    );
   if (error || !movie)
     return (
       <div
@@ -455,11 +412,16 @@ export default function MovieDetails({ params }) {
         }}
       >
         {backdrop && (
-          <img
-            src={backdrop}
-            alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
+          <div style={{ position: "absolute", inset: 0 }}>
+            <Image
+              src={backdrop}
+              alt=""
+              fill
+              sizes="100vw"
+              priority
+              style={{ objectFit: "cover" }}
+            />
+          </div>
         )}
         <div
           style={{
@@ -482,17 +444,20 @@ export default function MovieDetails({ params }) {
         <div className="movie-detail-grid">
           {/* Poster */}
           <div style={{ position: "relative" }}>
-            <div className="movie-poster-wrapper">
-              <img
+            <div
+              className="movie-poster-wrapper"
+              style={{ position: "relative", aspectRatio: "2/3" }}
+            >
+              <Image
                 src={poster}
                 alt={`${movie.title} poster`}
+                fill
+                sizes="(max-width: 768px) 260px, 500px"
                 style={{
-                  width: "100%",
                   borderRadius: "var(--radius-xl)",
                   boxShadow: "var(--shadow-xl)",
                   display: "block",
                 }}
-                loading="lazy"
               />
             </div>
           </div>
@@ -774,19 +739,23 @@ export default function MovieDetails({ params }) {
                 </p>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                   {watchProviders.flatrate.map((p) => (
-                    <img
+                    <div
                       key={p.provider_id}
-                      src={`${IMG}/w92${p.logo_path}`}
-                      alt={p.provider_name}
-                      title={p.provider_name}
-                      style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: "var(--radius-md)",
-                        objectFit: "cover",
-                        border: "1px solid var(--border)",
-                      }}
-                    />
+                      style={{ position: "relative", width: 36, height: 36 }}
+                    >
+                      <Image
+                        src={`${IMG}/w92${p.logo_path}`}
+                        alt={p.provider_name}
+                        title={p.provider_name}
+                        fill
+                        sizes="36px"
+                        style={{
+                          borderRadius: "var(--radius-md)",
+                          objectFit: "cover",
+                          border: "1px solid var(--border)",
+                        }}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>

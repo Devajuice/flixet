@@ -17,10 +17,16 @@ import {
   ChevronRight as ChevronRightIcon,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import WatchlistButton from "@/components/WatchlistButton";
 import VideoPlayer from "@/components/VideoPlayer";
 import MediaCard from "@/components/MediaCard";
 import ScrollRow from "@/components/ScrollRow";
+import {
+  Skeleton as SkeletonEl,
+  SkeletonTitle,
+  SkeletonText,
+} from "@/components/Skeleton";
 import { useContinueWatching } from "@/context/ContinueWatchingContext";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
@@ -30,15 +36,7 @@ const IMG = "https://image.tmdb.org/t/p";
 function Skeleton() {
   return (
     <div>
-      <div
-        className="skeleton"
-        style={{
-          width: "100%",
-          height: "70vh",
-          minHeight: 400,
-          borderRadius: 0,
-        }}
-      />
+      <Skeleton width="100%" height="70vh" minHeight={400} borderRadius={0} />
       <div
         style={{
           maxWidth: 1400,
@@ -56,32 +54,17 @@ function Skeleton() {
             zIndex: 1,
           }}
         >
-          <div
-            className="skeleton"
-            style={{ borderRadius: "var(--radius-xl)", aspectRatio: "2/3" }}
+          <Skeleton
+            width={260}
+            height={390}
+            borderRadius="var(--radius-xl)"
+            style={{ aspectRatio: "2/3" }}
           />
           <div style={{ paddingTop: 80 }}>
-            <div
-              className="skeleton"
-              style={{
-                height: 52,
-                width: "60%",
-                marginBottom: 16,
-                borderRadius: "var(--radius-lg)",
-              }}
-            />
-            {[100, 80, 65].map((w, i) => (
-              <div
-                key={i}
-                className="skeleton"
-                style={{
-                  height: 13,
-                  width: `${w}%`,
-                  marginBottom: 10,
-                  borderRadius: "var(--radius-md)",
-                }}
-              />
-            ))}
+            <SkeletonTitle width="60%" height={52} />
+            <SkeletonText width="100%" />
+            <SkeletonText width="80%" />
+            <SkeletonText width="65%" />
           </div>
         </div>
       </div>
@@ -224,12 +207,22 @@ function CastCard({ actor }) {
           }}
         >
           {actor.profile_path ? (
-            <img
-              src={`${IMG}/w185${actor.profile_path}`}
-              alt={actor.name}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              loading="lazy"
-            />
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "100%",
+                aspectRatio: "1/1",
+              }}
+            >
+              <Image
+                src={`${IMG}/w185${actor.profile_path}`}
+                alt={actor.name}
+                fill
+                sizes="84px"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
           ) : (
             <div
               style={{
@@ -320,7 +313,15 @@ function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
       {/* Thumbnail */}
       <div className="episode-thumb">
         {ep.still_path ? (
-          <img src={`${IMG}/w300${ep.still_path}`} alt="" loading="lazy" />
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            <Image
+              src={`${IMG}/w300${ep.still_path}`}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 200px, 300px"
+              style={{ objectFit: "cover" }}
+            />
+          </div>
         ) : (
           <div className="episode-thumb-placeholder">
             <Play size={20} color="var(--text-muted)" />
@@ -524,7 +525,10 @@ function TVShowDetailsContent({ params }) {
     addToContinueWatching,
   ]);
 
-  if (loading) return <Skeleton />;
+  if (loading)
+    return (
+      <SkeletonEl width="100%" height="70vh" minHeight={400} borderRadius={0} />
+    );
   if (error || !show)
     return (
       <div
@@ -687,11 +691,16 @@ function TVShowDetailsContent({ params }) {
         }}
       >
         {backdrop && (
-          <img
-            src={backdrop}
-            alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
+          <div style={{ position: "absolute", inset: 0 }}>
+            <Image
+              src={backdrop}
+              alt=""
+              fill
+              sizes="100vw"
+              priority
+              style={{ objectFit: "cover" }}
+            />
+          </div>
         )}
         <div
           style={{
@@ -714,18 +723,21 @@ function TVShowDetailsContent({ params }) {
         <div className="tv-detail-grid">
           {/* Poster */}
           <div style={{ position: "relative" }}>
-            <div className="tv-poster-wrapper">
+            <div
+              className="tv-poster-wrapper"
+              style={{ position: "relative", aspectRatio: "2/3" }}
+            >
               {poster ? (
-                <img
+                <Image
                   src={poster}
                   alt={`${show.name} poster`}
+                  fill
+                  sizes="(max-width: 768px) 260px, 500px"
                   style={{
-                    width: "100%",
                     borderRadius: "var(--radius-xl)",
                     boxShadow: "var(--shadow-xl)",
                     display: "block",
                   }}
-                  loading="lazy"
                 />
               ) : (
                 <div
@@ -742,7 +754,7 @@ function TVShowDetailsContent({ params }) {
                     boxShadow: "var(--shadow-xl)",
                   }}
                 >
-                  📺
+                  No Image
                 </div>
               )}
             </div>
@@ -1066,19 +1078,23 @@ function TVShowDetailsContent({ params }) {
                 </p>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                   {watchProviders.flatrate.map((p) => (
-                    <img
+                    <div
                       key={p.provider_id}
-                      src={`${IMG}/w92${p.logo_path}`}
-                      alt={p.provider_name}
-                      title={p.provider_name}
-                      style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: "var(--radius-md)",
-                        objectFit: "cover",
-                        border: "1px solid var(--border)",
-                      }}
-                    />
+                      style={{ position: "relative", width: 36, height: 36 }}
+                    >
+                      <Image
+                        src={`${IMG}/w92${p.logo_path}`}
+                        alt={p.provider_name}
+                        title={p.provider_name}
+                        fill
+                        sizes="36px"
+                        style={{
+                          borderRadius: "var(--radius-md)",
+                          objectFit: "cover",
+                          border: "1px solid var(--border)",
+                        }}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>

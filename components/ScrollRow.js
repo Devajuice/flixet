@@ -20,13 +20,14 @@ export default function ScrollRow({ title, children }) {
           alignItems: "center",
           justifyContent: "space-between",
           marginBottom: "var(--space-4)",
+          padding: "0 var(--container-padding)",
         }}
       >
         <h2
           style={{
             fontSize: "var(--text-xl)",
             fontWeight: "var(--font-bold)",
-            letterSpacing: "-0.01em",
+            letterSpacing: "-0.01em)",
           }}
         >
           {title}

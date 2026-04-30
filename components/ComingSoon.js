@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Star, Sparkles } from "lucide-react";
 
@@ -152,16 +153,18 @@ export default function ComingSoon({ type = "movie" }) {
             >
               <div className="cs-card" style={s.card}>
                 {/* Poster */}
-                <div style={s.posterArea}>
-                  <img
+                <div style={{ ...s.posterArea, position: "relative" }}>
+                  <Image
                     src={
                       item.poster_path
                         ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
                         : "/placeholder.png"
                     }
                     alt={item.title || item.name}
+                    fill
+                    sizes="(max-width: 768px) 160px, 250px"
                     className="cs-img"
-                    loading="lazy"
+                    style={{ objectFit: "cover" }}
                   />
                   <div style={s.vignette} />
                   <div className="cs-badge">

@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, X, Film, Tv, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
@@ -16,17 +17,21 @@ export default function SearchBar({ autoFocus }) {
   const searchRef = useRef(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (query.trim().length >= 2) {
-        searchContent(query);
+  const debouncedSearch = useCallback(
+    debounce((searchQuery) => {
+      if (searchQuery.trim().length >= 2) {
+        searchContent(searchQuery);
       } else {
         setResults([]);
         setIsOpen(false);
       }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [query]);
+    }, 300),
+    [],
+  );
+
+  useEffect(() => {
+    debouncedSearch(query);
+  }, [query, debouncedSearch]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -60,6 +65,14 @@ export default function SearchBar({ autoFocus }) {
       setLoading(false);
     }
   };
+
+  function debounce(fn, delay) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+  }
 
   const handleResultClick = (item) => {
     const path =
@@ -108,7 +121,7 @@ export default function SearchBar({ autoFocus }) {
           />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search movies, TV shows..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => {
@@ -121,6 +134,9 @@ export default function SearchBar({ autoFocus }) {
             }}
             autoComplete="off"
             autoFocus={autoFocus}
+            aria-label="Search movies and TV shows"
+            role="searchbox"
+            aria-autocomplete="list"
             style={{
               width: "100%",
               padding: "8px 36px 8px 36px",
@@ -249,12 +265,13 @@ function SearchResult({ item, onClick, isLast }) {
       }}
     >
       {poster ? (
-        <img
+        <Image
           src={poster}
           alt=""
+          width={40}
+          height={60}
+          sizes="40px"
           style={{
-            width: 40,
-            height: 60,
             objectFit: "cover",
             borderRadius: "var(--radius-sm)",
             flexShrink: 0,

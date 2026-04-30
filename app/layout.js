@@ -75,8 +75,12 @@ export default function RootLayout({ children }) {
       <body suppressHydrationWarning>
         <WatchlistProvider>
           <ContinueWatchingProvider>
+            <a href="#main-content" className="skip-to-content">
+              Skip to main content
+            </a>
             <Header />
             <main
+              id="main-content"
               style={{
                 minHeight: "100vh",
                 paddingTop: "var(--space-10)",

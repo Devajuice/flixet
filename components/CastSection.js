@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { getImageUrl } from "@/lib/tmdb";
 import { User } from "lucide-react";
 
@@ -145,12 +146,15 @@ export default function CastSection({ cast }) {
               transition={{ delay: 0.8 + index * 0.04 }}
               whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
             >
-              <div className="cast-img-wrap">
+              <div className="cast-img-wrap" style={{ position: "relative" }}>
                 {member.profile_path ? (
-                  <img
+                  <Image
                     src={getImageUrl(member.profile_path, "w185")}
                     alt={member.name}
+                    fill
+                    sizes="(max-width: 768px) 130px, 185px"
                     className="cast-img"
+                    style={{ objectFit: "cover" }}
                   />
                 ) : (
                   <div className="cast-placeholder">

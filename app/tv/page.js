@@ -753,6 +753,7 @@ function TVContent() {
           grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
           gap: 16px;
           margin-bottom: 40px;
+          justify-items: center;
         }
         @media (max-width: 768px) {
           .tv-grid {
