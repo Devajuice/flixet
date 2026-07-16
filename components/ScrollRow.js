@@ -27,7 +27,7 @@ export default function ScrollRow({ title, children }) {
           style={{
             fontSize: "var(--text-xl)",
             fontWeight: "var(--font-bold)",
-            letterSpacing: "-0.01em)",
+            letterSpacing: "-0.01em",
           }}
         >
           {title}

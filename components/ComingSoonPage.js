@@ -29,7 +29,7 @@ export default function ComingSoonPage({ type, CardComponent }) {
 
   useEffect(() => {
     fetchItems(1, true);
-  }, []);
+  }, [type]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

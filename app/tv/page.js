@@ -31,7 +31,6 @@ const GENRES = [
   { id: 18, name: "Drama" },
   { id: 9648, name: "Mystery" },
   { id: 10765, name: "Sci-Fi" },
-  { id: 53, name: "Thriller" },
   { id: 10749, name: "Romance" },
   { id: 16, name: "Animation" },
 ];
@@ -41,7 +40,6 @@ const GENRE_NAMES = {
   18: "Drama",
   9648: "Mystery",
   10765: "Sci-Fi",
-  53: "Thriller",
   10749: "Romance",
   16: "Animation",
 };

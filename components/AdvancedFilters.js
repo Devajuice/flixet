@@ -483,9 +483,10 @@ export default function AdvancedFilters({
                 <label className="filter-label">Genres</label>
                 <div className="filter-grid">
                   {genres.map((genre) => {
-                    const isActive = filters.with_genres.includes(
-                      genre.id.toString(),
-                    );
+                    const isActive = filters.with_genres
+                      .split(",")
+                      .filter(Boolean)
+                      .includes(genre.id.toString());
                     return (
                       <div
                         key={genre.id}

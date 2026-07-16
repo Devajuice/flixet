@@ -61,7 +61,7 @@ export default function SearchPageWrapper({ query, data }) {
                   "{query}"
                 </strong>
               </p>
-              {data.results.length > 0 && (
+              {data?.results?.length > 0 && (
                 <span
                   style={{
                     display: "inline-flex",

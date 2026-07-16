@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, X, Film, Tv, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -7,6 +7,14 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const IMG = "https://image.tmdb.org/t/p";
+
+function debounce(fn, delay) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
 
 export default function SearchBar({ autoFocus }) {
   const [query, setQuery] = useState("");
@@ -16,18 +24,44 @@ export default function SearchBar({ autoFocus }) {
   const [focused, setFocused] = useState(false);
   const searchRef = useRef(null);
   const router = useRouter();
+  const searchContentRef = useRef(null);
 
-  const debouncedSearch = useCallback(
+  const searchContent = async (searchQuery) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`,
+      );
+      if (!response.ok) throw new Error("Search request failed");
+      const data = await response.json();
+      const filtered = (data.results || [])
+        .filter(
+          (item) => item.media_type === "movie" || item.media_type === "tv",
+        )
+        .filter((item) => item.poster_path)
+        .slice(0, 8);
+      setResults(filtered);
+      setIsOpen(true);
+    } catch (error) {
+      console.error("Search error:", error);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  searchContentRef.current = searchContent;
+
+  const debouncedSearch = useRef(
     debounce((searchQuery) => {
       if (searchQuery.trim().length >= 2) {
-        searchContent(searchQuery);
+        searchContentRef.current(searchQuery);
       } else {
         setResults([]);
         setIsOpen(false);
       }
     }, 300),
-    [],
-  );
+  ).current;
 
   useEffect(() => {
     debouncedSearch(query);
@@ -43,36 +77,6 @@ export default function SearchBar({ autoFocus }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const searchContent = async (searchQuery) => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`,
-      );
-      const data = await response.json();
-      const filtered = data.results
-        .filter(
-          (item) => item.media_type === "movie" || item.media_type === "tv",
-        )
-        .filter((item) => item.poster_path)
-        .slice(0, 8);
-      setResults(filtered);
-      setIsOpen(true);
-    } catch (error) {
-      console.error("Search error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  function debounce(fn, delay) {
-    let timer;
-    return function (...args) {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn.apply(this, args), delay);
-    };
-  }
 
   const handleResultClick = (item) => {
     const path =

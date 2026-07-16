@@ -28,19 +28,27 @@ const formatTime = (seconds) => {
 
 export function ContinueWatchingProvider({ children }) {
   const [continueWatching, setContinueWatching] = useState([]);
+  const [loaded, setLoaded] = useState(false);
 
   // Load from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem("continueWatching");
     if (saved) {
-      setContinueWatching(JSON.parse(saved));
+      try {
+        setContinueWatching(JSON.parse(saved));
+      } catch (error) {
+        console.error("Error loading continue watching:", error);
+      }
     }
+    setLoaded(true);
   }, []);
 
   // Save to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem("continueWatching", JSON.stringify(continueWatching));
-  }, [continueWatching]);
+    if (loaded) {
+      localStorage.setItem("continueWatching", JSON.stringify(continueWatching));
+    }
+  }, [continueWatching, loaded]);
 
   const addToContinueWatching = useCallback((item) => {
     setContinueWatching((prev) => {
@@ -68,7 +76,6 @@ export function ContinueWatchingProvider({ children }) {
 
   const clearContinueWatching = useCallback(() => {
     setContinueWatching([]);
-    localStorage.removeItem("continueWatching");
   }, []);
 
   const getProgress = useCallback(

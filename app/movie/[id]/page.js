@@ -448,17 +448,36 @@ export default function MovieDetails({ params }) {
               className="movie-poster-wrapper"
               style={{ position: "relative", aspectRatio: "2/3" }}
             >
-              <Image
-                src={poster}
-                alt={`${movie.title} poster`}
-                fill
-                sizes="(max-width: 768px) 260px, 500px"
-                style={{
-                  borderRadius: "var(--radius-xl)",
-                  boxShadow: "var(--shadow-xl)",
-                  display: "block",
-                }}
-              />
+              {poster ? (
+                <Image
+                  src={poster}
+                  alt={`${movie.title} poster`}
+                  fill
+                  sizes="(max-width: 768px) 260px, 500px"
+                  style={{
+                    borderRadius: "var(--radius-xl)",
+                    boxShadow: "var(--shadow-xl)",
+                    display: "block",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    aspectRatio: "2/3",
+                    borderRadius: "var(--radius-xl)",
+                    background: "var(--bg-tertiary)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--text-muted)",
+                    fontSize: 48,
+                    boxShadow: "var(--shadow-xl)",
+                  }}
+                >
+                  No Image
+                </div>
+              )}
             </div>
           </div>
 

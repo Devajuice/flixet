@@ -33,10 +33,10 @@ const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
 const IMG = "https://image.tmdb.org/t/p";
 
-function Skeleton() {
+function SkeletonPage() {
   return (
     <div>
-      <Skeleton width="100%" height="70vh" minHeight={400} borderRadius={0} />
+      <SkeletonEl width="100%" height="70vh" minHeight={400} borderRadius={0} />
       <div
         style={{
           maxWidth: 1400,
@@ -54,7 +54,7 @@ function Skeleton() {
             zIndex: 1,
           }}
         >
-          <Skeleton
+          <SkeletonEl
             width={260}
             height={390}
             borderRadius="var(--radius-xl)"
@@ -298,7 +298,7 @@ function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          onClick();
+          if (!isFuture) onClick();
         }
       }}
       className={`episode-card ${isActive ? "active" : ""} ${isFuture ? "future" : ""}`}
@@ -1847,7 +1847,7 @@ function TVShowDetailsContent({ params }) {
 
 export default function TVShowDetails({ params }) {
   return (
-    <Suspense fallback={<Skeleton />}>
+    <Suspense fallback={<SkeletonPage />}>
       <TVShowDetailsContent params={params} />
     </Suspense>
   );

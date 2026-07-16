@@ -725,6 +725,7 @@ export default function Header() {
                     onClick={() => {
                       setShowMobileMenu(false);
                       setShowMobileSearch(true);
+                      document.body.classList.add("menu-open");
                     }}
                     style={{
                       display: "flex",

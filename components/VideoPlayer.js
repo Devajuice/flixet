@@ -45,7 +45,7 @@ const SERVERS = {
     },
     {
       label: "2embed",
-      url: (id, s, e) => `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`,
+      url: (id, s, e) => `https://www.2embed.cc/embedtv/${id}?s=${s}&e=${e}`,
     },
   ],
 };
@@ -314,7 +314,7 @@ export default function VideoPlayer({
         )}
 
         <iframe
-          key={`${activeServer}-${season}-${episode}`}
+          key={`${activeServer}-${id}-${season || ''}-${episode || ''}`}
           src={serverUrl}
           style={{
             width: "100%",
