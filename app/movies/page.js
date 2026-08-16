@@ -146,7 +146,7 @@ function MoviesContent() {
     setCurrentPage(1);
     setHasMore(true);
     fetchMovies(1, true, sortBy, activeGenre, yearRange, minRating);
-  }, [genreParam, sortBy, activeGenre, yearRange, minRating]);
+  }, [fetchMovies, sortBy, activeGenre, yearRange, minRating]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

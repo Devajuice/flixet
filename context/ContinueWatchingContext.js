@@ -3,12 +3,32 @@
 import {
   createContext,
   useContext,
-  useState,
-  useEffect,
+  useMemo,
   useCallback,
+  useSyncExternalStore,
 } from "react";
 
 const ContinueWatchingContext = createContext();
+
+const STORAGE_KEY = "continueWatching";
+
+function getSnapshot() {
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) ?? "";
+  } catch (error) {
+    console.error("Error reading continue watching:", error);
+    return "";
+  }
+}
+
+function subscribe(callback) {
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
+
+function getServerSnapshot() {
+  return null;
+}
 
 // Helper function to format seconds to MM:SS or HH:MM:SS
 const formatTime = (seconds) => {
@@ -27,56 +47,70 @@ const formatTime = (seconds) => {
 };
 
 export function ContinueWatchingProvider({ children }) {
-  const [continueWatching, setContinueWatching] = useState([]);
-  const [loaded, setLoaded] = useState(false);
+  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("continueWatching");
-    if (saved) {
-      try {
-        setContinueWatching(JSON.parse(saved));
-      } catch (error) {
-        console.error("Error loading continue watching:", error);
+  const continueWatching = useMemo(() => {
+    if (!raw) return [];
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      console.error("Error loading continue watching:", error);
+      return [];
+    }
+  }, [raw]);
+
+  const update = useCallback((updater) => {
+    try {
+      const currentRaw = window.localStorage.getItem(STORAGE_KEY);
+      let current = [];
+      if (currentRaw) {
+        try {
+          current = JSON.parse(currentRaw);
+        } catch {
+          current = [];
+        }
       }
+      const next = typeof updater === "function" ? updater(current) : updater;
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      window.dispatchEvent(new Event("storage"));
+    } catch (error) {
+      console.error("Error saving continue watching:", error);
     }
-    setLoaded(true);
   }, []);
 
-  // Save to localStorage whenever it changes
-  useEffect(() => {
-    if (loaded) {
-      localStorage.setItem("continueWatching", JSON.stringify(continueWatching));
-    }
-  }, [continueWatching, loaded]);
+  const addToContinueWatching = useCallback(
+    (item) => {
+      update((prev) => {
+        // Remove existing entry for this movie/show
+        const filtered = prev.filter(
+          (i) => !(i.id === item.id && i.type === item.type),
+        );
 
-  const addToContinueWatching = useCallback((item) => {
-    setContinueWatching((prev) => {
-      // Remove existing entry for this movie/show
-      const filtered = prev.filter(
-        (i) => !(i.id === item.id && i.type === item.type),
+        // Add new entry at the beginning (most recent first)
+        const newItem = {
+          ...item,
+          lastWatched: new Date().toISOString(),
+        };
+
+        // Keep only last 20 items
+        return [newItem, ...filtered].slice(0, 20);
+      });
+    },
+    [update],
+  );
+
+  const removeFromContinueWatching = useCallback(
+    (id, type) => {
+      update((prev) =>
+        prev.filter((item) => !(item.id === id && item.type === type)),
       );
-
-      // Add new entry at the beginning (most recent first)
-      const newItem = {
-        ...item,
-        lastWatched: new Date().toISOString(),
-      };
-
-      // Keep only last 20 items
-      return [newItem, ...filtered].slice(0, 20);
-    });
-  }, []);
-
-  const removeFromContinueWatching = useCallback((id, type) => {
-    setContinueWatching((prev) =>
-      prev.filter((item) => !(item.id === id && item.type === type)),
-    );
-  }, []);
+    },
+    [update],
+  );
 
   const clearContinueWatching = useCallback(() => {
-    setContinueWatching([]);
-  }, []);
+    update([]);
+  }, [update]);
 
   const getProgress = useCallback(
     (id, type) => {

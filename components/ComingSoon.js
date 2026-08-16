@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,11 +12,7 @@ export default function ComingSoon({ type = "movie" }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchComingSoon();
-  }, [type]);
-
-  const fetchComingSoon = async () => {
+  const fetchComingSoon = useCallback(async () => {
     setLoading(true);
     try {
       const url =
@@ -34,7 +30,11 @@ export default function ComingSoon({ type = "movie" }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [type]);
+
+  useEffect(() => {
+    fetchComingSoon();
+  }, [fetchComingSoon]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "TBA";

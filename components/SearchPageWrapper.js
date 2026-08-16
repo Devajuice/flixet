@@ -58,7 +58,7 @@ export default function SearchPageWrapper({ query, data }) {
               >
                 Showing results for{" "}
                 <strong style={{ color: "var(--text-primary)" }}>
-                  "{query}"
+                  &quot;{query}&quot;
                 </strong>
               </p>
               {data?.results?.length > 0 && (
@@ -121,7 +121,7 @@ export default function SearchPageWrapper({ query, data }) {
                   lineHeight: 1.7,
                 }}
               >
-                We couldn't find anything for "{query}". Try checking your
+                We couldn&apos;t find anything for &quot;{query}&quot;. Try checking your
                 spelling or using different keywords.
               </p>
               <div

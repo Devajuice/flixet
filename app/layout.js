@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { WatchlistProvider } from "@/context/WatchlistContext";
 import { ContinueWatchingProvider } from "@/context/ContinueWatchingContext";
+import { HistoryProvider } from "@/context/HistoryContext";
 
 export const metadata = {
   metadataBase: new URL("https://flixet.vercel.app"),
@@ -23,9 +24,12 @@ export const metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico" },
-      { url: "/icon.png", sizes: "512x512", type: "image/png" },
+      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   manifest: "/site.webmanifest",
   openGraph: {
@@ -63,7 +67,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -75,6 +79,7 @@ export default function RootLayout({ children }) {
       <body suppressHydrationWarning>
         <WatchlistProvider>
           <ContinueWatchingProvider>
+            <HistoryProvider>
             <a href="#main-content" className="skip-to-content">
               Skip to main content
             </a>
@@ -92,6 +97,7 @@ export default function RootLayout({ children }) {
             <Footer />
             <SpeedInsights />
             <Analytics />
+            </HistoryProvider>
           </ContinueWatchingProvider>
         </WatchlistProvider>
       </body>

@@ -74,74 +74,30 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshot-mobile.png",
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Browse trending movies and shows"
-    },
-    {
-      "src": "/screenshot-desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Flixet on desktop"
-    }
-  ],
   "shortcuts": [
     {
       "name": "Browse Movies",
       "short_name": "Movies",
       "description": "Discover and watch movies",
-      "url": "/movies",
-      "icons": [
-        {
-          "src": "/shortcut-movies.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "/movies"
     },
     {
       "name": "Browse TV Shows",
       "short_name": "TV Shows",
       "description": "Explore TV series and episodes",
-      "url": "/tv",
-      "icons": [
-        {
-          "src": "/shortcut-tv.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "/tv"
     },
     {
       "name": "Browse Anime",
       "short_name": "Anime",
       "description": "Watch anime series and movies",
-      "url": "/anime",
-      "icons": [
-        {
-          "src": "/shortcut-anime.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "/anime"
     },
     {
       "name": "My Watchlist",
       "short_name": "Watchlist",
       "description": "View your saved content",
-      "url": "/watchlist",
-      "icons": [
-        {
-          "src": "/shortcut-watchlist.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "/watchlist"
     }
   ],
   "related_applications": [],

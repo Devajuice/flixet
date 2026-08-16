@@ -1,47 +1,40 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Server, ChevronDown, ChevronUp } from "lucide-react";
+import { X, Server, ChevronDown, ChevronUp, Play } from "lucide-react";
 
 const SERVERS = {
   movie: [
+    {
+      label: "VidCore",
+      url: (id) => `https://vidcore.net/movie/${id}?theme=e50914`,
+    },
     {
       label: "VidLink",
       url: (id) =>
         `https://vidlink.pro/movie/${id}?primaryColor=e50914&autoplay=true`,
     },
     {
-      label: "VidPlus",
-      url: (id) => `https://player.vidplus.to/embed/Movie/${id}`,
-    },
-    {
       label: "VidSrc",
       url: (id) => `https://vidsrc.me/embed/movie?tmdb=${id}`,
-    },
-    {
-      label: "VidSrc.net",
-      url: (id) => `https://vidsrc.net/embed/movie/${id}`,
     },
     { label: "2embed", url: (id) => `https://www.2embed.cc/embed/${id}` },
   ],
   tv: [
+    {
+      label: "VidCore",
+      url: (id, s, e) =>
+        `https://vidcore.net/tv/${id}/${s}/${e}?theme=e50914`,
+    },
     {
       label: "VidLink",
       url: (id, s, e) =>
         `https://vidlink.pro/tv/${id}/${s}/${e}?primaryColor=e50914&autoplay=true&nextbutton=true`,
     },
     {
-      label: "VidPlus",
-      url: (id, s, e) => `https://player.vidplus.to/embed/tv/${id}/${s}/${e}`,
-    },
-    {
       label: "VidSrc",
       url: (id, s, e) =>
         `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`,
-    },
-    {
-      label: "VidSrc.net",
-      url: (id, s, e) => `https://vidsrc.net/embed/tv/${id}/${s}/${e}`,
     },
     {
       label: "2embed",
@@ -60,18 +53,23 @@ export default function VideoPlayer({
   episode,
   onNextEpisode,
   hasNext,
+  onWatchedSeconds,
 }) {
   const [activeServer, setActiveServer] = useState(0);
   const [showServerMenu, setShowServerMenu] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const openedAt = useRef(null);
 
-  useEffect(() => {
+  const resetKey = `${isOpen}-${id}-${season ?? ""}-${episode ?? ""}`;
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
+  if (resetKey !== prevResetKey) {
+    setPrevResetKey(resetKey);
     if (isOpen) {
       setActiveServer(0);
       setShowServerMenu(false);
       setIframeLoaded(false);
     }
-  }, [isOpen, id, season, episode]);
+  }
 
   useEffect(() => {
     if (!isOpen) return;
@@ -81,6 +79,16 @@ export default function VideoPlayer({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (!openedAt.current) openedAt.current = Date.now();
+    } else if (openedAt.current) {
+      const elapsed = Math.round((Date.now() - openedAt.current) / 1000);
+      openedAt.current = null;
+      if (elapsed > 0 && onWatchedSeconds) onWatchedSeconds(elapsed);
+    }
+  }, [isOpen, onWatchedSeconds]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -179,6 +187,28 @@ export default function VideoPlayer({
           </div>
 
           {/* Server selector */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            {hasNext && onNextEpisode && (
+              <button
+                onClick={onNextEpisode}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "clamp(6px, 1.5vw, 7px) clamp(10px, 2vw, 12px)",
+                  borderRadius: "var(--radius-lg)",
+                  background: "var(--accent)",
+                  border: "none",
+                  color: "#fff",
+                  fontSize: "clamp(12px, 2.5vw, var(--text-sm))",
+                  fontWeight: "var(--font-bold)",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Next Episode <Play size={14} fill="currentColor" />
+              </button>
+            )}
           <div style={{ position: "relative", flexShrink: 0 }}>
             <button
               onClick={() => setShowServerMenu((v) => !v)}
@@ -274,6 +304,7 @@ export default function VideoPlayer({
                 </motion.div>
               )}
             </AnimatePresence>
+          </div>
           </div>
         </div>
 

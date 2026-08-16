@@ -479,7 +479,7 @@ export default function PrivacyPolicy() {
             content: (
               <>
                 <p className="prv-text">
-                  Since we don't collect personal data, there is no personal
+                  Since we don&apos;t collect personal data, there is no personal
                   information to access, modify, or delete. However, you can:
                 </p>
                 <ul className="prv-list">
@@ -501,7 +501,7 @@ export default function PrivacyPolicy() {
               <>
                 <p className="prv-text">
                   If you have questions or concerns about this Privacy Policy,
-                  please don't hesitate to reach out:
+                  please don&apos;t hesitate to reach out:
                 </p>
                 <div className="prv-contact-card">
                   <Mail size={24} />

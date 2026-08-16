@@ -14,6 +14,7 @@ import {
 import MediaCard from "@/components/MediaCard";
 import ScrollRow from "@/components/ScrollRow";
 import ContinueWatchingSection from "@/components/ContinueWatchingSection";
+import { useHistory } from "@/context/HistoryContext";
 import {
   SkeletonCard,
   SkeletonWide,
@@ -381,6 +382,7 @@ function SectionHeader({ title, icon, href }) {
 
 /* ── Page ─────────────────────────────────────────────────────────── */
 export default function HomePage() {
+  const { history } = useHistory();
   const [trending, setTrending] = useState([]);
   const [popularMovies, setPopMovies] = useState([]);
   const [popularTV, setPopTV] = useState([]);
@@ -439,6 +441,26 @@ export default function HomePage() {
         <div style={{ marginTop: loading ? 0 : 40 }}>
           <ContinueWatchingSection />
         </div>
+
+        {/* Recently viewed */}
+        {history.length > 0 && (
+          <div style={{ marginTop: 40 }}>
+            <SectionHeader
+              title="Recently Viewed"
+              icon={<Clock size={20} color="var(--accent)" />}
+            />
+            <ScrollRow>
+              {history.map((item, i) => (
+                <MediaCard
+                  key={`${item.type}-${item.id}`}
+                  item={item}
+                  type={item.type}
+                  index={i}
+                />
+              ))}
+            </ScrollRow>
+          </div>
+        )}
 
         {/* Trending */}
         <div style={{ marginTop: 40 }}>

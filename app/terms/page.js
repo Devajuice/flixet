@@ -345,7 +345,7 @@ export default function TermsOfService() {
             title: "Acceptance of Terms",
             content: (
               <p className="terms-text">
-                By accessing and using Flixet ("the Website"), you accept and
+                By accessing and using Flixet (&quot;the Website&quot;), you accept and
                 agree to be bound by the terms and provisions of this agreement.
                 If you do not agree to these Terms of Service, please do not use
                 the Website.
@@ -489,7 +489,7 @@ export default function TermsOfService() {
             content: (
               <div className="terms-disclaimer">
                 <p>
-                  The website is provided "as is" and "as available" without
+                  The website is provided &quot;as is&quot; and &quot;as available&quot; without
                   warranties of any kind, either express or implied. We do not
                   warrant that the website will be uninterrupted, error-free, or
                   free of viruses or other harmful components.

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createPortal } from "react-dom"; // ✅ Added
+import { useState } from "react";
+import { useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { SlidersHorizontal, X } from "lucide-react";
 
@@ -11,17 +12,16 @@ export default function AdvancedFilters({
   initialFilters = {},
 }) {
   const [showFilters, setShowFilters] = useState(false);
-  const [mounted, setMounted] = useState(false); // ✅ Added
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const [filters, setFilters] = useState({
     sort_by: "popularity.desc",
     with_genres: "",
     ...initialFilters,
   });
-
-  // ✅ Added: Prevent SSR issues
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const sortOptions = [
     { value: "popularity.desc", label: "Most Popular" },

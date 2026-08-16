@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Film, Tv, Sparkles, Calendar, TrendingUp } from "lucide-react";
 import Link from "next/link";
@@ -27,26 +27,7 @@ export default function ComingSoonPage({ type, CardComponent }) {
 
   const observerTarget = useRef(null);
 
-  useEffect(() => {
-    fetchItems(1, true);
-  }, [type]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
-          fetchItems(currentPage + 1, false);
-        }
-      },
-      { threshold: 0.1 },
-    );
-    if (observerTarget.current) observer.observe(observerTarget.current);
-    return () => {
-      if (observerTarget.current) observer.unobserve(observerTarget.current);
-    };
-  }, [hasMore, loading, loadingMore, currentPage]);
-
-  const fetchItems = async (page, reset = false) => {
+  const fetchItems = useCallback(async (page, reset = false) => {
     if (reset) setLoading(true);
     else setLoadingMore(true);
 
@@ -83,7 +64,27 @@ export default function ComingSoonPage({ type, CardComponent }) {
       setLoading(false);
       setLoadingMore(false);
     }
-  };
+  }, [isMovie]);
+
+  useEffect(() => {
+    fetchItems(1, true);
+  }, [fetchItems]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
+          fetchItems(currentPage + 1, false);
+        }
+      },
+      { threshold: 0.1 },
+    );
+    const target = observerTarget.current;
+    if (target) observer.observe(target);
+    return () => {
+      if (target) observer.unobserve(target);
+    };
+  }, [hasMore, loading, loadingMore, currentPage, fetchItems]);
 
   const formatDate = (str) => {
     if (!str) return "";
@@ -469,7 +470,7 @@ export default function ComingSoonPage({ type, CardComponent }) {
                 >
                   <Sparkles size={18} color="#ffc13c" />
                   <p>
-                    You've explored all {items.length}{" "}
+                    You&apos;ve explored all {items.length}{" "}
                     {isMovie ? "movies" : "shows"}!
                   </p>
                   <Link href={browseHref}>

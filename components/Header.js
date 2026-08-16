@@ -17,6 +17,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import SearchBar from "./SearchBar";
+import RandomPicker from "./RandomPicker";
 
 export default function Header() {
   const pathname = usePathname();
@@ -41,9 +42,14 @@ export default function Header() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setShowMobileSearch(false);
     setShowMobileMenu(false);
+  }
+
+  useEffect(() => {
     document.body.classList.remove("menu-open");
   }, [pathname]);
 
@@ -171,6 +177,10 @@ export default function Header() {
                 })}
               </nav>
 
+              <div className="header-random">
+                <RandomPicker variant="header" />
+              </div>
+
               <div className="header-search">
                 <SearchBar />
               </div>
@@ -246,6 +256,14 @@ export default function Header() {
           position: relative;
           width: 260px;
           flex-shrink: 0;
+        }
+        .header-random {
+          flex-shrink: 0;
+        }
+        @media (max-width: 1200px) {
+          .header-random {
+            display: none;
+          }
         }
         .mobile-menu-btn {
           display: flex;
@@ -441,6 +459,49 @@ export default function Header() {
                   >
                     TV Genres
                   </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 4,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <Link
+                      href="/tv?sort=vote_average.desc"
+                      className="dropdown-item"
+                      onClick={() => setShowTVMenu(false)}
+                      style={{
+                        position: "relative",
+                        display: "block",
+                        padding: "8px 12px 8px 22px",
+                        borderRadius: "var(--radius-lg)",
+                        fontSize: "var(--text-sm)",
+                        fontWeight: "var(--font-semibold)",
+                        color: "var(--text-secondary)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <span style={{ marginRight: 6 }}>⭐</span> Top Rated
+                    </Link>
+                    <Link
+                      href="/tv?sort=popularity.desc"
+                      className="dropdown-item"
+                      onClick={() => setShowTVMenu(false)}
+                      style={{
+                        position: "relative",
+                        display: "block",
+                        padding: "8px 12px 8px 22px",
+                        borderRadius: "var(--radius-lg)",
+                        fontSize: "var(--text-sm)",
+                        fontWeight: "var(--font-semibold)",
+                        color: "var(--text-secondary)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <span style={{ marginRight: 6 }}>🔥</span> Trending
+                    </Link>
+                  </div>
                   <Link
                     href="/tv"
                     className="dropdown-all-link"
@@ -763,6 +824,7 @@ export default function Header() {
                   >
                     <Bookmark size={18} /> Watchlist
                   </Link>
+                  <RandomPicker variant="mobile" />
                 </div>
                 <div
                   style={{
@@ -855,6 +917,44 @@ export default function Header() {
                   >
                     <Tv size={11} /> TV Shows
                   </p>
+                  <Link
+                    href="/tv?sort=vote_average.desc"
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      document.body.classList.remove("menu-open");
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: "11px 14px",
+                      color: "var(--text-secondary)",
+                      textDecoration: "none",
+                      borderRadius: "var(--radius-lg)",
+                      marginBottom: 2,
+                    }}
+                  >
+                    <span style={{ fontSize: 15 }}>⭐</span> Top Rated TV
+                  </Link>
+                  <Link
+                    href="/tv?sort=popularity.desc"
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      document.body.classList.remove("menu-open");
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: "11px 14px",
+                      color: "var(--text-secondary)",
+                      textDecoration: "none",
+                      borderRadius: "var(--radius-lg)",
+                      marginBottom: 2,
+                    }}
+                  >
+                    <span style={{ fontSize: 15 }}>🔥</span> Trending TV
+                  </Link>
                   <Link
                     href="/tv"
                     onClick={() => {

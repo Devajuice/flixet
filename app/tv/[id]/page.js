@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, use, useRef, Suspense } from "react";
+import { useState, useEffect, use, useRef, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -22,12 +22,14 @@ import WatchlistButton from "@/components/WatchlistButton";
 import VideoPlayer from "@/components/VideoPlayer";
 import MediaCard from "@/components/MediaCard";
 import ScrollRow from "@/components/ScrollRow";
+import ShareButton from "@/components/ShareButton";
 import {
   Skeleton as SkeletonEl,
   SkeletonTitle,
   SkeletonText,
 } from "@/components/Skeleton";
 import { useContinueWatching } from "@/context/ContinueWatchingContext";
+import { useHistory } from "@/context/HistoryContext";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
@@ -179,7 +181,10 @@ function InfoCard({ icon, label, value }) {
 function CastCard({ actor }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <Link href={`/person/${actor.id}`} style={{ display: "block" }}>
+    <Link
+      href={`/person/${actor.id}`}
+      style={{ display: "block", textDecoration: "none" }}
+    >
       <div
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -404,12 +409,21 @@ function TVShowDetailsContent({ params }) {
   const [showImdb, setShowImdb] = useState(undefined);
   const [omdbCache, setOmdbCache] = useState({});
   const { addToContinueWatching } = useContinueWatching();
+  const { addToHistory } = useHistory();
 
-  useEffect(() => {
-    if (!showId) return;
+  const [prevShowId, setPrevShowId] = useState(showId);
+  if (showId !== prevShowId) {
+    setPrevShowId(showId);
     setLoading(true);
     setError(null);
     setShowImdb(undefined);
+    setSeasonData(null);
+    setSelSeason(null);
+    setSelEpisode(null);
+  }
+
+  useEffect(() => {
+    if (!showId) return;
     Promise.all([
       fetch(
         `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations,watch%2Fproviders`,
@@ -425,6 +439,16 @@ function TVShowDetailsContent({ params }) {
             showData.status_message || "Failed to fetch show data",
           );
         setShow(showData);
+        addToHistory({
+          id: showData.id,
+          type: "tv",
+          title: showData.name,
+          name: showData.name,
+          poster_path: showData.poster_path,
+          backdrop_path: showData.backdrop_path,
+          vote_average: showData.vote_average,
+          first_air_date: showData.first_air_date,
+        });
         setExternalIds(extData);
         const validSeasons =
           showData.seasons?.filter((s) => s.season_number > 0) || [];
@@ -442,7 +466,7 @@ function TVShowDetailsContent({ params }) {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [showId, seasonParam, episodeParam]);
+  }, [showId, seasonParam, episodeParam, addToHistory]);
 
   useEffect(() => {
     if (!OMDB_KEY || !externalIds?.imdb_id) return;
@@ -460,9 +484,15 @@ function TVShowDetailsContent({ params }) {
       .catch(() => setShowImdb(null));
   }, [externalIds]);
 
+  const [prevSeasonKey, setPrevSeasonKey] = useState(`${showId}-${selSeason}`);
+  const seasonKey = `${showId}-${selSeason}`;
+  if (seasonKey !== prevSeasonKey) {
+    setPrevSeasonKey(seasonKey);
+    setLoadingSeason(true);
+  }
+
   useEffect(() => {
     if (selSeason === null) return;
-    setLoadingSeason(true);
     fetch(
       `https://api.themoviedb.org/3/tv/${showId}/season/${selSeason}?api_key=${API_KEY}`,
     )
@@ -513,7 +543,7 @@ function TVShowDetailsContent({ params }) {
         season: selSeason,
         episode: selEpisode,
         runtime: ep?.runtime || show.episode_run_time?.[0] || 45,
-        progress: 15,
+        progress: 0,
       });
     }
   }, [
@@ -524,6 +554,33 @@ function TVShowDetailsContent({ params }) {
     seasonData,
     addToContinueWatching,
   ]);
+
+  const handleWatchedSeconds = useCallback(
+    (seconds) => {
+      if (!show) return;
+      const ep = seasonData?.episodes?.find(
+        (e) => e.episode_number === selEpisode,
+      );
+      const runtime = ep?.runtime || show.episode_run_time?.[0] || 45;
+      const runtimeSecs = runtime * 60;
+      const progress = Math.min(
+        99,
+        Math.max(1, Math.round((seconds / runtimeSecs) * 100)),
+      );
+      addToContinueWatching({
+        id: show.id,
+        type: "tv",
+        name: show.name,
+        poster_path: show.poster_path,
+        backdrop_path: show.backdrop_path,
+        season: selSeason,
+        episode: selEpisode,
+        runtime,
+        progress,
+      });
+    },
+    [show, seasonData, selSeason, selEpisode, addToContinueWatching],
+  );
 
   if (loading)
     return (
@@ -568,7 +625,7 @@ function TVShowDetailsContent({ params }) {
   const cast = show.credits?.cast?.slice(0, 16) || [];
   const validSeasons = show.seasons?.filter((s) => s.season_number > 0) || [];
   const watchProviders = (show["watch/providers"] ?? show["watch%2Fproviders"])
-    ?.results?.IN;
+    ?.results?.[process.env.NEXT_PUBLIC_TMDB_REGION || "IN"];
   const creators = show.created_by || [];
   const tagline = show.tagline;
 
@@ -635,6 +692,7 @@ function TVShowDetailsContent({ params }) {
         episode={selEpisode}
         onNextEpisode={canGoNext ? handleNextEpisode : null}
         hasNext={canGoNext}
+        onWatchedSeconds={handleWatchedSeconds}
       />
 
       {/* Trailer modal */}
@@ -980,6 +1038,7 @@ function TVShowDetailsContent({ params }) {
                 }}
                 variant="large"
               />
+              <ShareButton title={show.name} href={`/tv/${show.id}`} />
             </div>
 
             {/* Overview */}

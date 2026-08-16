@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, use, useRef } from "react";
+import { useState, useEffect, use, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
@@ -18,12 +18,14 @@ import WatchlistButton from "@/components/WatchlistButton";
 import VideoPlayer from "@/components/VideoPlayer";
 import MediaCard from "@/components/MediaCard";
 import ScrollRow from "@/components/ScrollRow";
+import ShareButton from "@/components/ShareButton";
 import {
   Skeleton as SkeletonEl,
   SkeletonTitle,
   SkeletonText,
 } from "@/components/Skeleton";
 import { useContinueWatching } from "@/context/ContinueWatchingContext";
+import { useHistory } from "@/context/HistoryContext";
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
@@ -127,7 +129,10 @@ function InfoCard({ icon, label, value }) {
 function CastCard({ actor }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <Link href={`/person/${actor.id}`} style={{ display: "block" }}>
+    <Link
+      href={`/person/${actor.id}`}
+      style={{ display: "block", textDecoration: "none" }}
+    >
       <div
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -227,12 +232,19 @@ export default function MovieDetails({ params }) {
   const [showTrailer, setShowTrailer] = useState(false);
   const [imdbRating, setImdbRating] = useState(undefined);
   const { addToContinueWatching } = useContinueWatching();
+  const { addToHistory } = useHistory();
   const hasAdded = useRef(false);
 
-  useEffect(() => {
+  const [prevMovieId, setPrevMovieId] = useState(movieId);
+  if (movieId !== prevMovieId) {
+    setPrevMovieId(movieId);
     setLoading(true);
     setError(null);
     setImdbRating(undefined);
+  }
+
+  useEffect(() => {
+    if (!movieId) return;
     Promise.all([
       fetch(
         `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations,watch%2Fproviders`,
@@ -248,6 +260,16 @@ export default function MovieDetails({ params }) {
             movieData.status_message || "Failed to fetch movie data",
           );
         setMovie(movieData);
+        addToHistory({
+          id: movieData.id,
+          type: "movie",
+          title: movieData.title,
+          name: movieData.title,
+          poster_path: movieData.poster_path,
+          backdrop_path: movieData.backdrop_path,
+          vote_average: movieData.vote_average,
+          release_date: movieData.release_date,
+        });
         if (OMDB_KEY && extData?.imdb_id) {
           fetch(
             `https://www.omdbapi.com/?i=${extData.imdb_id}&apikey=${OMDB_KEY}`,
@@ -265,7 +287,7 @@ export default function MovieDetails({ params }) {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [movieId]);
+  }, [movieId, addToHistory]);
 
   useEffect(() => {
     if (showPlayer && movie && !hasAdded.current) {
@@ -276,12 +298,33 @@ export default function MovieDetails({ params }) {
         poster_path: movie.poster_path,
         backdrop_path: movie.backdrop_path,
         runtime: movie.runtime || 120,
-        progress: 15,
+        progress: 0,
       });
       hasAdded.current = true;
     }
     if (!showPlayer) hasAdded.current = false;
   }, [showPlayer, movie, addToContinueWatching]);
+
+  const handleWatchedSeconds = useCallback(
+    (seconds) => {
+      if (!movie) return;
+      const runtimeSecs = (movie.runtime || 120) * 60;
+      const progress = Math.min(
+        99,
+        Math.max(1, Math.round((seconds / runtimeSecs) * 100)),
+      );
+      addToContinueWatching({
+        id: movie.id,
+        type: "movie",
+        title: movie.title,
+        poster_path: movie.poster_path,
+        backdrop_path: movie.backdrop_path,
+        runtime: movie.runtime || 120,
+        progress,
+      });
+    },
+    [movie, addToContinueWatching],
+  );
 
   if (loading)
     return (
@@ -334,7 +377,7 @@ export default function MovieDetails({ params }) {
     [];
   const watchProviders = (
     movie["watch/providers"] ?? movie["watch%2Fproviders"]
-  )?.results?.IN;
+  )?.results?.[process.env.NEXT_PUBLIC_TMDB_REGION || "IN"];
   const trailer =
     movie.videos?.results?.find(
       (v) => v.type === "Trailer" && v.site === "YouTube",
@@ -356,6 +399,7 @@ export default function MovieDetails({ params }) {
         type="movie"
         id={movieId}
         title={movie.title}
+        onWatchedSeconds={handleWatchedSeconds}
       />
 
       {/* Trailer modal */}
@@ -664,6 +708,7 @@ export default function MovieDetails({ params }) {
                 }}
                 variant="large"
               />
+              <ShareButton title={movie.title} href={`/movie/${movie.id}`} />
             </div>
 
             {/* Overview */}

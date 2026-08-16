@@ -485,7 +485,7 @@ export default function DMCAPage() {
                     <FileText size={15} />
                     <span className="dmca-contact-label">Subject Line:</span>
                     <span className="dmca-contact-value">
-                      "DMCA Takedown Request"
+                      &quot;DMCA Takedown Request&quot;
                     </span>
                   </div>
                 </div>

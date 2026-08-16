@@ -67,20 +67,36 @@ const RATING_OPTIONS = [
   { value: "6", label: "6+ ⭐" },
 ];
 
+const VALID_SORTS = [
+  "popularity.desc",
+  "vote_average.desc",
+  "first_air_date.desc",
+  "vote_count.desc",
+];
+
 function TVContent() {
   const searchParams = useSearchParams();
   const genreParam = searchParams.get("genre");
+  const sortParam = searchParams.get("sort");
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
-  const [sortBy, setSortBy] = useState("popularity.desc");
+  const [sortBy, setSortBy] = useState(
+    VALID_SORTS.includes(sortParam) ? sortParam : "popularity.desc",
+  );
   const [activeGenre, setActiveGenre] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [yearRange, setYearRange] = useState("");
   const [minRating, setMinRating] = useState("");
+
+  const [prevSortParam, setPrevSortParam] = useState(sortParam);
+  if (sortParam !== prevSortParam) {
+    setPrevSortParam(sortParam);
+    setSortBy(VALID_SORTS.includes(sortParam) ? sortParam : "popularity.desc");
+  }
 
   const activeFilterCount = [
     activeGenre,
@@ -141,7 +157,7 @@ function TVContent() {
     setCurrentPage(1);
     setHasMore(true);
     fetchShows(1, true, sortBy, activeGenre, yearRange, minRating);
-  }, [genreParam, sortBy, activeGenre, yearRange, minRating]);
+  }, [fetchShows, sortBy, activeGenre, yearRange, minRating]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -192,14 +208,18 @@ function TVContent() {
             lineHeight: 1,
           }}
         >
-          {genreParam
-            ? genreParam
-                .split("-")
-                .map((w) => w[0].toUpperCase() + w.slice(1))
-                .join(" ") + " TV Shows"
-            : activeGenre
-              ? GENRES.find((g) => g.id === activeGenre)?.name + " TV Shows"
-              : "TV Shows"}
+          {sortParam === "vote_average.desc"
+            ? "Top Rated TV Shows"
+            : sortParam === "popularity.desc"
+              ? "Trending TV Shows"
+              : genreParam
+                ? genreParam
+                    .split("-")
+                    .map((w) => w[0].toUpperCase() + w.slice(1))
+                    .join(" ") + " TV Shows"
+                : activeGenre
+                  ? GENRES.find((g) => g.id === activeGenre)?.name + " TV Shows"
+                  : "TV Shows"}
         </h1>
         {totalResults > 0 && !loading && (
           <p
