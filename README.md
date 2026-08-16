@@ -11,7 +11,7 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 📚 **Personal Watchlist** - Save your favorite content to watch later
 - 🔄 **Multiple Servers** - Switch between streaming sources if one doesn't work
 - 📺 **TV Show Support** - Full season and episode selection with OMDB ratings
-- 🎨 **Modern UI** - Beautiful dark interface with gold accent design system
+- 🎨 **Modern UI** - Beautiful dark interface with Netflix-style red accent design system
 - ⚡ **Fast Performance** - Built with Next.js 16 with Turbopack
 - 🎯 **Advanced Filters** - Filter by genre, year, rating, and more
 - 🚀 **Coming Soon** - Dedicated pages for upcoming movies and airing TV shows
@@ -21,6 +21,12 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - ♿️ **Accessibility** - Focus states, skip-to-content, reduced-motion support
 - 💫 **Loading Skeletons** - Smooth loading states with shimmer animations
 - ⌨️ **Debounced Search** - Optimized search input with 300ms delay
+- 🎭 **Actor Pages** - Dedicated pages with filmography split into Known For / Movies / TV
+- 🔥 **Top Rated & Trending TV** - Sort the TV browse page by rating or popularity
+- 🕘 **Recently Viewed** - Quickly jump back to titles you watched recently
+- 🔗 **Share Buttons** - Share movies and shows via native share or copy link
+- 🎲 **Random Picker** - One-click random movie/TV show discovery
+- 📈 **Real Progress Tracking** - Watch time measured and stored as viewing progress
 
 ## To Do
 
@@ -34,7 +40,12 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - [x] ~~Accessibility Improvements~~
 - [x] ~~Loading Skeleton States~~
 - [x] ~~Debounced Search~~
-- [ ] Random Movie Picker
+- [x] ~~Random Movie Picker~~
+- [x] ~~Actor/Person Pages~~
+- [x] ~~Top Rated & Trending TV~~
+- [x] ~~Recently Viewed~~
+- [x] ~~Share Buttons~~
+- [x] ~~Real Progress Tracking~~
 
 ## 🛠️ Tech Stack
 
@@ -81,6 +92,8 @@ Create a `.env.local` file in the root directory:
 ```bash
 NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_api_key_here
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_OMDB_API_KEY=your_omdb_api_key_here
+NEXT_PUBLIC_TMDB_REGION=IN
 ```
 
 4. **Run the development server:**
@@ -102,8 +115,9 @@ Flixet/
 ├── app/
 │   ├── movie/[id]/           # Movie detail page
 │   ├── tv/[id]/              # TV show detail page (episodes, seasons, metadata)
+│   ├── person/[id]/          # Actor/person detail page (filmography tabs)
 │   ├── movies/               # Browse movies with filters
-│   ├── tv/                   # Browse TV shows with filters
+│   ├── tv/                   # Browse TV shows (incl. Top Rated / Trending sorts)
 │   ├── anime/                # Browse anime
 │   ├── coming-soon/
 │   │   ├── movies/           # Upcoming movies page
@@ -120,14 +134,17 @@ Flixet/
 │   ├── ScrollRow.js          # Horizontal scrollable row (mobile padding)
 │   ├── MediaCard.js          # Universal media card (Next.js Image)
 │   ├── CastSection.js        # Cast display component
-│   ├── VideoPlayer.js        # Embedded video player
+│   ├── VideoPlayer.js        # Embedded video player with server switching
 │   ├── WatchlistButton.js    # Add/remove watchlist button
 │   ├── ContinueWatchingSection.js  # Resume watching section
 │   ├── Skeleton.js          # Reusable loading skeleton components
-│   └── SearchResults.js     # Search results grid
+│   ├── SearchResults.js     # Search results grid
+│   ├── RandomPicker.js       # Random movie/TV picker (header + mobile menu)
+│   └── ShareButton.js        # Share / copy-link button
 ├── context/
 │   ├── WatchlistContext.js   # Watchlist state management
-│   └── ContinueWatchingContext.js  # Continue watching state
+│   ├── ContinueWatchingContext.js  # Continue watching state
+│   └── HistoryContext.js     # Recently viewed history state
 ├── public/                   # Static assets (icons, images)
 └── .env.local                # Environment variables
 ```
@@ -145,7 +162,7 @@ Flixet/
 
 - **Episode Tracking**: Remembers the last season and episode for TV shows
 - **Deep Linking**: Clicking a continue watching item takes you directly to the right episode
-- **Progress Simulation**: Tracks viewing progress for quick resuming
+- **Real Progress**: Viewing time is measured while the player is open and stored as watch progress (capped at 99%)
 
 ### Search Functionality
 
@@ -164,8 +181,36 @@ Flixet/
 ### Streaming
 
 - **Multiple Sources**: Automatically embeds content from reliable third-party sources
-- **Server Switching**: If one server has issues, try another
+- **Default Player**: VidCore with a Netflix-style UI and red theme, switchable at any time
+- **Server Switching**: If one server has issues, try another (VidCore, VidLink, VidSrc, 2embed)
 - **HD Quality**: Most content available in high definition
+
+### Actor / Person Pages
+
+- **Filmography Tabs**: Known For, Movies, and TV split via TMDb `combined_credits`
+- **Deep Links**: Cast cards on movie and TV pages link directly to the actor's page
+- **Rich Details**: Biography, known-for credits, and more
+
+### Top Rated & Trending TV
+
+- **Sort Modes**: Toggle between Top Rated (`vote_average.desc`) and Trending (`popularity.desc`)
+- **Quick Access**: Switch sorts from the header dropdown or the mobile menu
+
+### Recently Viewed
+
+- **Automatic Tracking**: Movies and shows you open are added to your history
+- **Home Page Row**: Jump back to recently viewed titles from the home page
+- **LocalStorage**: Persists across sessions (capped at 30 entries, removable)
+
+### Random Picker
+
+- **One-Click Discovery**: Picks a random movie or TV show and takes you straight to it
+- **Available Anywhere**: Header button on desktop and menu item on mobile
+
+### Share Buttons
+
+- **Native Share**: Uses the Web Share API where supported
+- **Copy Link**: Falls back to copying the shareable URL with "Copied!" feedback
 
 ### Episode Selector
 
@@ -210,6 +255,8 @@ Flixet/
 4. Add environment variables:
    - `NEXT_PUBLIC_TMDB_API_KEY`
    - `NEXT_PUBLIC_SITE_URL`
+   - `NEXT_PUBLIC_OMDB_API_KEY` (optional, for episode ratings)
+   - `NEXT_PUBLIC_TMDB_REGION` (optional, for watch providers)
 5. Click Deploy!
 
 ### Deploy to Other Platforms
@@ -227,6 +274,8 @@ This is a standard Next.js app and can be deployed to:
 | -------------------------- | -------------------------------- | --------------- |
 | `NEXT_PUBLIC_TMDB_API_KEY` | Your TMDb API key                | ✅ Yes          |
 | `NEXT_PUBLIC_SITE_URL`     | Your deployed site URL           | ⚠️ Recommended |
+| `NEXT_PUBLIC_OMDB_API_KEY` | Your OMDB API key (episode ratings) | ⚠️ Recommended |
+| `NEXT_PUBLIC_TMDB_REGION`  | TMDb region for watch providers (e.g. `IN`, `US`, `GB`) | ⚠️ Optional |
 
 ## 🤝 Contributing
 
