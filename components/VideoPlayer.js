@@ -7,12 +7,12 @@ const SERVERS = {
   movie: [
     {
       label: "VidCore",
-      url: (id) => `https://vidcore.net/movie/${id}?theme=e50914`,
+      url: (id) => `https://vidcore.net/movie/${id}?theme=3b82f6`,
     },
     {
       label: "VidLink",
       url: (id) =>
-        `https://vidlink.pro/movie/${id}?primaryColor=e50914&autoplay=true`,
+        `https://vidlink.pro/movie/${id}?primaryColor=3b82f6&autoplay=true`,
     },
     {
       label: "VidSrc",
@@ -24,12 +24,12 @@ const SERVERS = {
     {
       label: "VidCore",
       url: (id, s, e) =>
-        `https://vidcore.net/tv/${id}/${s}/${e}?theme=e50914`,
+        `https://vidcore.net/tv/${id}/${s}/${e}?theme=3b82f6`,
     },
     {
       label: "VidLink",
       url: (id, s, e) =>
-        `https://vidlink.pro/tv/${id}/${s}/${e}?primaryColor=e50914&autoplay=true&nextbutton=true`,
+        `https://vidlink.pro/tv/${id}/${s}/${e}?primaryColor=3b82f6&autoplay=true&nextbutton=true`,
     },
     {
       label: "VidSrc",
@@ -326,7 +326,7 @@ export default function VideoPlayer({
               style={{
                 width: 48,
                 height: 48,
-                border: "3px solid rgba(229,9,20,0.2)",
+                border: "3px solid rgba(59, 130, 246, 0.2)",
                 borderTopColor: "var(--accent)",
                 borderRadius: "50%",
                 animation: "spin 0.8s linear infinite",

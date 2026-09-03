@@ -21,7 +21,6 @@ export default function PrivacyPolicy() {
           max-width: 1000px;
           margin: 0 auto;
           padding: 40px 20px 100px;
-          font-family: 'DM Sans', sans-serif;
         }
 
         /* ── Header ────────────────────────────────────── */
@@ -31,7 +30,6 @@ export default function PrivacyPolicy() {
         }
 
         .prv-title {
-          font-family: 'DM Sans', sans-serif;
           font-size: 42px;
           font-weight: 900;
           margin-bottom: 16px;
@@ -44,26 +42,24 @@ export default function PrivacyPolicy() {
         }
 
         .prv-title svg {
-          color: #ffc13c;
+          color: var(--accent);
           flex-shrink: 0;
         }
 
         .prv-last-updated {
-          font-family: 'DM Sans', sans-serif;
           font-size: 11px;
           font-weight: 700;
-          color: #ffc13c;
-          background: rgba(255, 193, 60, 0.08);
+          color: var(--accent);
+          background: var(--accent-subtle);
           padding: 6px 16px;
           border-radius: 20px;
           display: inline-block;
-          border: 1px solid rgba(255, 193, 60, 0.2);
+          border: 1px solid var(--accent-border);
           text-transform: uppercase;
           letter-spacing: 0.07em;
         }
 
         .prv-subtitle {
-          font-family: 'DM Sans', sans-serif;
           font-size: 14px;
           color: rgba(255, 255, 255, 0.38);
           max-width: 680px;
@@ -83,7 +79,7 @@ export default function PrivacyPolicy() {
         }
 
         .prv-section:hover {
-          border-color: rgba(255, 193, 60, 0.1);
+          border-color: rgba(59, 130, 246, 0.2);
         }
 
         .prv-section-header {
@@ -98,26 +94,24 @@ export default function PrivacyPolicy() {
         .prv-section-number {
           width: 32px;
           height: 32px;
-          background: rgba(255, 193, 60, 0.1);
-          border: 1px solid rgba(255, 193, 60, 0.25);
+          background: var(--accent-subtle);
+          border: 1px solid var(--accent-border);
           border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-family: 'DM Sans', sans-serif;
           font-weight: 800;
           font-size: 13px;
-          color: #ffc13c;
+          color: var(--accent);
           flex-shrink: 0;
         }
 
         .prv-section-header svg {
-          color: #ffc13c;
+          color: var(--accent);
           flex-shrink: 0;
         }
 
         .prv-section-title {
-          font-family: 'DM Sans', sans-serif;
           font-size: 16px;
           font-weight: 700;
           color: rgba(255, 255, 255, 0.88);
@@ -127,7 +121,6 @@ export default function PrivacyPolicy() {
 
         /* ── Body text ─────────────────────────────────── */
         .prv-text {
-          font-family: 'DM Sans', sans-serif;
           font-size: 13px;
           line-height: 1.85;
           color: rgba(255, 255, 255, 0.38);
@@ -148,7 +141,6 @@ export default function PrivacyPolicy() {
         .prv-list li {
           padding: 10px 0 10px 20px;
           position: relative;
-          font-family: 'DM Sans', sans-serif;
           font-size: 13px;
           color: rgba(255, 255, 255, 0.38);
           line-height: 1.7;
@@ -168,21 +160,20 @@ export default function PrivacyPolicy() {
           width: 4px;
           height: 4px;
           border-radius: 50%;
-          background: rgba(255, 193, 60, 0.4);
+          background: var(--accent);
         }
 
         /* ── Highlight box ─────────────────────────────── */
         .prv-highlight {
           background: rgba(255, 255, 255, 0.02);
           border: 1px solid rgba(255, 255, 255, 0.07);
-          border-left: 3px solid #ffc13c;
+          border-left: 3px solid var(--accent);
           border-radius: 10px;
           padding: 14px 16px;
           margin: 14px 0;
         }
 
         .prv-highlight p {
-          font-family: 'DM Sans', sans-serif;
           font-size: 13px;
           line-height: 1.85;
           color: rgba(255, 255, 255, 0.38);
@@ -190,7 +181,7 @@ export default function PrivacyPolicy() {
         }
 
         .prv-highlight strong {
-          color: #ffc13c;
+          color: var(--accent);
           font-weight: 700;
         }
 
@@ -211,20 +202,18 @@ export default function PrivacyPolicy() {
         }
 
         .prv-service-item:hover {
-          border-color: rgba(255, 193, 60, 0.15);
+          border-color: rgba(59, 130, 246, 0.25);
         }
 
         .prv-service-name {
-          font-family: 'DM Sans', sans-serif;
           font-size: 13px;
           font-weight: 700;
-          color: #ffc13c;
+          color: var(--accent);
           margin-bottom: 5px;
           letter-spacing: 0.01em;
         }
 
         .prv-service-desc {
-          font-family: 'DM Sans', sans-serif;
           font-size: 12px;
           color: rgba(255, 255, 255, 0.35);
           margin: 0;
@@ -233,8 +222,8 @@ export default function PrivacyPolicy() {
 
         /* ── Contact card ──────────────────────────────── */
         .prv-contact-card {
-          background: rgba(255, 193, 60, 0.04);
-          border: 1px solid rgba(255, 193, 60, 0.15);
+          background: var(--accent-subtle);
+          border: 1px solid var(--accent-border);
           border-radius: 10px;
           padding: 18px 20px;
           display: flex;
@@ -244,12 +233,11 @@ export default function PrivacyPolicy() {
         }
 
         .prv-contact-card svg {
-          color: #ffc13c;
+          color: var(--accent);
           flex-shrink: 0;
         }
 
         .prv-contact-label {
-          font-family: 'DM Sans', sans-serif;
           font-size: 11px;
           font-weight: 700;
           color: rgba(255, 255, 255, 0.25);
@@ -259,10 +247,9 @@ export default function PrivacyPolicy() {
         }
 
         .prv-contact-email {
-          font-family: 'DM Sans', sans-serif;
           font-size: 14px;
           font-weight: 700;
-          color: #ffc13c;
+          color: var(--accent);
           letter-spacing: 0.01em;
         }
 

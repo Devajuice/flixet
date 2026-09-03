@@ -122,7 +122,7 @@ export default function AnimePage() {
               gap: 12,
             }}
           >
-            <Sparkles size={40} color="rgba(229,9,20,0.2)" />
+            <Sparkles size={40} color="rgba(59,130,246,0.2)" />
             <p
               style={{
                 fontSize: "var(--text-sm)",
@@ -163,7 +163,7 @@ export default function AnimePage() {
                     style={{
                       width: 28,
                       height: 28,
-                      border: "3px solid rgba(229,9,20,0.2)",
+                      border: "3px solid rgba(59, 130, 246, 0.2)",
                       borderTopColor: "var(--accent)",
                       borderRadius: "50%",
                       animation: "spin 0.9s linear infinite",

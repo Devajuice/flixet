@@ -55,7 +55,7 @@ export default function MediaCard({
         background: "var(--bg-secondary)",
         cursor: "pointer",
         aspectRatio: variant === "backdrop" ? "16/9" : "2/3",
-        boxShadow: hovered ? "var(--shadow-xl)" : "var(--shadow-md)",
+        boxShadow: hovered ? "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(59, 130, 246, 0.15)" : "var(--shadow-md)",
         transform: hovered ? "translateY(-4px) scale(1.02)" : "none",
         transition: "all var(--transition-slow)",
         zIndex: hovered ? 10 : 1,
@@ -129,11 +129,11 @@ export default function MediaCard({
                 width: 48,
                 height: 48,
                 borderRadius: "var(--radius-full)",
-                background: "var(--accent)",
+                background: "linear-gradient(135deg, #2563eb, #3b82f6)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 8px 32px rgba(229,9,20,0.5)",
+                boxShadow: "0 8px 32px rgba(59, 130, 246, 0.5)",
               }}
             >
               <Play size={20} fill="white" color="white" />

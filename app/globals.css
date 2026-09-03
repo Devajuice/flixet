@@ -1,25 +1,25 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
 
 /* ── Design Tokens ────────────────────────────────────────────── */
 :root {
     /* Colors */
-    --bg: #0a0a0a;
-    --bg-secondary: #111111;
-    --bg-tertiary: #1a1a1a;
-    --bg-elevated: #222222;
+    --bg: #0b0f1a;
+    --bg-secondary: #111827;
+    --bg-tertiary: #1e293b;
+    --bg-elevated: #283548;
 
     --border: rgba(255, 255, 255, 0.08);
     --border-hover: rgba(255, 255, 255, 0.15);
 
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.65);
-    --text-tertiary: rgba(255, 255, 255, 0.4);
-    --text-muted: rgba(255, 255, 255, 0.25);
+    --text-primary: #f1f5f9;
+    --text-secondary: rgba(241, 245, 249, 0.7);
+    --text-tertiary: rgba(241, 245, 249, 0.45);
+    --text-muted: rgba(241, 245, 249, 0.25);
 
-    --accent: #e50914;
-    --accent-hover: #ff1a25;
-    --accent-subtle: rgba(229, 9, 20, 0.1);
-    --accent-border: rgba(229, 9, 20, 0.3);
+    --accent: #3b82f6;
+    --accent-hover: #60a5fa;
+    --accent-subtle: rgba(59, 130, 246, 0.12);
+    --accent-border: rgba(59, 130, 246, 0.3);
 
     --gold: #f5c518;
     --gold-subtle: rgba(245, 197, 24, 0.1);
@@ -30,8 +30,9 @@
 
     /* Typography */
     --font-sans:
-        "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --font-display: "Inter", sans-serif;
+        "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    --font-display: "Plus Jakarta Sans", sans-serif;
 
     --text-xs: 0.75rem;
     --text-sm: 0.875rem;
@@ -71,11 +72,11 @@
     --radius-full: 9999px;
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
-    --shadow-glow: 0 0 20px rgba(229, 9, 20, 0.3);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.7);
+    --shadow-glow: 0 0 24px rgba(59, 130, 246, 0.35);
 
     /* Transitions */
     --transition-fast: 150ms ease;
@@ -214,24 +215,27 @@ video {
 }
 
 .btn-primary {
-    background: var(--accent);
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%);
     color: var(--text-primary);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
 }
 
 .btn-primary:hover {
-    background: var(--accent-hover);
-    box-shadow: var(--shadow-glow);
+    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
+    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.45);
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
     color: var(--text-primary);
     border: 1px solid var(--border);
+    backdrop-filter: blur(8px);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: var(--border-hover);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-border);
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.15);
 }
 
 .badge {
@@ -281,8 +285,10 @@ video {
 }
 
 .media-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: var(--shadow-xl);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.6),
+        0 0 32px rgba(59, 130, 246, 0.15);
     z-index: 10;
 }
 
@@ -318,14 +324,14 @@ video {
     transform: translate(-50%, -50%) scale(0.8);
     width: 44px;
     height: 44px;
-    background: var(--accent);
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     transition: all var(--transition-base);
-    box-shadow: var(--shadow-glow);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
 }
 
 .media-card:hover .media-card__play {
@@ -379,6 +385,7 @@ video {
 .nav-link:hover {
     color: var(--accent) !important;
     background: var(--accent-subtle);
+    text-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
 }
 
 .dropdown-trigger {
@@ -402,6 +409,7 @@ video {
 .dropdown-trigger:hover {
     color: var(--accent) !important;
     background: var(--accent-subtle);
+    text-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
 }
 
 .dropdown-all-link {
@@ -579,7 +587,7 @@ video {
 /* Focus visible for keyboard navigation */
 :focus-visible {
     outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    outline-offset: 3px;
 }
 
 button:focus-visible,
@@ -588,7 +596,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
     outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    outline-offset: 3px;
 }
 
 /* Skip to main content link */
@@ -598,12 +606,13 @@ textarea:focus-visible {
     left: 16px;
     z-index: 9999;
     padding: 8px 16px;
-    background: var(--accent);
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
     color: white;
     font-weight: var(--font-bold);
     border-radius: var(--radius-md);
     text-decoration: none;
     transition: top 0.2s ease;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
 }
 
 .skip-to-content:focus {
@@ -633,4 +642,19 @@ textarea:focus-visible {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+}
+
+/* ── Glass effect ───────────────────────────────────────── */
+.glass {
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-elevated {
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }

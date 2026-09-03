@@ -95,7 +95,6 @@ export default function Loading() {
           gap: 28px;
           position: relative;
           overflow: hidden;
-          font-family: "DM Sans", sans-serif;
         }
 
         .ldg-container::before {
@@ -109,7 +108,7 @@ export default function Loading() {
           border-radius: 50%;
           background: radial-gradient(
             circle,
-            rgba(255, 193, 60, 0.08) 0%,
+            rgba(59, 130, 246, 0.08) 0%,
             transparent 70%
           );
           animation: ldg-glow 3s ease-in-out infinite;
@@ -128,8 +127,8 @@ export default function Loading() {
         .ldg-ring-outer {
           width: 96px;
           height: 96px;
-          border: 2px solid rgba(255, 193, 60, 0.08);
-          border-top: 2px solid #ffc13c;
+          border: 2px solid rgba(59, 130, 246, 0.08);
+          border-top: 2px solid #3b82f6;
           border-radius: 50%;
           animation: ldg-spin 1s linear infinite;
           display: flex;
@@ -140,8 +139,8 @@ export default function Loading() {
         .ldg-ring-inner {
           width: 66px;
           height: 66px;
-          border: 2px solid rgba(255, 193, 60, 0.06);
-          border-bottom: 2px solid rgba(255, 193, 60, 0.5);
+          border: 2px solid rgba(59, 130, 246, 0.06);
+          border-bottom: 2px solid rgba(96, 165, 250, 0.5);
           border-radius: 50%;
           animation: ldg-spin-rev 0.7s linear infinite;
           display: flex;
@@ -150,7 +149,7 @@ export default function Loading() {
         }
 
         .ldg-film-icon {
-          color: #ffc13c;
+          color: #60a5fa;
           animation: ldg-pulse 2s ease-in-out infinite;
         }
 
@@ -164,7 +163,6 @@ export default function Loading() {
         }
 
         .ldg-title {
-          font-family: "DM Sans", sans-serif;
           font-size: 20px;
           font-weight: 800;
           color: rgba(255, 255, 255, 0.88);
@@ -173,7 +171,6 @@ export default function Loading() {
         }
 
         .ldg-subtitle {
-          font-family: "DM Sans", sans-serif;
           font-size: 12px;
           font-weight: 600;
           color: rgba(255, 255, 255, 0.25);
@@ -192,7 +189,7 @@ export default function Loading() {
         .ldg-dot {
           width: 6px;
           height: 6px;
-          background: #ffc13c;
+          background: #60a5fa;
           border-radius: 50%;
           animation: ldg-dot 1.4s ease-in-out infinite;
         }
@@ -215,7 +212,7 @@ export default function Loading() {
 
         .ldg-progress-fill {
           height: 100%;
-          background: #ffc13c;
+          background: linear-gradient(90deg, #2563eb, #60a5fa);
           border-radius: 2px;
           animation: ldg-progress 1.6s ease-in-out infinite;
         }

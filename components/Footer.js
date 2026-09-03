@@ -32,9 +32,9 @@ export default function Footer() {
         {/* Disclaimer */}
         <div
           style={{
-            background: "rgba(255,255,255,0.02)",
-            border: "1px solid var(--border)",
-            borderLeft: "3px solid var(--gold)",
+            background: "rgba(59, 130, 246, 0.04)",
+            border: "1px solid rgba(59, 130, 246, 0.12)",
+            borderLeft: "3px solid var(--accent)",
             borderRadius: "var(--radius-xl)",
             padding: "22px 24px",
             marginBottom: 52,
@@ -48,12 +48,12 @@ export default function Footer() {
               marginBottom: 12,
             }}
           >
-            <AlertTriangle size={15} color="var(--gold)" />
+            <AlertTriangle size={15} color="var(--accent)" />
             <h4
               style={{
                 fontSize: "var(--text-xs)",
                 fontWeight: "var(--font-bold)",
-                color: "var(--gold)",
+                color: "var(--accent)",
                 textTransform: "uppercase",
                 letterSpacing: "0.07em",
                 margin: 0,
@@ -100,7 +100,7 @@ export default function Footer() {
                 borderBottom: "1px solid var(--border)",
               }}
             >
-              <Film size={16} color="var(--gold)" />
+              <Film size={16} color="var(--accent)" />
               <h3
                 style={{
                   fontSize: "var(--text-base)",
@@ -141,11 +141,11 @@ export default function Footer() {
                   color: "var(--text-tertiary)",
                 }}
               >
-                <Mail size={13} color="var(--gold)" />
+                <Mail size={13} color="var(--accent)" />
                 <a
                   href="mailto:devajuice@zohomail.in"
                   style={{
-                    color: "var(--gold)",
+                    color: "var(--accent)",
                     textDecoration: "none",
                     fontWeight: "var(--font-semibold)",
                   }}
@@ -168,7 +168,7 @@ export default function Footer() {
                 borderBottom: "1px solid var(--border)",
               }}
             >
-              <Tv size={16} color="var(--gold)" />
+              <Tv size={16} color="var(--accent)" />
               <h3
                 style={{
                   fontSize: "var(--text-base)",
@@ -235,7 +235,7 @@ export default function Footer() {
                 borderBottom: "1px solid var(--border)",
               }}
             >
-              <Shield size={16} color="var(--gold)" />
+              <Shield size={16} color="var(--accent)" />
               <h3
                 style={{
                   fontSize: "var(--text-base)",
@@ -332,12 +332,12 @@ export default function Footer() {
               color: "var(--text-muted)",
             }}
           >
-            Made with <Heart size={13} color="var(--accent)" /> by Flixet Team
+            Made with <Heart size={13} color="var(--accent)" fill="var(--accent)" /> by Flixet Team
           </div>
           <div
             style={{
-              background: "rgba(255,255,255,0.02)",
-              border: "1px solid var(--border)",
+              background: "rgba(59, 130, 246, 0.04)",
+              border: "1px solid rgba(59, 130, 246, 0.1)",
               borderRadius: "var(--radius-lg)",
               padding: "16px 24px",
               display: "flex",
@@ -350,7 +350,7 @@ export default function Footer() {
             <p
               style={{
                 fontSize: 10,
-                color: "var(--text-muted)",
+                color: "var(--accent)",
                 textTransform: "uppercase",
                 letterSpacing: "0.09em",
                 fontWeight: "var(--font-semibold)",
@@ -367,7 +367,7 @@ export default function Footer() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
-                color: "var(--gold)",
+                color: "var(--accent)",
                 textDecoration: "none",
                 fontWeight: "var(--font-bold)",
                 fontSize: "var(--text-sm)",

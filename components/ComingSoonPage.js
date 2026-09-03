@@ -134,7 +134,6 @@ export default function ComingSoonPage({ type, CardComponent }) {
         .cs-page {
           padding: 20px;
           padding-bottom: 100px;
-          font-family: "DM Sans", sans-serif;
         }
 
         /* ── Header ───────────────────────────────── */
@@ -149,7 +148,6 @@ export default function ComingSoonPage({ type, CardComponent }) {
           opacity: 0.9;
         }
         .cs-title {
-          font-family: "DM Sans", sans-serif;
           font-size: 38px;
           font-weight: 800;
           letter-spacing: -0.03em;
@@ -157,10 +155,9 @@ export default function ComingSoonPage({ type, CardComponent }) {
           color: rgba(255, 255, 255, 0.95);
         }
         .cs-title span {
-          color: #ffc13c;
+          color: var(--accent);
         }
         .cs-subtitle {
-          font-family: "DM Sans", sans-serif;
           font-size: 15px;
           font-weight: 400;
           color: rgba(255, 255, 255, 0.38);
@@ -183,14 +180,13 @@ export default function ComingSoonPage({ type, CardComponent }) {
           background: rgba(255, 255, 255, 0.04);
           border: 1px solid rgba(255, 255, 255, 0.07);
           border-radius: 50px;
-          font-family: "DM Sans", sans-serif;
           font-size: 12px;
           font-weight: 500;
           color: rgba(255, 255, 255, 0.5);
           letter-spacing: 0.02em;
         }
         .cs-stat-chip strong {
-          color: #ffc13c;
+          color: var(--accent);
           font-weight: 700;
         }
 
@@ -248,14 +244,12 @@ export default function ComingSoonPage({ type, CardComponent }) {
           border-radius: 16px;
         }
         .cs-empty h2 {
-          font-family: "DM Sans", sans-serif;
           font-size: 18px;
           font-weight: 700;
           color: rgba(255, 255, 255, 0.88);
           margin: 0;
         }
         .cs-empty p {
-          font-family: "DM Sans", sans-serif;
           font-size: 14px;
           color: rgba(255, 255, 255, 0.35);
           margin: 0;
@@ -265,19 +259,20 @@ export default function ComingSoonPage({ type, CardComponent }) {
           align-items: center;
           gap: 7px;
           padding: 11px 24px;
-          background: #ffc13c;
-          color: #0d0d0f;
+          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          color: #ffffff;
           border: none;
-          border-radius: 8px;
-          font-family: "DM Sans", sans-serif;
+          border-radius: 10px;
           font-size: 13px;
           font-weight: 700;
           cursor: pointer;
           letter-spacing: 0.01em;
-          transition: opacity 0.2s ease;
+          box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+          transition: all 0.2s ease;
         }
         .cs-browse-btn:hover {
-          opacity: 0.88;
+          background: linear-gradient(135deg, #3b82f6, #60a5fa);
+          box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
         }
 
         /* ── Observer zone ────────────────────────── */
@@ -297,13 +292,12 @@ export default function ComingSoonPage({ type, CardComponent }) {
         .cs-spinner-sm {
           width: 30px;
           height: 30px;
-          border: 3px solid rgba(255, 193, 60, 0.12);
-          border-top-color: #ffc13c;
+          border: 3px solid rgba(59, 130, 246, 0.12);
+          border-top-color: #3b82f6;
           border-radius: 50%;
           animation: spin 0.9s linear infinite;
         }
         .cs-loading-more p {
-          font-family: "DM Sans", sans-serif;
           font-size: 13px;
           color: rgba(255, 255, 255, 0.35);
           margin: 0;
@@ -315,7 +309,6 @@ export default function ComingSoonPage({ type, CardComponent }) {
           gap: 10px;
         }
         .cs-end-message p {
-          font-family: "DM Sans", sans-serif;
           font-size: 13px;
           font-weight: 500;
           color: rgba(255, 255, 255, 0.3);
@@ -328,21 +321,22 @@ export default function ComingSoonPage({ type, CardComponent }) {
           gap: 7px;
           padding: 9px 20px;
           background: transparent;
-          color: #ffc13c;
-          border: 1px solid rgba(255, 193, 60, 0.35);
-          border-radius: 8px;
-          font-family: "DM Sans", sans-serif;
+          color: var(--accent);
+          border: 1px solid var(--accent-border);
+          border-radius: 10px;
           font-size: 13px;
           font-weight: 600;
           cursor: pointer;
           letter-spacing: 0.01em;
           transition:
             background 0.2s ease,
-            border-color 0.2s ease;
+            border-color 0.2s ease,
+            color 0.2s ease;
         }
         .cs-end-link-btn:hover {
-          background: rgba(255, 193, 60, 0.08);
-          border-color: rgba(255, 193, 60, 0.6);
+          background: var(--accent-subtle);
+          border-color: var(--accent);
+          color: var(--accent-hover);
         }
       `}</style>
 
@@ -360,7 +354,7 @@ export default function ComingSoonPage({ type, CardComponent }) {
           transition={{ duration: 0.5 }}
         >
           <div className="cs-header-icon">
-            <Icon size={28} color="#ffc13c" />
+            <Icon size={28} color="#3b82f6" />
           </div>
           <h1 className="cs-title">
             {isMovie ? (
@@ -389,21 +383,21 @@ export default function ComingSoonPage({ type, CardComponent }) {
             transition={{ delay: 0.2 }}
           >
             <div className="cs-stat-chip">
-              <TrendingUp size={13} color="#ffc13c" />
+              <TrendingUp size={13} color="#3b82f6" />
               <strong>{totalResults.toLocaleString()}</strong>
               {isMovie ? " movies" : " TV shows"}
             </div>
 
             {isMovie && dateRange.start && dateRange.end && (
               <div className="cs-stat-chip">
-                <Calendar size={13} color="#ffc13c" />
+                <Calendar size={13} color="#3b82f6" />
                 {formatDate(dateRange.start)} – {formatDate(dateRange.end)}
               </div>
             )}
 
             {!isMovie && (
               <div className="cs-stat-chip">
-                <Sparkles size={13} color="#ffc13c" />
+                <Sparkles size={13} color="#3b82f6" />
                 Active &amp; releasing now
               </div>
             )}
@@ -468,7 +462,7 @@ export default function ComingSoonPage({ type, CardComponent }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
-                  <Sparkles size={18} color="#ffc13c" />
+                  <Sparkles size={18} color="#3b82f6" />
                   <p>
                     You&apos;ve explored all {items.length}{" "}
                     {isMovie ? "movies" : "shows"}!
@@ -497,13 +491,12 @@ const loadingStyles = {
     justifyContent: "center",
     minHeight: "60vh",
     gap: "18px",
-    fontFamily: "'DM Sans', sans-serif",
   },
   spinner: {
     width: "44px",
     height: "44px",
-    border: "4px solid rgba(255,193,60,0.1)",
-    borderTopColor: "#ffc13c",
+    border: "4px solid rgba(59, 130, 246, 0.1)",
+    borderTopColor: "#3b82f6",
     borderRadius: "50%",
     animation: "spin 0.9s linear infinite",
   },

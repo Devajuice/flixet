@@ -19,7 +19,6 @@ export default function DMCAPage() {
           max-width: 1000px;
           margin: 0 auto;
           padding: 40px 20px 100px;
-          font-family: 'DM Sans', sans-serif;
         }
 
         /* ── Header ────────────────────────────────────── */
@@ -29,7 +28,6 @@ export default function DMCAPage() {
         }
 
         .dmca-title {
-          font-family: 'DM Sans', sans-serif;
           font-size: 42px;
           font-weight: 900;
           margin-bottom: 16px;
@@ -42,12 +40,11 @@ export default function DMCAPage() {
         }
 
         .dmca-title svg {
-          color: #ffc13c;
+          color: var(--accent);
           flex-shrink: 0;
         }
 
         .dmca-subtitle {
-          font-family: 'DM Sans', sans-serif;
           font-size: 14px;
           color: rgba(255, 255, 255, 0.38);
           max-width: 680px;
@@ -59,7 +56,7 @@ export default function DMCAPage() {
         .dmca-notice-box {
           background: rgba(255, 255, 255, 0.02);
           border: 1px solid rgba(255, 255, 255, 0.07);
-          border-left: 3px solid #ffc13c;
+          border-left: 3px solid var(--accent);
           border-radius: 12px;
           padding: 20px 22px;
           margin-bottom: 24px;
@@ -69,13 +66,12 @@ export default function DMCAPage() {
         }
 
         .dmca-notice-box svg {
-          color: #ffc13c;
+          color: var(--accent);
           flex-shrink: 0;
           margin-top: 1px;
         }
 
         .dmca-notice-box p {
-          font-family: 'DM Sans', sans-serif;
           font-size: 13px;
           line-height: 1.85;
           color: rgba(255, 255, 255, 0.38);
@@ -83,7 +79,7 @@ export default function DMCAPage() {
         }
 
         .dmca-notice-box strong {
-          color: #ffc13c;
+          color: var(--accent);
           font-weight: 700;
         }
 
@@ -99,7 +95,7 @@ export default function DMCAPage() {
         }
 
         .dmca-section:hover {
-          border-color: rgba(255, 193, 60, 0.1);
+          border-color: rgba(59, 130, 246, 0.2);
         }
 
         .dmca-section-header {
@@ -112,12 +108,11 @@ export default function DMCAPage() {
         }
 
         .dmca-section-header svg {
-          color: #ffc13c;
+          color: var(--accent);
           flex-shrink: 0;
         }
 
         .dmca-section-title {
-          font-family: 'DM Sans', sans-serif;
           font-size: 16px;
           font-weight: 700;
           color: rgba(255, 255, 255, 0.88);
@@ -127,7 +122,6 @@ export default function DMCAPage() {
 
         /* ── Body text ─────────────────────────────────── */
         .dmca-text {
-          font-family: 'DM Sans', sans-serif;
           font-size: 13px;
           line-height: 1.85;
           color: rgba(255, 255, 255, 0.38);
@@ -148,7 +142,6 @@ export default function DMCAPage() {
         .dmca-list li {
           padding: 10px 0 10px 20px;
           position: relative;
-          font-family: 'DM Sans', sans-serif;
           font-size: 13px;
           color: rgba(255, 255, 255, 0.38);
           line-height: 1.7;
@@ -168,7 +161,7 @@ export default function DMCAPage() {
           width: 4px;
           height: 4px;
           border-radius: 50%;
-          background: rgba(255, 193, 60, 0.4);
+          background: var(--accent);
         }
 
         /* ── Steps grid ────────────────────────────────── */
@@ -189,27 +182,25 @@ export default function DMCAPage() {
         }
 
         .dmca-step-card:hover {
-          border-color: rgba(255, 193, 60, 0.15);
+          border-color: rgba(59, 130, 246, 0.25);
         }
 
         .dmca-step-number {
           width: 34px;
           height: 34px;
-          background: rgba(255, 193, 60, 0.1);
-          border: 1px solid rgba(255, 193, 60, 0.25);
+          background: var(--accent-subtle);
+          border: 1px solid var(--accent-border);
           border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-family: 'DM Sans', sans-serif;
           font-weight: 800;
           font-size: 14px;
-          color: #ffc13c;
+          color: var(--accent);
           margin: 0 auto 12px;
         }
 
         .dmca-step-card p {
-          font-family: 'DM Sans', sans-serif;
           font-size: 13px;
           color: rgba(255, 255, 255, 0.38);
           line-height: 1.7;
@@ -218,8 +209,8 @@ export default function DMCAPage() {
 
         /* ── Contact card ──────────────────────────────── */
         .dmca-contact-card {
-          background: rgba(255, 193, 60, 0.04);
-          border: 1px solid rgba(255, 193, 60, 0.15);
+          background: var(--accent-subtle);
+          border: 1px solid var(--accent-border);
           border-radius: 10px;
           padding: 18px 20px;
           margin-top: 14px;
@@ -232,12 +223,11 @@ export default function DMCAPage() {
           display: flex;
           align-items: center;
           gap: 10px;
-          font-family: 'DM Sans', sans-serif;
           font-size: 13px;
         }
 
         .dmca-contact-item svg {
-          color: #ffc13c;
+          color: var(--accent);
           flex-shrink: 0;
         }
 
@@ -247,7 +237,7 @@ export default function DMCAPage() {
         }
 
         .dmca-contact-value {
-          color: #ffc13c;
+          color: var(--accent);
           font-weight: 700;
         }
 

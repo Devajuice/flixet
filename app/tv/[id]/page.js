@@ -140,9 +140,12 @@ function InfoCard({ icon, label, value }) {
         alignItems: "center",
         gap: 12,
         padding: "14px 16px",
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid var(--border)",
+        background: "rgba(17, 24, 39, 0.6)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        border: "1px solid rgba(255, 255, 255, 0.06)",
         borderRadius: "var(--radius-lg)",
+        transition: "all var(--transition-base)",
       }}
     >
       <div style={{ color: "var(--accent)", flexShrink: 0 }}>{icon}</div>
@@ -193,12 +196,13 @@ function CastCard({ actor }) {
           cursor: "pointer",
           borderRadius: "var(--radius-lg)",
           overflow: "hidden",
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid var(--border)",
+          background: "rgba(17, 24, 39, 0.5)",
+          border: hovered ? "1px solid var(--accent-border)" : "1px solid rgba(255, 255, 255, 0.06)",
           padding: 8,
           textAlign: "center",
           transition: "all var(--transition-base)",
           transform: hovered ? "translateY(-4px)" : "none",
+          boxShadow: hovered ? "0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(59, 130, 246, 0.15)" : "none",
         }}
       >
         <div
@@ -765,7 +769,7 @@ function TVShowDetailsContent({ params }) {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to top, var(--bg) 0%, rgba(10,10,10,0.6) 50%, rgba(10,10,10,0.3) 100%)",
+              "linear-gradient(to top, var(--bg) 0%, rgba(11, 15, 26, 0.7) 40%, rgba(11, 15, 26, 0.4) 100%)",
           }}
         />
       </div>
@@ -793,7 +797,7 @@ function TVShowDetailsContent({ params }) {
                   sizes="(max-width: 768px) 260px, 500px"
                   style={{
                     borderRadius: "var(--radius-xl)",
-                    boxShadow: "var(--shadow-xl)",
+                    boxShadow: "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(59, 130, 246, 0.15)",
                     display: "block",
                   }}
                 />
@@ -1556,9 +1560,10 @@ function TVShowDetailsContent({ params }) {
           min-height: 36px;
         }
         .season-btn.active {
-          background: var(--accent);
+          background: linear-gradient(135deg, #2563eb, #3b82f6);
           border-color: var(--accent);
           color: #fff;
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
         .season-count {
           opacity: 0.5;
@@ -1572,7 +1577,7 @@ function TVShowDetailsContent({ params }) {
           padding: 16px;
           border-radius: var(--radius-lg);
           cursor: pointer;
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(17, 24, 39, 0.4);
           border: 1px solid rgba(255, 255, 255, 0.06);
           transition: all 0.2s ease;
           align-items: flex-start;
@@ -1580,9 +1585,14 @@ function TVShowDetailsContent({ params }) {
           max-width: 100%;
           overflow: hidden;
         }
+        .episode-card:hover {
+          background: rgba(30, 41, 59, 0.5);
+          border-color: rgba(255, 255, 255, 0.1);
+        }
         .episode-card.active {
-          background: var(--accent-subtle);
-          border-color: var(--accent-border);
+          background: rgba(59, 130, 246, 0.08);
+          border-color: rgba(59, 130, 246, 0.3);
+          box-shadow: 0 0 16px rgba(59, 130, 246, 0.1);
         }
         .episode-card.future {
           cursor: default;

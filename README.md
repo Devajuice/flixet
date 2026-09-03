@@ -11,7 +11,9 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 📚 **Personal Watchlist** - Save your favorite content to watch later
 - 🔄 **Multiple Servers** - Switch between streaming sources if one doesn't work
 - 📺 **TV Show Support** - Full season and episode selection with OMDB ratings
-- 🎨 **Modern UI** - Beautiful dark interface with Netflix-style red accent design system
+- 🎨 **Modern UI** - Bold, Disney+-inspired dark navy interface with a blue accent design system
+- 🏠 **Cinematic Home** - Auto-rotating hero carousel, genre card grid, and editor's spotlight section
+- 🗂️ **Rich Browse Pages** - Movies and TV share a redesigned catalog page with a genre rail, inline sort dropdown, and slide-in filter drawer
 - ⚡ **Fast Performance** - Built with Next.js 16 with Turbopack
 - 🎯 **Advanced Filters** - Filter by genre, year, rating, and more
 - 🚀 **Coming Soon** - Dedicated pages for upcoming movies and airing TV shows
@@ -46,6 +48,7 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - [x] ~~Recently Viewed~~
 - [x] ~~Share Buttons~~
 - [x] ~~Real Progress Tracking~~
+- [x] ~~Visual Redesign (blue theme, home + navbar + browse pages)~~
 
 ## 🛠️ Tech Stack
 
@@ -128,11 +131,12 @@ Flixet/
 │   ├── globals.css           # Global styles, design tokens, media queries
 │   └── layout.js             # Root layout
 ├── components/
-│   ├── Header.js             # Responsive navigation header
+│   ├── Header.js             # Responsive nav header (active-link highlight, scroll-compact)
 │   ├── Footer.js             # Footer with links and disclaimer
 │   ├── SearchBar.js          # Search input with dropdown (debounced)
-│   ├── ScrollRow.js          # Horizontal scrollable row (mobile padding)
+│   ├── ScrollRow.js          # Horizontal scrollable row (inline section header)
 │   ├── MediaCard.js          # Universal media card (Next.js Image)
+│   ├── CatalogPage.js        # Shared Movies/TV browse template (genre rail, sort, filter drawer)
 │   ├── CastSection.js        # Cast display component
 │   ├── VideoPlayer.js        # Embedded video player with server switching
 │   ├── WatchlistButton.js    # Add/remove watchlist button
@@ -181,7 +185,7 @@ Flixet/
 ### Streaming
 
 - **Multiple Sources**: Automatically embeds content from reliable third-party sources
-- **Default Player**: VidCore with a Netflix-style UI and red theme, switchable at any time
+- **Default Player**: VidCore with a blue-themed UI, switchable at any time
 - **Server Switching**: If one server has issues, try another (VidCore, VidLink, VidSrc, 2embed)
 - **HD Quality**: Most content available in high definition
 
@@ -195,6 +199,16 @@ Flixet/
 
 - **Sort Modes**: Toggle between Top Rated (`vote_average.desc`) and Trending (`popularity.desc`)
 - **Quick Access**: Switch sorts from the header dropdown or the mobile menu
+
+### Visual Redesign
+
+Full UI overhaul in a Bold / Disney+ inspired direction (dark navy base with a blue accent):
+
+- **Blue design system**: Accent moved from Netflix red (#e50914) to blue (#3b82f6), Plus Jakarta Sans replaces Inter, and blue glow/gradient shadows unify every page, card, player, spinner, and empty state.
+- **Cinematic home page**: Auto-rotating hero carousel with a glowing accent bar, pill meta badges, and numbered/glowing dot navigation; a "Browse by Genre" card grid; and a new "Editor's Spotlight" editorial section.
+- **Navbar**: Transparent gradient at the top of the page that compacts into a glassy bar on scroll, plus active-route highlighting (blue pill + glowing underline).
+- **Shared browse template** (`CatalogPage.js`): Movies and TV now render from one component — always-visible genre pill rail, a custom sort dropdown, a slide-in filter drawer, animated grid transitions, and rich empty/end states.
+- **Player re-theme**: Embedded player URL params updated to match the blue accent.
 
 ### Recently Viewed
 
@@ -333,14 +347,14 @@ Built this while learning:
 Flixet uses a consistent design system defined in `app/globals.css`:
 
 ### Color Tokens
-- `--bg`, `--bg-secondary`, `--bg-tertiary`, `--bg-elevated` - Dark theme backgrounds
+- `--bg`, `--bg-secondary`, `--bg-tertiary`, `--bg-elevated` - Dark navy theme backgrounds
 - `--text-primary`, `--text-secondary`, `--text-tertiary`, `--text-muted` - Text hierarchy
-- `--accent` (#e50914), `--accent-hover` - Primary accent (Netflix-style red)
+- `--accent` (#3b82f6), `--accent-hover` (#60a5fa) - Primary blue accent
 - `--gold` (#f5c518), `--gold-subtle`, `--gold-border` - IMDB-style ratings
 - `--border`, `--border-hover` - Border colors
 
 ### Typography
-- Font: Inter (300–900 weights)
+- Font: Plus Jakarta Sans (300–900 weights)
 - Scale: `--text-xs` (0.75rem) → `--text-4xl` (2.25rem)
 - Weights: `--font-light` through `--font-extrabold`
 

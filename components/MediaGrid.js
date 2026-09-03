@@ -72,7 +72,6 @@ const styles = {
     textAlign: "center",
     padding: "40px",
     color: "var(--text-secondary)",
-    fontFamily: "'DM Sans', sans-serif",
     fontSize: "14px",
   },
 };

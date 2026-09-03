@@ -27,6 +27,7 @@ export default function Header() {
   const [showTVMenu, setShowTVMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [dropdownPositions, setDropdownPositions] = useState({
     movies: { left: 0, top: 0 },
     tv: { left: 0, top: 0 },
@@ -40,6 +41,22 @@ export default function Header() {
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 12);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const [prevPathname, setPrevPathname] = useState(pathname);
@@ -120,6 +137,16 @@ export default function Header() {
     { href: "/watchlist", label: "Watchlist", icon: Bookmark },
   ];
 
+  const isActive = (href) => {
+    if (href === "/") return pathname === "/";
+    if (href === "/movies")
+      return pathname === "/movies" || pathname.startsWith("/movie/");
+    if (href === "/tv") return pathname === "/tv" || pathname.startsWith("/tv/");
+    if (href === "/anime") return pathname === "/anime";
+    if (href === "/watchlist") return pathname === "/watchlist";
+    return pathname === href;
+  };
+
   return (
     <>
       <motion.header
@@ -127,15 +154,30 @@ export default function Header() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
         style={{
-          background: "rgba(10,10,10,0.92)",
-          borderBottom: "1px solid var(--border)",
+          background: scrolled
+            ? "rgba(11, 15, 26, 0.92)"
+            : "linear-gradient(to bottom, rgba(11,15,26,0.7) 0%, rgba(11,15,26,0.25) 100%)",
+          borderBottom: scrolled
+            ? "1px solid rgba(255, 255, 255, 0.08)"
+            : "1px solid transparent",
+          boxShadow: scrolled ? "0 8px 32px rgba(0,0,0,0.45)" : "none",
           position: "sticky",
           top: 0,
           zIndex: 1000,
-          backdropFilter: "blur(20px)",
+          backdropFilter: "blur(24px) saturate(1.8)",
+          WebkitBackdropFilter: "blur(24px) saturate(1.8)",
+          transition: "background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
         }}
       >
-        <div className="header-inner">
+        <div
+          className="header-inner"
+          style={{
+            height: scrolled
+              ? "calc(var(--header-height) - 8px)"
+              : "var(--header-height)",
+            transition: "height 0.3s ease",
+          }}
+        >
           <Link href="/" className="header-logo">
             <div className="header-logo-icon">
               <Film size={18} fill="white" color="white" strokeWidth={0} />
@@ -147,13 +189,14 @@ export default function Header() {
             <>
               <nav className="header-nav">
                 {navLinks.map((link) => {
+                  const active = isActive(link.href);
                   if (link.dropdown) {
                     return (
                       <Link
                         key={link.href}
                         href={link.href}
                         ref={link.ref}
-                        className="nav-link"
+                        className={`nav-link${active ? " nav-link--active" : ""}`}
                         onMouseEnter={() =>
                           link.dropdown === "movies"
                             ? setShowMoviesMenu(true)
@@ -170,7 +213,11 @@ export default function Header() {
                     );
                   }
                   return (
-                    <Link key={link.href} href={link.href} className="nav-link">
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`nav-link${active ? " nav-link--active" : ""}`}
+                    >
                       {link.label}
                     </Link>
                   );
@@ -236,10 +283,11 @@ export default function Header() {
           width: 34px;
           height: 34px;
           border-radius: var(--radius-lg);
-          background: var(--accent);
+          background: linear-gradient(135deg, #2563eb, #3b82f6);
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
         .header-logo span {
           font-size: var(--text-xl);
@@ -251,6 +299,24 @@ export default function Header() {
           display: flex;
           align-items: center;
           gap: 2px;
+        }
+        .nav-link {
+          position: relative;
+        }
+        .nav-link--active {
+          color: var(--accent) !important;
+          background: var(--accent-subtle);
+        }
+        .nav-link--active::after {
+          content: "";
+          position: absolute;
+          left: 14px;
+          right: 14px;
+          bottom: 6px;
+          height: 2px;
+          border-radius: 2px;
+          background: linear-gradient(90deg, #2563eb, #60a5fa);
+          box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
         }
         .header-search {
           position: relative;
@@ -348,22 +414,24 @@ export default function Header() {
               >
                 <div
                   style={{
-                    background: "var(--bg-elevated)",
-                    border: "1px solid var(--border)",
+                    background: "rgba(17, 24, 39, 0.85)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255, 255, 255, 0.06)",
                     borderTop: "2px solid var(--accent)",
                     borderRadius: "var(--radius-xl)",
                     padding: 16,
                     minWidth: 210,
                     maxHeight: 380,
                     overflowY: "auto",
-                    boxShadow: "var(--shadow-xl)",
+                    boxShadow: "0 24px 64px rgba(0, 0, 0, 0.6), 0 0 24px rgba(59, 130, 246, 0.1)",
                   }}
                 >
                   <p
                     style={{
                       fontSize: 10,
                       fontWeight: "var(--font-bold)",
-                      color: "var(--text-tertiary)",
+                      color: "var(--accent)",
                       marginBottom: 10,
                       textTransform: "uppercase",
                       letterSpacing: "0.09em",
@@ -380,8 +448,8 @@ export default function Header() {
                     style={{
                       display: "block",
                       padding: "8px 12px",
-                      background: "rgba(229,9,20,0.08)",
-                      border: "1px solid rgba(229,9,20,0.2)",
+                      background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(96, 165, 250, 0.08))",
+                      border: "1px solid rgba(59, 130, 246, 0.25)",
                       borderRadius: "var(--radius-lg)",
                       fontSize: "var(--text-sm)",
                       fontWeight: "var(--font-bold)",
@@ -434,22 +502,24 @@ export default function Header() {
               >
                 <div
                   style={{
-                    background: "var(--bg-elevated)",
-                    border: "1px solid var(--border)",
+                    background: "rgba(17, 24, 39, 0.85)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255, 255, 255, 0.06)",
                     borderTop: "2px solid var(--accent)",
                     borderRadius: "var(--radius-xl)",
                     padding: 16,
                     minWidth: 210,
                     maxHeight: 380,
                     overflowY: "auto",
-                    boxShadow: "var(--shadow-xl)",
+                    boxShadow: "0 24px 64px rgba(0, 0, 0, 0.6), 0 0 24px rgba(59, 130, 246, 0.1)",
                   }}
                 >
                   <p
                     style={{
                       fontSize: 10,
                       fontWeight: "var(--font-bold)",
-                      color: "var(--text-tertiary)",
+                      color: "var(--accent)",
                       marginBottom: 10,
                       textTransform: "uppercase",
                       letterSpacing: "0.09em",
@@ -509,8 +579,8 @@ export default function Header() {
                     style={{
                       display: "block",
                       padding: "8px 12px",
-                      background: "rgba(229,9,20,0.08)",
-                      border: "1px solid rgba(229,9,20,0.2)",
+                      background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(96, 165, 250, 0.08))",
+                      border: "1px solid rgba(59, 130, 246, 0.25)",
                       borderRadius: "var(--radius-lg)",
                       fontSize: "var(--text-sm)",
                       fontWeight: "var(--font-bold)",
@@ -565,9 +635,9 @@ export default function Header() {
             style={{
               position: "fixed",
               inset: 0,
-              background: "rgba(0,0,0,0.97)",
+              background: "rgba(11, 15, 26, 0.97)",
               zIndex: 99999,
-              backdropFilter: "blur(12px)",
+              backdropFilter: "blur(16px)",
               display: "flex",
               flexDirection: "column",
             }}
@@ -595,8 +665,8 @@ export default function Header() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "rgba(229,9,20,0.1)",
-                  border: "1px solid rgba(229,9,20,0.3)",
+                  background: "rgba(59, 130, 246, 0.1)",
+                  border: "1px solid rgba(59, 130, 246, 0.25)",
                   borderRadius: "50%",
                   color: "var(--accent)",
                   cursor: "pointer",
@@ -699,11 +769,13 @@ export default function Header() {
                 bottom: 0,
                 width: "85%",
                 maxWidth: 340,
-                background: "var(--bg)",
+                background: "rgba(11, 15, 26, 0.98)",
                 zIndex: 99999,
                 overflowY: "auto",
-                boxShadow: "-4px 0 40px rgba(0,0,0,0.8)",
-                borderLeft: "1px solid var(--border)",
+                boxShadow: "-8px 0 48px rgba(0, 0, 0, 0.8)",
+                borderLeft: "1px solid rgba(255, 255, 255, 0.06)",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)",
               }}
             >
               <div
@@ -735,8 +807,8 @@ export default function Header() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: "rgba(229,9,20,0.1)",
-                    border: "1px solid rgba(229,9,20,0.2)",
+                    background: "rgba(59, 130, 246, 0.1)",
+                    border: "1px solid rgba(59, 130, 246, 0.2)",
                     borderRadius: "50%",
                     color: "var(--accent)",
                     cursor: "pointer",
