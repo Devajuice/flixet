@@ -13,7 +13,6 @@ import {
   Bookmark,
   Menu,
   X,
-  TrendingUp,
   ArrowLeft,
 } from "lucide-react";
 import SearchBar from "./SearchBar";
@@ -149,34 +148,45 @@ export default function Header() {
 
   return (
     <>
-      <motion.header
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.45, ease: "easeOut" }}
+      <div
         style={{
-          background: scrolled
-            ? "rgba(11, 15, 26, 0.92)"
-            : "linear-gradient(to bottom, rgba(11,15,26,0.7) 0%, rgba(11,15,26,0.25) 100%)",
-          borderBottom: scrolled
-            ? "1px solid rgba(255, 255, 255, 0.08)"
-            : "1px solid transparent",
-          boxShadow: scrolled ? "0 8px 32px rgba(0,0,0,0.45)" : "none",
-          position: "sticky",
-          top: 0,
+          position: "fixed",
+          top: 16,
+          left: 0,
+          right: 0,
           zIndex: 1000,
-          backdropFilter: "blur(24px) saturate(1.8)",
-          WebkitBackdropFilter: "blur(24px) saturate(1.8)",
-          transition: "background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
+          display: "flex",
+          justifyContent: "center",
+          padding: "0 24px",
+          pointerEvents: "none",
         }}
       >
+        <motion.header
+          initial={{ y: -80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          style={{
+            background: scrolled
+              ? "rgba(0, 0, 0, 0.92)"
+              : "rgba(0, 0, 0, 0.6)",
+            border: scrolled
+              ? "1px solid rgba(255, 255, 255, 0.1)"
+              : "1px solid rgba(255, 255, 255, 0.06)",
+            boxShadow: scrolled
+              ? "0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05)"
+              : "0 4px 16px rgba(0, 0, 0, 0.3)",
+            width: "100%",
+            maxWidth: 1200,
+            zIndex: 1000,
+            borderRadius: "var(--radius-full)",
+            backdropFilter: "blur(24px) saturate(1.8)",
+            WebkitBackdropFilter: "blur(24px) saturate(1.8)",
+            transition: "background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
+            pointerEvents: "auto",
+          }}
+        >
         <div
           className="header-inner"
-          style={{
-            height: scrolled
-              ? "calc(var(--header-height) - 8px)"
-              : "var(--header-height)",
-            transition: "height 0.3s ease",
-          }}
         >
           <Link href="/" className="header-logo">
             <div className="header-logo-icon">
@@ -260,10 +270,11 @@ export default function Header() {
           )}
         </div>
       </motion.header>
+      </div>
 
       <style jsx global>{`
         .header-inner {
-          max-width: 1400px;
+          max-width: 1200px;
           margin: 0 auto;
           padding: 0 var(--container-padding);
           height: var(--header-height);
@@ -283,11 +294,11 @@ export default function Header() {
           width: 34px;
           height: 34px;
           border-radius: var(--radius-lg);
-          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          background: linear-gradient(135deg, #d97706, #f59e0b);
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
         .header-logo span {
           font-size: var(--text-xl);
@@ -315,8 +326,8 @@ export default function Header() {
           bottom: 6px;
           height: 2px;
           border-radius: 2px;
-          background: linear-gradient(90deg, #2563eb, #60a5fa);
-          box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+          background: linear-gradient(90deg, #d97706, #fbbf24);
+          box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
         }
         .header-search {
           position: relative;
@@ -414,7 +425,7 @@ export default function Header() {
               >
                 <div
                   style={{
-                    background: "rgba(17, 24, 39, 0.85)",
+                    background: "rgba(10, 10, 10, 0.9)",
                     backdropFilter: "blur(20px)",
                     WebkitBackdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.06)",
@@ -424,7 +435,7 @@ export default function Header() {
                     minWidth: 210,
                     maxHeight: 380,
                     overflowY: "auto",
-                    boxShadow: "0 24px 64px rgba(0, 0, 0, 0.6), 0 0 24px rgba(59, 130, 246, 0.1)",
+                    boxShadow: "0 24px 64px rgba(0, 0, 0, 0.6), 0 0 24px rgba(245, 158, 11, 0.1)",
                   }}
                 >
                   <p
@@ -448,8 +459,8 @@ export default function Header() {
                     style={{
                       display: "block",
                       padding: "8px 12px",
-                      background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(96, 165, 250, 0.08))",
-                      border: "1px solid rgba(59, 130, 246, 0.25)",
+                      background: "linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.08))",
+                      border: "1px solid rgba(245, 158, 11, 0.25)",
                       borderRadius: "var(--radius-lg)",
                       fontSize: "var(--text-sm)",
                       fontWeight: "var(--font-bold)",
@@ -502,7 +513,7 @@ export default function Header() {
               >
                 <div
                   style={{
-                    background: "rgba(17, 24, 39, 0.85)",
+                    background: "rgba(10, 10, 10, 0.9)",
                     backdropFilter: "blur(20px)",
                     WebkitBackdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.06)",
@@ -512,7 +523,7 @@ export default function Header() {
                     minWidth: 210,
                     maxHeight: 380,
                     overflowY: "auto",
-                    boxShadow: "0 24px 64px rgba(0, 0, 0, 0.6), 0 0 24px rgba(59, 130, 246, 0.1)",
+                    boxShadow: "0 24px 64px rgba(0, 0, 0, 0.6), 0 0 24px rgba(245, 158, 11, 0.1)",
                   }}
                 >
                   <p
@@ -579,8 +590,8 @@ export default function Header() {
                     style={{
                       display: "block",
                       padding: "8px 12px",
-                      background: "linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(96, 165, 250, 0.08))",
-                      border: "1px solid rgba(59, 130, 246, 0.25)",
+                      background: "linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.08))",
+                      border: "1px solid rgba(245, 158, 11, 0.25)",
                       borderRadius: "var(--radius-lg)",
                       fontSize: "var(--text-sm)",
                       fontWeight: "var(--font-bold)",
@@ -635,7 +646,7 @@ export default function Header() {
             style={{
               position: "fixed",
               inset: 0,
-              background: "rgba(11, 15, 26, 0.97)",
+              background: "rgba(0, 0, 0, 0.97)",
               zIndex: 99999,
               backdropFilter: "blur(16px)",
               display: "flex",
@@ -665,8 +676,8 @@ export default function Header() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "rgba(59, 130, 246, 0.1)",
-                  border: "1px solid rgba(59, 130, 246, 0.25)",
+                  background: "rgba(245, 158, 11, 0.1)",
+                  border: "1px solid rgba(245, 158, 11, 0.25)",
                   borderRadius: "50%",
                   color: "var(--accent)",
                   cursor: "pointer",
@@ -679,65 +690,11 @@ export default function Header() {
                 <SearchBar autoFocus />
               </div>
             </div>
-            <div
-              style={{ flex: 1, overflowY: "auto", padding: "24px 16px 30px" }}
-            >
-              <div style={{ marginBottom: 30 }}>
-                <p
-                  style={{
-                    fontSize: 10,
-                    fontWeight: "var(--font-bold)",
-                    color: "var(--accent)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.09em",
-                    marginBottom: 12,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
-                >
-                  <TrendingUp size={13} /> Trending Searches
-                </p>
-                {[
-                  "Deadpool & Wolverine",
-                  "Dune 2",
-                  "Oppenheimer",
-                  "The Last of Us",
-                ].map((item) => (
-                  <Link
-                    key={item}
-                    href={`/search?q=${encodeURIComponent(item)}`}
-                    onClick={() => {
-                      setShowMobileSearch(false);
-                      document.body.classList.remove("menu-open");
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "13px 14px",
-                      background: "rgba(255,255,255,0.02)",
-                      border: "1px solid var(--border)",
-                      borderRadius: "var(--radius-lg)",
-                      marginBottom: 6,
-                      cursor: "pointer",
-                      textDecoration: "none",
-                      color: "var(--text-secondary)",
-                      fontSize: "var(--text-sm)",
-                      fontWeight: "var(--font-medium)",
-                    }}
-                  >
-                    <SearchIcon size={16} opacity={0.5} />
-                    <span>{item}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Mobile drawer */}
+      {/* Mobile bottom sheet menu */}
       <AnimatePresence>
         {showMobileMenu && isMobile && (
           <>
@@ -752,45 +709,62 @@ export default function Header() {
               style={{
                 position: "fixed",
                 inset: 0,
-                background: "rgba(0,0,0,0.75)",
+                background: "rgba(0,0,0,0.7)",
                 zIndex: 99998,
                 backdropFilter: "blur(4px)",
               }}
             />
             <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 26, stiffness: 220 }}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
               style={{
                 position: "fixed",
-                top: 0,
+                left: 0,
                 right: 0,
                 bottom: 0,
-                width: "85%",
-                maxWidth: 340,
-                background: "rgba(11, 15, 26, 0.98)",
                 zIndex: 99999,
-                overflowY: "auto",
-                boxShadow: "-8px 0 48px rgba(0, 0, 0, 0.8)",
-                borderLeft: "1px solid rgba(255, 255, 255, 0.06)",
+                background: "rgba(0, 0, 0, 0.98)",
                 backdropFilter: "blur(24px)",
                 WebkitBackdropFilter: "blur(24px)",
+                borderTopLeftRadius: "var(--radius-2xl)",
+                borderTopRightRadius: "var(--radius-2xl)",
+                border: "1px solid rgba(255, 255, 255, 0.06)",
+                boxShadow: "0 -8px 48px rgba(0, 0, 0, 0.8)",
+                maxHeight: "82vh",
+                overflowY: "auto",
+                paddingBottom: 24,
               }}
             >
               <div
                 style={{
                   display: "flex",
+                  justifyContent: "center",
+                  padding: "10px 0 4px",
+                }}
+              >
+                <div
+                  style={{
+                    width: 44,
+                    height: 5,
+                    borderRadius: 3,
+                    background: "rgba(255,255,255,0.2)",
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  padding: 20,
-                  borderBottom: "1px solid var(--border)",
+                  padding: "8px 20px 12px",
                 }}
               >
                 <span
                   style={{
                     fontSize: "var(--text-lg)",
-                    fontWeight: "var(--font-bold)",
+                    fontWeight: "var(--font-extrabold)",
                   }}
                 >
                   Explore
@@ -807,8 +781,8 @@ export default function Header() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: "rgba(59, 130, 246, 0.1)",
-                    border: "1px solid rgba(59, 130, 246, 0.2)",
+                    background: "rgba(245, 158, 11, 0.1)",
+                    border: "1px solid rgba(245, 158, 11, 0.2)",
                     borderRadius: "50%",
                     color: "var(--accent)",
                     cursor: "pointer",
@@ -817,26 +791,62 @@ export default function Header() {
                   <X size={20} />
                 </button>
               </div>
-              <div style={{ padding: 20 }}>
-                <div style={{ marginBottom: 28 }}>
-                  <p
-                    style={{
-                      fontSize: 10,
-                      fontWeight: "var(--font-bold)",
-                      color: "var(--text-tertiary)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.09em",
-                      marginBottom: 10,
-                      paddingLeft: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                    }}
-                  >
-                    <TrendingUp size={11} /> Quick Access
-                  </p>
+
+              <div style={{ padding: "0 20px" }}>
+                {/* Main quick-access grid — big thumb-friendly tiles */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, 1fr)",
+                    gap: 10,
+                    marginBottom: 20,
+                  }}
+                >
+                  {[
+                    { href: "/", label: "Home", icon: Home },
+                    { href: "/movies", label: "Movies", icon: Film },
+                    { href: "/tv", label: "TV", icon: Tv },
+                    { href: "/anime", label: "Anime", icon: Sparkles },
+                  ].map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        document.body.classList.remove("menu-open");
+                      }}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "14px 4px",
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "var(--radius-xl)",
+                        color: item.href === "/" ? "var(--accent)" : "var(--text-secondary)",
+                        textDecoration: "none",
+                        fontSize: "var(--text-xs)",
+                        fontWeight: "var(--font-semibold)",
+                      }}
+                    >
+                      <item.icon size={22} strokeWidth={2} />
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Watchlist, Search, Random */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                    gap: 10,
+                    marginBottom: 20,
+                  }}
+                >
                   <Link
-                    href="/"
+                    href="/watchlist"
                     onClick={() => {
                       setShowMobileMenu(false);
                       document.body.classList.remove("menu-open");
@@ -844,15 +854,19 @@ export default function Header() {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: 12,
-                      padding: "11px 14px",
+                      justifyContent: "center",
+                      gap: 8,
+                      padding: "14px 12px",
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "var(--radius-xl)",
                       color: "var(--text-secondary)",
                       textDecoration: "none",
-                      borderRadius: "var(--radius-lg)",
-                      marginBottom: 2,
+                      fontSize: "var(--text-sm)",
+                      fontWeight: "var(--font-semibold)",
                     }}
                   >
-                    <Home size={18} /> Home
+                    <Bookmark size={18} /> Watchlist
                   </Link>
                   <button
                     onClick={() => {
@@ -863,264 +877,23 @@ export default function Header() {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: 12,
-                      padding: "11px 14px",
+                      justifyContent: "center",
+                      gap: 8,
+                      padding: "14px 12px",
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "var(--radius-xl)",
                       color: "var(--text-secondary)",
-                      borderRadius: "var(--radius-lg)",
-                      marginBottom: 2,
-                      background: "transparent",
-                      border: "none",
-                      width: "100%",
+                      fontSize: "var(--text-sm)",
+                      fontWeight: "var(--font-semibold)",
                       cursor: "pointer",
-                      textAlign: "left",
                     }}
                   >
                     <SearchIcon size={18} /> Search
                   </button>
-                  <Link
-                    href="/watchlist"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove("menu-open");
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "11px 14px",
-                      color: "var(--text-secondary)",
-                      textDecoration: "none",
-                      borderRadius: "var(--radius-lg)",
-                      marginBottom: 2,
-                    }}
-                  >
-                    <Bookmark size={18} /> Watchlist
-                  </Link>
-                  <RandomPicker variant="mobile" />
                 </div>
-                <div
-                  style={{
-                    height: 1,
-                    background: "var(--border)",
-                    margin: "22px 0",
-                  }}
-                />
-                <div style={{ marginBottom: 28 }}>
-                  <p
-                    style={{
-                      fontSize: 10,
-                      fontWeight: "var(--font-bold)",
-                      color: "var(--text-tertiary)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.09em",
-                      marginBottom: 10,
-                      paddingLeft: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                    }}
-                  >
-                    <Film size={11} /> Movie Genres
-                  </p>
-                  <Link
-                    href="/movies"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove("menu-open");
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "11px 14px",
-                      color: "var(--accent)",
-                      textDecoration: "none",
-                      borderRadius: "var(--radius-lg)",
-                      marginBottom: 2,
-                      fontWeight: "var(--font-bold)",
-                    }}
-                  >
-                    <Film size={18} /> All Movies
-                  </Link>
-                  {movieGenres.slice(0, 6).map((g) => (
-                    <Link
-                      key={g}
-                      href={`/movies?genre=${g.toLowerCase()}`}
-                      onClick={() => {
-                        setShowMobileMenu(false);
-                        document.body.classList.remove("menu-open");
-                      }}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 12,
-                        padding: "11px 14px",
-                        color: "var(--text-secondary)",
-                        textDecoration: "none",
-                        borderRadius: "var(--radius-lg)",
-                        marginBottom: 2,
-                      }}
-                    >
-                      {g}
-                    </Link>
-                  ))}
-                </div>
-                <div
-                  style={{
-                    height: 1,
-                    background: "var(--border)",
-                    margin: "22px 0",
-                  }}
-                />
-                <div style={{ marginBottom: 28 }}>
-                  <p
-                    style={{
-                      fontSize: 10,
-                      fontWeight: "var(--font-bold)",
-                      color: "var(--text-tertiary)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.09em",
-                      marginBottom: 10,
-                      paddingLeft: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                    }}
-                  >
-                    <Tv size={11} /> TV Shows
-                  </p>
-                  <Link
-                    href="/tv?sort=vote_average.desc"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove("menu-open");
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "11px 14px",
-                      color: "var(--text-secondary)",
-                      textDecoration: "none",
-                      borderRadius: "var(--radius-lg)",
-                      marginBottom: 2,
-                    }}
-                  >
-                    <span style={{ fontSize: 15 }}>⭐</span> Top Rated TV
-                  </Link>
-                  <Link
-                    href="/tv?sort=popularity.desc"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove("menu-open");
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "11px 14px",
-                      color: "var(--text-secondary)",
-                      textDecoration: "none",
-                      borderRadius: "var(--radius-lg)",
-                      marginBottom: 2,
-                    }}
-                  >
-                    <span style={{ fontSize: 15 }}>🔥</span> Trending TV
-                  </Link>
-                  <Link
-                    href="/tv"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove("menu-open");
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "11px 14px",
-                      color: "var(--accent)",
-                      textDecoration: "none",
-                      borderRadius: "var(--radius-lg)",
-                      marginBottom: 2,
-                      fontWeight: "var(--font-bold)",
-                    }}
-                  >
-                    <Tv size={18} /> All TV Shows
-                  </Link>
-                  {tvGenres.slice(0, 6).map((g) => {
-                    const slug = g
-                      .toLowerCase()
-                      .replace(/ & /g, "-")
-                      .replace(/ /g, "-");
-                    return (
-                      <Link
-                        key={g}
-                        href={`/tv?genre=${slug}`}
-                        onClick={() => {
-                          setShowMobileMenu(false);
-                          document.body.classList.remove("menu-open");
-                        }}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 12,
-                          padding: "11px 14px",
-                          color: "var(--text-secondary)",
-                          textDecoration: "none",
-                          borderRadius: "var(--radius-lg)",
-                          marginBottom: 2,
-                        }}
-                      >
-                        {g}
-                      </Link>
-                    );
-                  })}
-                </div>
-                <div
-                  style={{
-                    height: 1,
-                    background: "var(--border)",
-                    margin: "22px 0",
-                  }}
-                />
-                <div>
-                  <p
-                    style={{
-                      fontSize: 10,
-                      fontWeight: "var(--font-bold)",
-                      color: "var(--text-tertiary)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.09em",
-                      marginBottom: 10,
-                      paddingLeft: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                    }}
-                  >
-                    <Sparkles size={11} /> Anime
-                  </p>
-                  <Link
-                    href="/anime"
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      document.body.classList.remove("menu-open");
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: "11px 14px",
-                      color: "var(--accent)",
-                      textDecoration: "none",
-                      borderRadius: "var(--radius-lg)",
-                      marginBottom: 2,
-                      fontWeight: "var(--font-bold)",
-                    }}
-                  >
-                    <Sparkles size={18} /> Browse Anime
-                  </Link>
-                </div>
+
+                <RandomPicker variant="mobile" />
               </div>
             </motion.div>
           </>

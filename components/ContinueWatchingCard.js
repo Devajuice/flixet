@@ -136,7 +136,7 @@ export default function ContinueWatchingCard({ item }) {
             box-shadow:
               0 12px 28px rgba(0, 0, 0, 0.7),
               0 0 0 1px var(--accent-border),
-              0 0 18px rgba(59, 130, 246, 0.15);
+              0 0 18px rgba(245, 158, 11, 0.15);
           }
           .cw-card:active {
             transform: scale(0.97);
@@ -206,7 +206,7 @@ export default function ContinueWatchingCard({ item }) {
             height: 55%;
             background: linear-gradient(
               to top,
-              rgba(17, 24, 39, 0.88) 0%,
+              rgba(10, 10, 10, 0.88) 0%,
               transparent 100%
             );
             pointer-events: none;
@@ -230,12 +230,12 @@ export default function ContinueWatchingCard({ item }) {
           .cw-play-btn {
             width: 44px;
             height: 44px;
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            background: linear-gradient(135deg, #d97706, #f59e0b);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.5);
             transform: scale(0.82);
             transition: transform 0.2s ease;
           }
@@ -292,7 +292,7 @@ export default function ContinueWatchingCard({ item }) {
           }
           .cw-progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #2563eb, #60a5fa);
+            background: linear-gradient(90deg, #d97706, #fbbf24);
             border-radius: 0 1px 1px 0;
             transition: width 0.3s ease;
           }

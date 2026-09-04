@@ -108,7 +108,7 @@ export default function Loading() {
           border-radius: 50%;
           background: radial-gradient(
             circle,
-            rgba(59, 130, 246, 0.08) 0%,
+            rgba(245, 158, 11, 0.08) 0%,
             transparent 70%
           );
           animation: ldg-glow 3s ease-in-out infinite;
@@ -127,8 +127,8 @@ export default function Loading() {
         .ldg-ring-outer {
           width: 96px;
           height: 96px;
-          border: 2px solid rgba(59, 130, 246, 0.08);
-          border-top: 2px solid #3b82f6;
+          border: 2px solid rgba(245, 158, 11, 0.08);
+          border-top: 2px solid #f59e0b;
           border-radius: 50%;
           animation: ldg-spin 1s linear infinite;
           display: flex;
@@ -139,8 +139,8 @@ export default function Loading() {
         .ldg-ring-inner {
           width: 66px;
           height: 66px;
-          border: 2px solid rgba(59, 130, 246, 0.06);
-          border-bottom: 2px solid rgba(96, 165, 250, 0.5);
+          border: 2px solid rgba(245, 158, 11, 0.06);
+          border-bottom: 2px solid rgba(251, 191, 36, 0.5);
           border-radius: 50%;
           animation: ldg-spin-rev 0.7s linear infinite;
           display: flex;
@@ -149,7 +149,7 @@ export default function Loading() {
         }
 
         .ldg-film-icon {
-          color: #60a5fa;
+          color: #fbbf24;
           animation: ldg-pulse 2s ease-in-out infinite;
         }
 
@@ -189,7 +189,7 @@ export default function Loading() {
         .ldg-dot {
           width: 6px;
           height: 6px;
-          background: #60a5fa;
+          background: #fbbf24;
           border-radius: 50%;
           animation: ldg-dot 1.4s ease-in-out infinite;
         }
@@ -212,7 +212,7 @@ export default function Loading() {
 
         .ldg-progress-fill {
           height: 100%;
-          background: linear-gradient(90deg, #2563eb, #60a5fa);
+          background: linear-gradient(90deg, #d97706, #fbbf24);
           border-radius: 2px;
           animation: ldg-progress 1.6s ease-in-out infinite;
         }

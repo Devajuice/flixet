@@ -237,7 +237,7 @@ function PersonDetailsContent({ params }) {
             position: "relative",
             flexShrink: 0,
             background: "var(--bg-tertiary)",
-            boxShadow: "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(59, 130, 246, 0.15)",
+            boxShadow: "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(245, 158, 11, 0.15)",
           }}
         >
           {profile ? (
@@ -311,7 +311,7 @@ function PersonDetailsContent({ params }) {
                   alignItems: "center",
                   gap: 10,
                   padding: "10px 14px",
-                  background: "rgba(17, 24, 39, 0.6)",
+                  background: "rgba(10, 10, 10, 0.6)",
                   backdropFilter: "blur(12px)",
                   WebkitBackdropFilter: "blur(12px)",
                   border: "1px solid rgba(255, 255, 255, 0.06)",
@@ -408,14 +408,14 @@ function PersonDetailsContent({ params }) {
               gap: 8,
               background:
                 tab === t.id
-                  ? "linear-gradient(135deg, #2563eb, #3b82f6)"
+                  ? "linear-gradient(135deg, #d97706, #f59e0b)"
                   : "rgba(255, 255, 255, 0.04)",
               border: `1px solid ${tab === t.id ? "var(--accent)" : "var(--border)"}`,
               color: tab === t.id ? "#fff" : "var(--text-secondary)",
               fontWeight: tab === t.id ? "var(--font-bold)" : "var(--font-medium)",
               transition: "all 0.2s",
               cursor: "pointer",
-              boxShadow: tab === t.id ? "0 4px 12px rgba(59, 130, 246, 0.3)" : "none",
+              boxShadow: tab === t.id ? "0 4px 12px rgba(245, 158, 11, 0.3)" : "none",
             }}
           >
             {t.icon} {t.label}

@@ -3,23 +3,23 @@
 /* ── Design Tokens ────────────────────────────────────────────── */
 :root {
     /* Colors */
-    --bg: #0b0f1a;
-    --bg-secondary: #111827;
-    --bg-tertiary: #1e293b;
-    --bg-elevated: #283548;
+    --bg: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-tertiary: #171717;
+    --bg-elevated: #262626;
 
     --border: rgba(255, 255, 255, 0.08);
     --border-hover: rgba(255, 255, 255, 0.15);
 
-    --text-primary: #f1f5f9;
-    --text-secondary: rgba(241, 245, 249, 0.7);
-    --text-tertiary: rgba(241, 245, 249, 0.45);
-    --text-muted: rgba(241, 245, 249, 0.25);
+    --text-primary: #fafafa;
+    --text-secondary: rgba(250, 250, 250, 0.7);
+    --text-tertiary: rgba(250, 250, 250, 0.45);
+    --text-muted: rgba(250, 250, 250, 0.25);
 
-    --accent: #3b82f6;
-    --accent-hover: #60a5fa;
-    --accent-subtle: rgba(59, 130, 246, 0.12);
-    --accent-border: rgba(59, 130, 246, 0.3);
+    --accent: #f59e0b;
+    --accent-hover: #fbbf24;
+    --accent-subtle: rgba(245, 158, 11, 0.12);
+    --accent-border: rgba(245, 158, 11, 0.3);
 
     --gold: #f5c518;
     --gold-subtle: rgba(245, 197, 24, 0.1);
@@ -76,7 +76,7 @@
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
     --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.7);
-    --shadow-glow: 0 0 24px rgba(59, 130, 246, 0.35);
+    --shadow-glow: 0 0 24px rgba(245, 158, 11, 0.35);
 
     /* Transitions */
     --transition-fast: 150ms ease;
@@ -215,14 +215,14 @@ video {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%);
-    color: var(--text-primary);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%);
+    color: #000000;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
-    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.45);
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #fde68a 100%);
+    box-shadow: 0 6px 24px rgba(245, 158, 11, 0.45);
 }
 
 .btn-secondary {
@@ -235,7 +235,7 @@ video {
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: var(--accent-border);
-    box-shadow: 0 0 16px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.15);
 }
 
 .badge {
@@ -288,7 +288,7 @@ video {
     transform: translateY(-6px) scale(1.02);
     box-shadow:
         0 16px 48px rgba(0, 0, 0, 0.6),
-        0 0 32px rgba(59, 130, 246, 0.15);
+        0 0 32px rgba(245, 158, 11, 0.15);
     z-index: 10;
 }
 
@@ -324,14 +324,14 @@ video {
     transform: translate(-50%, -50%) scale(0.8);
     width: 44px;
     height: 44px;
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    background: linear-gradient(135deg, #d97706, #f59e0b);
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     transition: all var(--transition-base);
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5);
 }
 
 .media-card:hover .media-card__play {
@@ -385,7 +385,7 @@ video {
 .nav-link:hover {
     color: var(--accent) !important;
     background: var(--accent-subtle);
-    text-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+    text-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
 }
 
 .dropdown-trigger {
@@ -409,7 +409,7 @@ video {
 .dropdown-trigger:hover {
     color: var(--accent) !important;
     background: var(--accent-subtle);
-    text-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+    text-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
 }
 
 .dropdown-all-link {
@@ -606,13 +606,13 @@ textarea:focus-visible {
     left: 16px;
     z-index: 9999;
     padding: 8px 16px;
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-    color: white;
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #000000;
     font-weight: var(--font-bold);
     border-radius: var(--radius-md);
     text-decoration: none;
     transition: top 0.2s ease;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
 }
 
 .skip-to-content:focus {
@@ -646,14 +646,14 @@ textarea:focus-visible {
 
 /* ── Glass effect ───────────────────────────────────────── */
 .glass {
-    background: rgba(17, 24, 39, 0.7);
+    background: rgba(10, 10, 10, 0.7);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .glass-elevated {
-    background: rgba(30, 41, 59, 0.6);
+    background: rgba(23, 23, 23, 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.08);

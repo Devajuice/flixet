@@ -36,7 +36,7 @@ export default function ScrollRow({
             width: 4,
             height: 22,
             borderRadius: 2,
-            background: "linear-gradient(180deg, #2563eb, #60a5fa)",
+            background: "linear-gradient(180deg, #d97706, #fbbf24)",
             boxShadow: "0 0 12px rgba(59,130,246,0.4)",
             flexShrink: 0,
           }}

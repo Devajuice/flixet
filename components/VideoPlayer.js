@@ -326,7 +326,7 @@ export default function VideoPlayer({
               style={{
                 width: 48,
                 height: 48,
-                border: "3px solid rgba(59, 130, 246, 0.2)",
+                border: "3px solid rgba(245, 158, 11, 0.2)",
                 borderTopColor: "var(--accent)",
                 borderRadius: "50%",
                 animation: "spin 0.8s linear infinite",

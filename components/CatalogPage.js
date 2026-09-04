@@ -504,8 +504,8 @@ function CatalogContent({
           width: 10px;
           height: 10px;
           border-radius: 3px;
-          background: linear-gradient(135deg, #2563eb, #60a5fa);
-          box-shadow: 0 0 16px rgba(59, 130, 246, 0.6);
+          background: linear-gradient(135deg, #d97706, #fbbf24);
+          box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
         }
         .catalog-header-row {
           display: flex;
@@ -532,8 +532,8 @@ function CatalogContent({
           font-size: var(--text-sm);
           font-weight: var(--font-semibold);
           color: var(--accent);
-          background: rgba(59, 130, 246, 0.12);
-          border: 1px solid rgba(59, 130, 246, 0.25);
+          background: rgba(245, 158, 11, 0.12);
+          border: 1px solid rgba(245, 158, 11, 0.25);
           white-space: nowrap;
         }
         .catalog-subtitle {
@@ -576,9 +576,9 @@ function CatalogContent({
         }
         .catalog-genre-chip.is-active {
           color: #fff;
-          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          background: linear-gradient(135deg, #d97706, #f59e0b);
           border-color: transparent;
-          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
         }
         .catalog-toolbar {
           display: flex;
@@ -652,7 +652,7 @@ function CatalogContent({
         }
         .catalog-sort-item.is-active {
           color: var(--accent);
-          background: rgba(59, 130, 246, 0.1);
+          background: rgba(245, 158, 11, 0.1);
           font-weight: var(--font-semibold);
         }
         .catalog-sort-check {
@@ -680,9 +680,9 @@ function CatalogContent({
         }
         .catalog-filters-btn.has-filters {
           color: #fff;
-          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          background: linear-gradient(135deg, #d97706, #f59e0b);
           border-color: transparent;
-          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
         }
         .catalog-filters-badge {
           display: inline-flex;
@@ -717,7 +717,7 @@ function CatalogContent({
         .catalog-backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(11, 15, 26, 0.6);
+          background: rgba(0, 0, 0, 0.6);
           backdrop-filter: blur(6px);
           z-index: 9999;
         }
@@ -730,7 +730,7 @@ function CatalogContent({
           z-index: 10000;
           display: flex;
           flex-direction: column;
-          background: rgba(17, 24, 39, 0.98);
+          background: rgba(10, 10, 10, 0.98);
           backdrop-filter: blur(24px);
           border-left: 1px solid var(--border);
           box-shadow: -24px 0 80px rgba(0, 0, 0, 0.6);
@@ -814,9 +814,9 @@ function CatalogContent({
         }
         .catalog-chip-lg.is-active {
           color: #fff;
-          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          background: linear-gradient(135deg, #d97706, #f59e0b);
           border-color: transparent;
-          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
         }
         .catalog-chips {
           display: flex;
@@ -838,7 +838,7 @@ function CatalogContent({
         }
         .catalog-chip-sm.is-active {
           color: #fff;
-          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          background: linear-gradient(135deg, #d97706, #f59e0b);
           border-color: transparent;
         }
         .catalog-drawer-actions {
@@ -873,15 +873,15 @@ function CatalogContent({
           font-size: var(--text-sm);
           font-weight: var(--font-bold);
           color: #fff;
-          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          background: linear-gradient(135deg, #d97706, #f59e0b);
           border: none;
           cursor: pointer;
-          box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+          box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
           transition: all 0.2s;
         }
         .catalog-done-btn:hover {
           transform: translateY(-1px);
-          box-shadow: 0 12px 28px rgba(59, 130, 246, 0.45);
+          box-shadow: 0 12px 28px rgba(245, 158, 11, 0.45);
         }
         .catalog-grid {
           display: grid;
@@ -914,13 +914,13 @@ function CatalogContent({
           width: 72px;
           height: 72px;
           border-radius: 24px;
-          background: rgba(59, 130, 246, 0.1);
-          border: 1px solid rgba(59, 130, 246, 0.25);
+          background: rgba(245, 158, 11, 0.1);
+          border: 1px solid rgba(245, 158, 11, 0.25);
           display: flex;
           align-items: center;
           justify-content: center;
           margin-bottom: 20px;
-          box-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
+          box-shadow: 0 0 40px rgba(245, 158, 11, 0.15);
         }
         .catalog-empty-title {
           font-size: var(--text-xl);
@@ -942,10 +942,10 @@ function CatalogContent({
           font-size: var(--text-sm);
           font-weight: var(--font-semibold);
           color: #fff;
-          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          background: linear-gradient(135deg, #d97706, #f59e0b);
           border: none;
           cursor: pointer;
-          box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+          box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
         }
         .catalog-observer {
           min-height: 60px;
@@ -963,7 +963,7 @@ function CatalogContent({
         .catalog-spinner {
           width: 28px;
           height: 28px;
-          border: 3px solid rgba(59, 130, 246, 0.2);
+          border: 3px solid rgba(245, 158, 11, 0.2);
           border-top-color: var(--accent);
           border-radius: 50%;
           animation: spin 0.9s linear infinite;
@@ -1024,7 +1024,7 @@ export default function CatalogPage({
             style={{
               width: 40,
               height: 40,
-              border: "4px solid rgba(59, 130, 246, 0.2)",
+              border: "4px solid rgba(245, 158, 11, 0.2)",
               borderTopColor: "var(--accent)",
               borderRadius: "50%",
               animation: "spin 0.9s linear infinite",

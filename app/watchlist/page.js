@@ -23,7 +23,7 @@ export default function WatchlistPage() {
           style={{
             width: 40,
             height: 40,
-            border: "4px solid rgba(59, 130, 246, 0.2)",
+            border: "4px solid rgba(245, 158, 11, 0.2)",
             borderTopColor: "var(--accent)",
             borderRadius: "50%",
             animation: "spin 0.9s linear infinite",
@@ -70,8 +70,8 @@ export default function WatchlistPage() {
                   alignItems: "center",
                   gap: 5,
                   padding: "4px 10px",
-                  background: "rgba(59, 130, 246, 0.12)",
-                  border: "1px solid rgba(59, 130, 246, 0.25)",
+                  background: "rgba(245, 158, 11, 0.12)",
+                  border: "1px solid rgba(245, 158, 11, 0.25)",
                   borderRadius: "50px",
                   fontSize: "var(--text-xs)",
                   fontWeight: "var(--font-semibold)",
@@ -94,7 +94,7 @@ export default function WatchlistPage() {
                   borderRadius: "50px",
                   fontSize: "var(--text-xs)",
                   fontWeight: "var(--font-semibold)",
-                  color: "#60a5fa",
+                  color: "#fbbf24",
                 }}
               >
                 <Tv size={11} />
@@ -141,8 +141,8 @@ export default function WatchlistPage() {
             style={{
               width: 80,
               height: 80,
-              background: "rgba(59, 130, 246, 0.08)",
-              border: "1px solid rgba(59, 130, 246, 0.15)",
+              background: "rgba(245, 158, 11, 0.08)",
+              border: "1px solid rgba(245, 158, 11, 0.15)",
               borderRadius: "22px",
               display: "flex",
               alignItems: "center",

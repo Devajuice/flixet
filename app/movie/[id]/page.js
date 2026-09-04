@@ -93,7 +93,7 @@ function InfoCard({ icon, label, value }) {
         alignItems: "center",
         gap: 12,
         padding: "14px 16px",
-        background: "rgba(17, 24, 39, 0.6)",
+        background: "rgba(10, 10, 10, 0.6)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         border: "1px solid rgba(255, 255, 255, 0.06)",
@@ -144,13 +144,13 @@ function CastCard({ actor }) {
           cursor: "pointer",
           borderRadius: "var(--radius-lg)",
           overflow: "hidden",
-          background: "rgba(17, 24, 39, 0.5)",
+          background: "rgba(10, 10, 10, 0.5)",
           border: hovered ? "1px solid var(--accent-border)" : "1px solid rgba(255, 255, 255, 0.06)",
           padding: 8,
           textAlign: "center",
           transition: "all var(--transition-base)",
           transform: hovered ? "translateY(-4px)" : "none",
-          boxShadow: hovered ? "0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(59, 130, 246, 0.15)" : "none",
+          boxShadow: hovered ? "0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(245, 158, 11, 0.15)" : "none",
         }}
       >
         <div
@@ -476,7 +476,7 @@ export default function MovieDetails({ params }) {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to top, var(--bg) 0%, rgba(11, 15, 26, 0.7) 40%, rgba(11, 15, 26, 0.4) 100%)",
+              "linear-gradient(to top, var(--bg) 0%, rgba(0, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0.4) 100%)",
           }}
         />
       </div>
@@ -504,7 +504,7 @@ export default function MovieDetails({ params }) {
                   sizes="(max-width: 768px) 260px, 500px"
                   style={{
                     borderRadius: "var(--radius-xl)",
-                    boxShadow: "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(59, 130, 246, 0.15)",
+                    boxShadow: "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(245, 158, 11, 0.15)",
                     display: "block",
                   }}
                 />

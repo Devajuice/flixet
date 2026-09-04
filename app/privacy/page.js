@@ -79,7 +79,7 @@ export default function PrivacyPolicy() {
         }
 
         .prv-section:hover {
-          border-color: rgba(59, 130, 246, 0.2);
+          border-color: rgba(245, 158, 11, 0.2);
         }
 
         .prv-section-header {
@@ -202,7 +202,7 @@ export default function PrivacyPolicy() {
         }
 
         .prv-service-item:hover {
-          border-color: rgba(59, 130, 246, 0.25);
+          border-color: rgba(245, 158, 11, 0.25);
         }
 
         .prv-service-name {

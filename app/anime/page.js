@@ -163,7 +163,7 @@ export default function AnimePage() {
                     style={{
                       width: 28,
                       height: 28,
-                      border: "3px solid rgba(59, 130, 246, 0.2)",
+                      border: "3px solid rgba(245, 158, 11, 0.2)",
                       borderTopColor: "var(--accent)",
                       borderRadius: "50%",
                       animation: "spin 0.9s linear infinite",

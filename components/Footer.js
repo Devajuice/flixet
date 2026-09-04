@@ -32,8 +32,8 @@ export default function Footer() {
         {/* Disclaimer */}
         <div
           style={{
-            background: "rgba(59, 130, 246, 0.04)",
-            border: "1px solid rgba(59, 130, 246, 0.12)",
+            background: "rgba(245, 158, 11, 0.04)",
+            border: "1px solid rgba(245, 158, 11, 0.12)",
             borderLeft: "3px solid var(--accent)",
             borderRadius: "var(--radius-xl)",
             padding: "22px 24px",
@@ -336,8 +336,8 @@ export default function Footer() {
           </div>
           <div
             style={{
-              background: "rgba(59, 130, 246, 0.04)",
-              border: "1px solid rgba(59, 130, 246, 0.1)",
+              background: "rgba(245, 158, 11, 0.04)",
+              border: "1px solid rgba(245, 158, 11, 0.1)",
               borderRadius: "var(--radius-lg)",
               padding: "16px 24px",
               display: "flex",

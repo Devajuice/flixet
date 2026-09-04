@@ -259,7 +259,7 @@ export default function ComingSoonPage({ type, CardComponent }) {
           align-items: center;
           gap: 7px;
           padding: 11px 24px;
-          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          background: linear-gradient(135deg, #d97706, #f59e0b);
           color: #ffffff;
           border: none;
           border-radius: 10px;
@@ -267,12 +267,12 @@ export default function ComingSoonPage({ type, CardComponent }) {
           font-weight: 700;
           cursor: pointer;
           letter-spacing: 0.01em;
-          box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+          box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
           transition: all 0.2s ease;
         }
         .cs-browse-btn:hover {
-          background: linear-gradient(135deg, #3b82f6, #60a5fa);
-          box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
+          background: linear-gradient(135deg, #f59e0b, #fbbf24);
+          box-shadow: 0 6px 24px rgba(245, 158, 11, 0.5);
         }
 
         /* ── Observer zone ────────────────────────── */
@@ -292,8 +292,8 @@ export default function ComingSoonPage({ type, CardComponent }) {
         .cs-spinner-sm {
           width: 30px;
           height: 30px;
-          border: 3px solid rgba(59, 130, 246, 0.12);
-          border-top-color: #3b82f6;
+          border: 3px solid rgba(245, 158, 11, 0.12);
+          border-top-color: #f59e0b;
           border-radius: 50%;
           animation: spin 0.9s linear infinite;
         }
@@ -354,7 +354,7 @@ export default function ComingSoonPage({ type, CardComponent }) {
           transition={{ duration: 0.5 }}
         >
           <div className="cs-header-icon">
-            <Icon size={28} color="#3b82f6" />
+            <Icon size={28} color="#f59e0b" />
           </div>
           <h1 className="cs-title">
             {isMovie ? (
@@ -383,21 +383,21 @@ export default function ComingSoonPage({ type, CardComponent }) {
             transition={{ delay: 0.2 }}
           >
             <div className="cs-stat-chip">
-              <TrendingUp size={13} color="#3b82f6" />
+              <TrendingUp size={13} color="#f59e0b" />
               <strong>{totalResults.toLocaleString()}</strong>
               {isMovie ? " movies" : " TV shows"}
             </div>
 
             {isMovie && dateRange.start && dateRange.end && (
               <div className="cs-stat-chip">
-                <Calendar size={13} color="#3b82f6" />
+                <Calendar size={13} color="#f59e0b" />
                 {formatDate(dateRange.start)} – {formatDate(dateRange.end)}
               </div>
             )}
 
             {!isMovie && (
               <div className="cs-stat-chip">
-                <Sparkles size={13} color="#3b82f6" />
+                <Sparkles size={13} color="#f59e0b" />
                 Active &amp; releasing now
               </div>
             )}
@@ -462,7 +462,7 @@ export default function ComingSoonPage({ type, CardComponent }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
-                  <Sparkles size={18} color="#3b82f6" />
+                  <Sparkles size={18} color="#f59e0b" />
                   <p>
                     You&apos;ve explored all {items.length}{" "}
                     {isMovie ? "movies" : "shows"}!
@@ -495,8 +495,8 @@ const loadingStyles = {
   spinner: {
     width: "44px",
     height: "44px",
-    border: "4px solid rgba(59, 130, 246, 0.1)",
-    borderTopColor: "#3b82f6",
+    border: "4px solid rgba(245, 158, 11, 0.1)",
+    borderTopColor: "#f59e0b",
     borderRadius: "50%",
     animation: "spin 0.9s linear infinite",
   },

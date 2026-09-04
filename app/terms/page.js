@@ -82,7 +82,7 @@ export default function TermsOfService() {
         }
 
         .terms-section:hover {
-          border-color: rgba(59, 130, 246, 0.2);
+          border-color: rgba(245, 158, 11, 0.2);
         }
 
         .terms-section-header {

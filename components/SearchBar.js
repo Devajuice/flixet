@@ -192,15 +192,18 @@ export default function SearchBar({ autoFocus }) {
             style={{
               position: "absolute",
               top: "calc(100% + 8px)",
-              left: 0,
-              right: 0,
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
-              borderRadius: "var(--radius-xl)",
-              maxHeight: "min(420px, 50vh)",
+              left: -12,
+              right: -12,
+              background: "rgba(10, 10, 10, 0.88)",
+              backdropFilter: "blur(20px) saturate(1.4)",
+              WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+              borderRadius: 18,
+              maxHeight: "min(480px, 60vh)",
               overflowY: "auto",
               zIndex: 1000,
               boxShadow: "var(--shadow-xl)",
+              padding: 6,
             }}
           >
             {loading ? (
@@ -261,10 +264,12 @@ function SearchResult({ item, onClick, isLast }) {
         display: "flex",
         alignItems: "center",
         gap: 12,
-        padding: "8px 12px",
+        padding: "10px 10px",
         cursor: "pointer",
-        background: hovered ? "rgba(255,255,255,0.04)" : "transparent",
-        borderBottom: isLast ? "none" : "1px solid var(--border)",
+        background: hovered ? "rgba(255,255,255,0.06)" : "transparent",
+        borderRadius: 12,
+        marginBottom: 2,
+        borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.05)",
         transition: "background 0.15s ease",
       }}
     >
@@ -272,9 +277,9 @@ function SearchResult({ item, onClick, isLast }) {
         <Image
           src={poster}
           alt=""
-          width={40}
-          height={60}
-          sizes="40px"
+          width={44}
+          height={62}
+          sizes="44px"
           style={{
             objectFit: "cover",
             borderRadius: "var(--radius-sm)",
@@ -285,8 +290,8 @@ function SearchResult({ item, onClick, isLast }) {
       ) : (
         <div
           style={{
-            width: 40,
-            height: 60,
+            width: 44,
+            height: 62,
             borderRadius: "var(--radius-sm)",
             flexShrink: 0,
             background: "var(--bg-tertiary)",
@@ -323,7 +328,7 @@ function SearchResult({ item, onClick, isLast }) {
               gap: 3,
               fontSize: 10,
               fontWeight: "var(--font-medium)",
-              color: isTV ? "#60a5fa" : "var(--accent)",
+              color: isTV ? "#fbbf24" : "var(--accent)",
             }}
           >
             {isTV ? <Tv size={10} /> : <Film size={10} />}

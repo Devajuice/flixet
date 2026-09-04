@@ -241,7 +241,7 @@ function HeroBanner({ items }) {
                   height: 3,
                   borderRadius: 2,
                   background:
-                    "linear-gradient(90deg, #2563eb, #60a5fa)",
+                    "linear-gradient(90deg, #d97706, #fbbf24)",
                   boxShadow: "0 0 12px rgba(59,130,246,0.5)",
                 }}
               />
@@ -273,8 +273,8 @@ function HeroBanner({ items }) {
                   alignItems: "center",
                   gap: 4,
                   padding: "4px 10px",
-                  background: "rgba(59, 130, 246, 0.15)",
-                  border: "1px solid rgba(59, 130, 246, 0.3)",
+                  background: "rgba(245, 158, 11, 0.15)",
+                  border: "1px solid rgba(245, 158, 11, 0.3)",
                   borderRadius: "var(--radius-full)",
                   fontSize: "var(--text-xs)",
                   fontWeight: "var(--font-bold)",
@@ -397,7 +397,7 @@ function HeroBanner({ items }) {
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = "var(--accent-border)";
                     e.currentTarget.style.boxShadow =
-                      "0 0 20px rgba(59, 130, 246, 0.2)";
+                      "0 0 20px rgba(245, 158, 11, 0.2)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = "var(--border)";
@@ -431,13 +431,13 @@ function HeroBanner({ items }) {
                 borderRadius: 4,
                 background:
                   i === idx
-                    ? "linear-gradient(90deg, #2563eb, #60a5fa)"
+                    ? "linear-gradient(90deg, #d97706, #fbbf24)"
                     : "rgba(255,255,255,0.18)",
                 border: "none",
                 cursor: "pointer",
                 transition: "all var(--transition-base)",
                 boxShadow:
-                  i === idx ? "0 0 12px rgba(59, 130, 246, 0.4)" : "none",
+                  i === idx ? "0 0 12px rgba(245, 158, 11, 0.4)" : "none",
               }}
             />
           ))}
@@ -464,7 +464,7 @@ function SectionHeader({ title, icon, href, subtitle }) {
           width: 4,
           height: 22,
           borderRadius: 2,
-          background: "linear-gradient(180deg, #2563eb, #60a5fa)",
+          background: "linear-gradient(180deg, #d97706, #fbbf24)",
           boxShadow: "0 0 12px rgba(59,130,246,0.4)",
           flexShrink: 0,
         }}

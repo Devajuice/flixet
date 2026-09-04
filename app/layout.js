@@ -62,7 +62,7 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#3b82f6",
+  themeColor: "#f59e0b",
 };
 
 export default function RootLayout({ children }) {
@@ -88,7 +88,6 @@ export default function RootLayout({ children }) {
               id="main-content"
               style={{
                 minHeight: "100vh",
-                paddingTop: "var(--space-10)",
                 paddingBottom: "var(--space-16)",
               }}
             >

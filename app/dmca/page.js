@@ -95,7 +95,7 @@ export default function DMCAPage() {
         }
 
         .dmca-section:hover {
-          border-color: rgba(59, 130, 246, 0.2);
+          border-color: rgba(245, 158, 11, 0.2);
         }
 
         .dmca-section-header {
@@ -182,7 +182,7 @@ export default function DMCAPage() {
         }
 
         .dmca-step-card:hover {
-          border-color: rgba(59, 130, 246, 0.25);
+          border-color: rgba(245, 158, 11, 0.25);
         }
 
         .dmca-step-number {
