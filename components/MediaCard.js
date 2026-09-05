@@ -15,6 +15,7 @@ export default function MediaCard({
   variant = "poster",
   showRemove,
   onRemove,
+  cardWidth,
 }) {
   const [hovered, setHovered] = useState(false);
 
@@ -31,13 +32,302 @@ export default function MediaCard({
     ? `${IMG}${variant === "backdrop" ? "/w780" : "/w342"}${imgPath}`
     : null;
 
-  const width = variant === "backdrop" ? 240 : 140;
+  const width = variant === "backdrop" ? 240 : variant === "tile" ? 240 : 140;
 
   const handleRemove = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (onRemove) onRemove(item.id, mediaType);
   };
+
+  const year =
+    item.release_date || item.first_air_date
+      ? new Date(item.release_date || item.first_air_date).getFullYear()
+      : null;
+
+  /* ── Split-tile variant (catalog grid) ─────────────────────── */
+  if (variant === "tile") {
+    const tileContent = (
+      <motion.div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: Math.min((index || 0) * 0.04, 0.4), duration: 0.3 }}
+        style={{
+          width: cardWidth || "100%",
+          minWidth: cardWidth || 0,
+          flexShrink: cardWidth ? 0 : 1,
+          position: "relative",
+          borderRadius: "var(--radius-lg)",
+          overflow: "hidden",
+          background: "var(--bg-secondary)",
+          cursor: "pointer",
+          border: "1px solid var(--border)",
+          boxShadow: hovered
+            ? "0 16px 40px rgba(0, 0, 0, 0.55), 0 0 28px rgba(245, 158, 11, 0.12)"
+            : "var(--shadow-sm)",
+          transform: hovered ? "translateY(-4px)" : "none",
+          transition: "all var(--transition-slow)",
+          zIndex: hovered ? 10 : 1,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {/* Poster area */}
+        <div
+          style={{
+            position: "relative",
+            aspectRatio: "2/3",
+            overflow: "hidden",
+            background: "var(--bg-tertiary)",
+            flexShrink: 0,
+          }}
+        >
+          {imgSrc ? (
+            <Image
+              src={imgSrc}
+              alt={title}
+              fill
+              sizes="(max-width: 768px) 180px, 240px"
+              style={{
+                objectFit: "cover",
+                display: "block",
+                transition: "all var(--transition-slow)",
+                transform: hovered ? "scale(1.05)" : "none",
+                filter: hovered ? "brightness(0.55)" : "none",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "var(--space-3)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "var(--text-xs)",
+                  color: "var(--text-muted)",
+                  textAlign: "center",
+                }}
+              >
+                {title}
+              </span>
+            </div>
+          )}
+
+          {/* Dark gradient for legibility */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: hovered
+                ? "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.05) 100%)"
+                : "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 45%)",
+              transition: "background var(--transition-slow)",
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* Play button — centered via flexbox */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              pointerEvents: "none",
+            }}
+          >
+            <AnimatePresence>
+              {hovered && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  style={{
+                    width: 46,
+                    height: 46,
+                    borderRadius: "var(--radius-full)",
+                    background: "linear-gradient(135deg, #d97706, #f59e0b)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 8px 28px rgba(245, 158, 11, 0.5)",
+                  }}
+                >
+                  <Play size={19} fill="white" color="white" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Rating badge — top left */}
+          {item.vote_average > 0 && (
+            <div
+              style={{
+                position: "absolute",
+                top: "var(--space-2)",
+                left: "var(--space-2)",
+                display: "flex",
+                alignItems: "center",
+                gap: "var(--space-1)",
+                padding: "3px 8px",
+                background: "rgba(0,0,0,0.72)",
+                backdropFilter: "blur(8px)",
+                borderRadius: "var(--radius-md)",
+                fontSize: "var(--text-xs)",
+                fontWeight: "var(--font-bold)",
+                color: "var(--gold)",
+              }}
+            >
+              ★ {item.vote_average.toFixed(1)}
+            </div>
+          )}
+
+          {/* Watchlist button */}
+          {!showRemove && (
+            <div
+              style={{
+                position: "absolute",
+                top: "var(--space-2)",
+                right: "var(--space-2)",
+                opacity: hovered ? 1 : 0,
+                transform: hovered ? "translateY(0)" : "translateY(-4px)",
+                transition: "all var(--transition-base)",
+                pointerEvents: "auto",
+              }}
+            >
+              <WatchlistButton
+                item={{
+                  id: item.id,
+                  type: mediaType,
+                  title,
+                  name: title,
+                  poster_path: item.poster_path,
+                  vote_average: item.vote_average,
+                  release_date: item.release_date,
+                  first_air_date: item.first_air_date,
+                }}
+              />
+            </div>
+          )}
+          {showRemove && (
+            <div
+              style={{
+                position: "absolute",
+                top: "var(--space-2)",
+                right: "var(--space-2)",
+                pointerEvents: "auto",
+              }}
+            >
+              <motion.button
+                onClick={handleRemove}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: "var(--radius-md)",
+                  background: "rgba(0,0,0,0.7)",
+                  backdropFilter: "blur(8px)",
+                  border: "1px solid var(--border)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "var(--text-secondary)",
+                  cursor: "pointer",
+                }}
+              >
+                <X size={13} />
+              </motion.button>
+            </div>
+          )}
+        </div>
+
+        {/* Info bar */}
+        <div
+          style={{
+            padding: "10px 12px 12px",
+            display: "flex",
+            flexDirection: "column",
+            flex: 1,
+            gap: 4,
+          }}
+        >
+          <p
+            style={{
+              fontSize: "var(--text-sm)",
+              fontWeight: "var(--font-bold)",
+              color: "var(--text-primary)",
+              margin: 0,
+              lineHeight: 1.3,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {title}
+          </p>
+          <div
+            style={{
+              marginTop: "auto",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            {year && (
+              <span
+                style={{
+                  fontSize: "var(--text-xs)",
+                  color: "var(--text-tertiary)",
+                  fontWeight: "var(--font-medium)",
+                }}
+              >
+                {year}
+              </span>
+            )}
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                marginLeft: "auto",
+                padding: "2px 8px",
+                borderRadius: "var(--radius-full)",
+                background: "var(--accent-subtle)",
+                border: "1px solid var(--accent-border)",
+                fontSize: 10,
+                fontWeight: "var(--font-semibold)",
+                color: "var(--accent)",
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+              }}
+            >
+              {mediaType === "movie" ? "Movie" : "TV"}
+            </span>
+          </div>
+        </div>
+      </motion.div>
+    );
+
+    return showRemove ? (
+      <div style={{ display: "block" }}>{tileContent}</div>
+    ) : (
+      <Link href={href} style={{ display: "block" }}>
+        {tileContent}
+      </Link>
+    );
+  }
 
   const cardContent = (
     <motion.div

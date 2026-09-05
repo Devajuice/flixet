@@ -460,7 +460,7 @@ function CatalogContent({
             className="catalog-grid"
           >
             {items.map((item, i) => (
-              <MediaCard key={item.id} item={item} type={type} index={i} />
+              <MediaCard key={item.id} item={item} type={type} index={i} variant="tile" />
             ))}
           </motion.div>
           <div ref={observerTarget} className="catalog-observer">
@@ -888,14 +888,12 @@ function CatalogContent({
           grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
           gap: 16px;
           margin-bottom: 40px;
-          justify-items: center;
         }
         .catalog-skeleton-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
           gap: 16px;
           margin-bottom: 40px;
-          justify-items: center;
         }
         .catalog-skeleton-card {
           width: 100%;

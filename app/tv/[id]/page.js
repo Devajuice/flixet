@@ -1484,16 +1484,16 @@ function TVShowDetailsContent({ params }) {
           margin-bottom: 20px;
         }
         .episodes-list {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
           max-width: 100%;
           overflow: hidden;
         }
         .episodes-list-loading {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
           max-width: 100%;
           overflow: hidden;
         }
@@ -1742,6 +1742,12 @@ function TVShowDetailsContent({ params }) {
           font-weight: var(--font-semibold);
         }
 
+        @media (max-width: 1100px) {
+          .episode-thumb {
+            width: 120px;
+            height: 68px;
+          }
+        }
         @media (max-width: 768px) {
           .tv-detail-grid {
             grid-template-columns: 1fr;
@@ -1834,6 +1840,10 @@ function TVShowDetailsContent({ params }) {
           .episode-meta {
             font-size: 10px;
           }
+          .episodes-list,
+          .episodes-list-loading {
+            grid-template-columns: 1fr;
+          }
         }
         @media (max-width: 480px) {
           .tv-poster-wrapper {
@@ -1844,14 +1854,14 @@ function TVShowDetailsContent({ params }) {
             gap: 8px;
           }
           .episode-card {
-            flex-direction: column;
+            flex-direction: row;
             gap: 10px;
             padding: 10px;
+            align-items: center;
           }
           .episode-thumb {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 16/9;
+            width: 96px;
+            height: 54px;
           }
           .episode-ep-num {
             display: none;
@@ -1863,11 +1873,16 @@ function TVShowDetailsContent({ params }) {
             gap: 8px;
           }
           .episode-title {
-            font-size: var(--text-sm);
+            font-size: var(--text-xs);
           }
           .episode-overview {
-            font-size: 11px;
-            line-height: 1.5;
+            display: none;
+          }
+          .episode-info {
+            gap: 4px;
+          }
+          .episode-meta-row {
+            gap: 8px;
           }
           .episode-meta {
             font-size: 10px;

@@ -11,8 +11,11 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 📚 **Personal Watchlist** - Save your favorite content to watch later
 - 🔄 **Multiple Servers** - Switch between streaming sources if one doesn't work
 - 📺 **TV Show Support** - Full season and episode selection with OMDB ratings
-- 🎨 **Modern UI** - Bold, Disney+-inspired dark navy interface with a blue accent design system
+- 🎨 **Modern UI** - Bold, Disney+-inspired black interface with an amber/orange accent design system
+- 💊 **Floating Navbar** - A pill-shaped, glass-morphism navbar that floats and stays centered while scrolling
+- 📱 **Bottom Sheet Menu** - Replace the old side drawer with a bottom sheet optimized for one-handed mobile use
 - 🏠 **Cinematic Home** - Auto-rotating hero carousel, genre card grid, and editor's spotlight section
+- 🏷️ **Split-Tile Cards** - Cards redesigned with a poster area + info bar (title, year, type pill); used across the home rows and shared catalog grids with a responsive 2-column episode list
 - 🗂️ **Rich Browse Pages** - Movies and TV share a redesigned catalog page with a genre rail, inline sort dropdown, and slide-in filter drawer
 - ⚡ **Fast Performance** - Built with Next.js 16 with Turbopack
 - 🎯 **Advanced Filters** - Filter by genre, year, rating, and more
@@ -49,6 +52,11 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - [x] ~~Share Buttons~~
 - [x] ~~Real Progress Tracking~~
 - [x] ~~Visual Redesign (blue theme, home + navbar + browse pages)~~
+- [x] ~~Floating Pill Navbar~~
+- [x] ~~Amber/Orange Color Scheme (black base)~~
+- [x] ~~Mobile Bottom Sheet Menu~~
+- [x] ~~Split-Tile Card Redesign (home rows + catalog grids)~~
+- [x] ~~Episode List Improvements (2-column grid, compact mobile cards)~~
 
 ## 🛠️ Tech Stack
 
@@ -131,7 +139,7 @@ Flixet/
 │   ├── globals.css           # Global styles, design tokens, media queries
 │   └── layout.js             # Root layout
 ├── components/
-│   ├── Header.js             # Responsive nav header (active-link highlight, scroll-compact)
+│   ├── Header.js             # Floating pill navbar + mobile bottom sheet menu (active-link highlight)
 │   ├── Footer.js             # Footer with links and disclaimer
 │   ├── SearchBar.js          # Search input with dropdown (debounced)
 │   ├── ScrollRow.js          # Horizontal scrollable row (inline section header)
@@ -185,7 +193,7 @@ Flixet/
 ### Streaming
 
 - **Multiple Sources**: Automatically embeds content from reliable third-party sources
-- **Default Player**: VidCore with a blue-themed UI, switchable at any time
+- **Default Player**: VidCore with an amber-themed UI, switchable at any time
 - **Server Switching**: If one server has issues, try another (VidCore, VidLink, VidSrc, 2embed)
 - **HD Quality**: Most content available in high definition
 
@@ -202,13 +210,17 @@ Flixet/
 
 ### Visual Redesign
 
-Full UI overhaul in a Bold / Disney+ inspired direction (dark navy base with a blue accent):
+Full UI overhaul in a Bold / Disney+ inspired direction (black base with an amber/orange accent):
 
-- **Blue design system**: Accent moved from Netflix red (#e50914) to blue (#3b82f6), Plus Jakarta Sans replaces Inter, and blue glow/gradient shadows unify every page, card, player, spinner, and empty state.
+- **Amber design system**: Accent moved from blue (#3b82f6) to amber (#f59e0b), with a pure-black background base, Plus Jakarta Sans typography, and amber glow/gradient shadows that unify every page, card, player, spinner, and empty state.
 - **Cinematic home page**: Auto-rotating hero carousel with a glowing accent bar, pill meta badges, and numbered/glowing dot navigation; a "Browse by Genre" card grid; and a new "Editor's Spotlight" editorial section.
-- **Navbar**: Transparent gradient at the top of the page that compacts into a glassy bar on scroll, plus active-route highlighting (blue pill + glowing underline).
+- **Floating pill navbar**: The navbar is now a centered, pill-shaped, glass-morphism bar that floats at the top of the viewport and stays centered while the page scrolls beneath it (active-route highlighting with an amber pill + glowing underline).
+- **Mobile bottom sheet menu**: The previous full-height side drawer was replaced with a bottom sheet that slides up from the bottom — a drag handle, thumb-friendly 4-tile quick-access grid (Home / Movies / TV / Anime), quick-action buttons (Watchlist / Search), and a random picker make one-handed navigation easy.
+- **Glass search dropdown**: The search results dropdown uses a semi-transparent, blurred (glass) background and larger, touch-friendly result rows on mobile.
+- **Split-tile cards**: Media cards were redesigned as "split tiles" — a large poster area on top (2:3) with a fixed info bar below showing the title (2-line clamp), year, and a Movie/TV pill. Used full-width in the shared catalog grids and at a fixed 240px in the home scroll rows, with equal-width stretching in grids and snug shrink-wrapping in scroll rows.
+- **Episode list improvements**: The TV show episode list renders as a 2-column grid on desktop (with skeletons matching the grid so there's no layout shift) and collapses to compact horizontal cards on mobile — small 16:9 thumbnail, single-line title, rating and meta — instead of the previous tall stacked layout.
 - **Shared browse template** (`CatalogPage.js`): Movies and TV now render from one component — always-visible genre pill rail, a custom sort dropdown, a slide-in filter drawer, animated grid transitions, and rich empty/end states.
-- **Player re-theme**: Embedded player URL params updated to match the blue accent.
+- **Player re-theme**: Embedded player URL params updated to match the amber accent.
 
 ### Recently Viewed
 
@@ -229,6 +241,8 @@ Full UI overhaul in a Bold / Disney+ inspired direction (dark navy base with a b
 ### Episode Selector
 
 - **Season & Episode Navigation**: Full season/episode selection with arrow navigation
+- **2-Column Episode Grid**: Episode cards render in a responsive 2-column grid on desktop for a denser, scan-friendly list (single column below 768px)
+- **Compact Mobile Cards**: On small screens each episode collapses to a slim horizontal row (small thumbnail, single-line title, rating + runtime) instead of the tall stacked layout
 - **OMDB Ratings**: Individual episode ratings fetched and cached per episode
 - **Optimized Fetching**: `useCallback` memoization prevents duplicate API calls
 - **Deep Link Support**: URL query params (`?season=1&episode=3`) for direct episode access
@@ -347,9 +361,9 @@ Built this while learning:
 Flixet uses a consistent design system defined in `app/globals.css`:
 
 ### Color Tokens
-- `--bg`, `--bg-secondary`, `--bg-tertiary`, `--bg-elevated` - Dark navy theme backgrounds
+- `--bg`, `--bg-secondary`, `--bg-tertiary`, `--bg-elevated` - Black theme backgrounds
 - `--text-primary`, `--text-secondary`, `--text-tertiary`, `--text-muted` - Text hierarchy
-- `--accent` (#3b82f6), `--accent-hover` (#60a5fa) - Primary blue accent
+- `--accent` (#f59e0b), `--accent-hover` (#fbbf24) - Primary amber accent
 - `--gold` (#f5c518), `--gold-subtle`, `--gold-border` - IMDB-style ratings
 - `--border`, `--border-hover` - Border colors
 

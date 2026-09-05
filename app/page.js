@@ -752,6 +752,8 @@ export default function HomePage() {
                   item={item}
                   type={item.type}
                   index={i}
+                  variant="tile"
+                  cardWidth={240}
                 />
               ))}
             </ScrollRow>
@@ -772,10 +774,10 @@ export default function HomePage() {
           >
             {loading
               ? Array.from({ length: 12 }).map((_, i) => (
-                  <SkeletonCard key={i} />
+                  <SkeletonCard key={i} width={240} height={360} />
                 ))
               : trending.map((item, i) => (
-                  <MediaCard key={item.id} item={item} index={i} />
+                  <MediaCard key={item.id} item={item} index={i} variant="tile" cardWidth={240} />
                 ))}
           </ScrollRow>
         </div>
@@ -789,10 +791,10 @@ export default function HomePage() {
           >
             {loading
               ? Array.from({ length: 12 }).map((_, i) => (
-                  <SkeletonCard key={i} />
+                  <SkeletonCard key={i} width={240} height={360} />
                 ))
               : popularMovies.map((item, i) => (
-                  <MediaCard key={item.id} item={item} type="movie" index={i} />
+                  <MediaCard key={item.id} item={item} type="movie" index={i} variant="tile" cardWidth={240} />
                 ))}
           </ScrollRow>
         </div>
@@ -829,10 +831,10 @@ export default function HomePage() {
           >
             {loading
               ? Array.from({ length: 12 }).map((_, i) => (
-                  <SkeletonCard key={i} />
+                  <SkeletonCard key={i} width={240} height={360} />
                 ))
               : topRated.map((item, i) => (
-                  <MediaCard key={item.id} item={item} type="movie" index={i} />
+                  <MediaCard key={item.id} item={item} type="movie" index={i} variant="tile" cardWidth={240} />
                 ))}
           </ScrollRow>
         </div>
@@ -846,10 +848,10 @@ export default function HomePage() {
           >
             {loading
               ? Array.from({ length: 12 }).map((_, i) => (
-                  <SkeletonCard key={i} />
+                  <SkeletonCard key={i} width={240} height={360} />
                 ))
               : action.map((item, i) => (
-                  <MediaCard key={item.id} item={item} type="movie" index={i} />
+                  <MediaCard key={item.id} item={item} type="movie" index={i} variant="tile" cardWidth={240} />
                 ))}
           </ScrollRow>
         </div>
