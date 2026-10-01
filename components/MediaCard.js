@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,7 +8,12 @@ import WatchlistButton from "./WatchlistButton";
 
 const IMG = "https://image.tmdb.org/t/p";
 
-export default function MediaCard({
+function releaseYear(item) {
+  const date = item.release_date || item.first_air_date;
+  return date ? String(date).slice(0, 4) : null;
+}
+
+function MediaCard({
   item,
   type,
   index,
@@ -40,10 +45,7 @@ export default function MediaCard({
     if (onRemove) onRemove(item.id, mediaType);
   };
 
-  const year =
-    item.release_date || item.first_air_date
-      ? new Date(item.release_date || item.first_air_date).getFullYear()
-      : null;
+  const year = releaseYear(item);
 
   /* ── Split-tile variant (catalog grid) ─────────────────────── */
   if (variant === "tile") {
@@ -90,7 +92,7 @@ export default function MediaCard({
               src={imgSrc}
               alt={title}
               fill
-              sizes="(max-width: 768px) 180px, 240px"
+              sizes="(max-width: 480px) 42vw, (max-width: 768px) 30vw, 200px"
               style={{
                 objectFit: "cover",
                 display: "block",
@@ -195,6 +197,7 @@ export default function MediaCard({
           {/* Watchlist button */}
           {!showRemove && (
             <div
+              className="media-card-action"
               style={{
                 position: "absolute",
                 top: "var(--space-2)",
@@ -358,8 +361,8 @@ export default function MediaCard({
           fill
           sizes={
             variant === "backdrop"
-              ? "(max-width: 768px) 240px, 240px"
-              : "(max-width: 768px) 140px, 140px"
+              ? "(max-width: 768px) 42vw, 280px"
+              : "(max-width: 768px) 33vw, 180px"
           }
           style={{
             objectFit: "cover",
@@ -468,6 +471,7 @@ export default function MediaCard({
               onClick={handleRemove}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
+              aria-label={`Remove ${title} from watchlist`}
               style={{
                 width: 28,
                 height: 28,
@@ -490,6 +494,7 @@ export default function MediaCard({
         {/* Watchlist button (normal) */}
         {!showRemove && (
           <div
+            className="media-card-action"
             style={{
               position: "absolute",
               top: "var(--space-2)",
@@ -538,14 +543,14 @@ export default function MediaCard({
           >
             {title}
           </p>
-          {(item.release_date || item.first_air_date) && (
+          {year && (
             <span
               style={{
                 fontSize: "var(--text-xs)",
                 color: "var(--text-tertiary)",
               }}
             >
-              {new Date(item.release_date || item.first_air_date).getFullYear()}
+              {year}
             </span>
           )}
         </div>
@@ -561,3 +566,5 @@ export default function MediaCard({
     </Link>
   );
 }
+
+export default React.memo(MediaCard);

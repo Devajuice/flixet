@@ -89,15 +89,18 @@ export function HistoryProvider({ children }) {
     update([]);
   }, [update]);
 
+  const value = useMemo(
+    () => ({
+      history,
+      addToHistory,
+      removeFromHistory,
+      clearHistory,
+    }),
+    [history, addToHistory, removeFromHistory, clearHistory],
+  );
+
   return (
-    <HistoryContext.Provider
-      value={{
-        history,
-        addToHistory,
-        removeFromHistory,
-        clearHistory,
-      }}
-    >
+    <HistoryContext.Provider value={value}>
       {children}
     </HistoryContext.Provider>
   );

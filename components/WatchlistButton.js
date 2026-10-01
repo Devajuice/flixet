@@ -26,6 +26,7 @@ export default function WatchlistButton({ item, variant = "default" }) {
         onClick={handleClick}
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
+        aria-pressed={isInWatchlist}
         style={{
           display: "inline-flex",
           alignItems: "center",
@@ -59,6 +60,12 @@ export default function WatchlistButton({ item, variant = "default" }) {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
       title={isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+      aria-label={
+        isInWatchlist
+          ? `Remove ${item.title || item.name} from watchlist`
+          : `Add ${item.title || item.name} to watchlist`
+      }
+      aria-pressed={isInWatchlist}
       style={{
         width: 40,
         height: 40,

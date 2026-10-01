@@ -213,11 +213,11 @@ export default function WatchlistPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
         >
-          {watchlist.map((item, index) => {
+          {watchlist.map((item) => {
             const itemType = item.type === "tv" ? "tv" : "movie";
             return (
               <MediaCard
-                key={`${itemType}-${item.id}-${index}`}
+                key={`${itemType}-${item.id}`}
                 item={item}
                 type={itemType}
                 onRemove={() => removeFromWatchlist(item.id, itemType)}

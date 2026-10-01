@@ -9,6 +9,7 @@ export default function ScrollRow({
   subtitle,
   href,
   children,
+  style,
 }) {
   const ref = useRef(null);
 
@@ -20,7 +21,7 @@ export default function ScrollRow({
   };
 
   return (
-    <section>
+    <section style={style}>
       <div
         style={{
           display: "flex",

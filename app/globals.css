@@ -2,6 +2,8 @@
 
 /* ── Design Tokens ────────────────────────────────────────────── */
 :root {
+    color-scheme: dark;
+
     /* Colors */
     --bg: #000000;
     --bg-secondary: #0a0a0a;
@@ -13,8 +15,8 @@
 
     --text-primary: #fafafa;
     --text-secondary: rgba(250, 250, 250, 0.7);
-    --text-tertiary: rgba(250, 250, 250, 0.45);
-    --text-muted: rgba(250, 250, 250, 0.25);
+    --text-tertiary: rgba(250, 250, 250, 0.62);
+    --text-muted: rgba(250, 250, 250, 0.48);
 
     --accent: #f59e0b;
     --accent-hover: #fbbf24;
@@ -118,7 +120,13 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
+    overflow-x: clip;
+}
+
+/* Locks background scroll while the mobile menu / search overlay is open. */
+body.menu-open {
+    overflow: hidden;
+    touch-action: none;
 }
 
 a {
@@ -161,13 +169,6 @@ video {
     background: var(--text-tertiary);
 }
 
-/* ── Layout ───────────────────────────────────────────────────── */
-.container {
-    max-width: var(--container-max);
-    margin: 0 auto;
-    padding: 0 var(--container-padding);
-}
-
 /* ── Utility Classes ──────────────────────────────────────────── */
 .skeleton {
     background: linear-gradient(
@@ -193,6 +194,20 @@ video {
 
 .scroll-row::-webkit-scrollbar {
     display: none;
+}
+
+/* Hover-revealed card actions: keep them visible on touch devices (no hover)
+   and whenever something inside has keyboard focus. */
+@media (hover: none), (pointer: coarse) {
+    .media-card-action {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+.media-card-action:focus-within {
+    opacity: 1 !important;
+    transform: none !important;
 }
 
 .scroll-row > * {
@@ -252,12 +267,6 @@ video {
     background: var(--accent-subtle);
     color: var(--accent);
     border: 1px solid var(--accent-border);
-}
-
-.badge-gold {
-    background: var(--gold-subtle);
-    color: var(--gold);
-    border: 1px solid var(--gold-border);
 }
 
 .genre-pill {
@@ -642,19 +651,4 @@ textarea:focus-visible {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
-}
-
-/* ── Glass effect ───────────────────────────────────────── */
-.glass {
-    background: rgba(10, 10, 10, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.glass-elevated {
-    background: rgba(23, 23, 23, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
 }

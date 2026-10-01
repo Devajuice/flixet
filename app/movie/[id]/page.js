@@ -15,7 +15,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import WatchlistButton from "@/components/WatchlistButton";
-import VideoPlayer from "@/components/VideoPlayer";
+import dynamic from "next/dynamic";
 import MediaCard from "@/components/MediaCard";
 import ScrollRow from "@/components/ScrollRow";
 import ShareButton from "@/components/ShareButton";
@@ -26,8 +26,13 @@ import {
 } from "@/components/Skeleton";
 import { useContinueWatching } from "@/context/ContinueWatchingContext";
 import { useHistory } from "@/context/HistoryContext";
+import { formatDate } from "@/lib/utils";
+import { getMovieDetails, getMovieExternalIds } from "@/lib/tmdbClient";
 
-const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+const VideoPlayer = dynamic(() => import("@/components/VideoPlayer"), {
+  ssr: false,
+});
+
 const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
 const IMG = "https://image.tmdb.org/t/p";
 
@@ -249,20 +254,15 @@ export default function MovieDetails({ params }) {
 
   useEffect(() => {
     if (!movieId) return;
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
     Promise.all([
-      fetch(
-        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations,watch%2Fproviders`,
-      ),
-      fetch(
-        `https://api.themoviedb.org/3/movie/${movieId}/external_ids?api_key=${API_KEY}`,
-      ),
+      getMovieDetails(movieId, { signal }),
+      getMovieExternalIds(movieId, { signal }),
     ])
-      .then((rs) => Promise.all(rs.map((r) => r.json())))
       .then(([movieData, extData]) => {
-        if (movieData.success === false || movieData.status_code)
-          throw new Error(
-            movieData.status_message || "Failed to fetch movie data",
-          );
         setMovie(movieData);
         addToHistory({
           id: movieData.id,
@@ -289,8 +289,15 @@ export default function MovieDetails({ params }) {
             .catch(() => setImdbRating(null));
         } else setImdbRating(null);
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (err.name === "AbortError") return;
+        setError(err.message || "Failed to fetch movie data");
+      })
+      .finally(() => {
+        if (!signal.aborted) setLoading(false);
+      });
+
+    return () => controller.abort();
   }, [movieId, addToHistory]);
 
   useEffect(() => {
@@ -367,7 +374,7 @@ export default function MovieDetails({ params }) {
     );
 
   const backdrop = movie.backdrop_path
-    ? `${IMG}/original${movie.backdrop_path}`
+    ? `${IMG}/w1280${movie.backdrop_path}`
     : null;
   const poster = movie.poster_path ? `${IMG}/w500${movie.poster_path}` : null;
   const cast = movie.credits?.cast?.slice(0, 16) || [];
@@ -414,6 +421,9 @@ export default function MovieDetails({ params }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowTrailer(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${movie.title} trailer`}
             style={{
               position: "fixed",
               inset: 0,
@@ -441,6 +451,7 @@ export default function MovieDetails({ params }) {
             >
               <iframe
                 src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&rel=0`}
+                title={`${movie.title} trailer`}
                 allow="autoplay; encrypted-media"
                 allowFullScreen
                 style={{ width: "100%", height: "100%", border: "none" }}
@@ -467,6 +478,7 @@ export default function MovieDetails({ params }) {
               fill
               sizes="100vw"
               priority
+              quality={75}
               style={{ objectFit: "cover" }}
             />
           </div>
@@ -640,10 +652,7 @@ export default function MovieDetails({ params }) {
                   >
                     <Calendar size={14} />
                     <span style={{ fontSize: "var(--text-sm)" }}>
-                      {new Date(movie.release_date).toLocaleDateString(
-                        "en-US",
-                        { year: "numeric", month: "long", day: "numeric" },
-                      )}
+                      {formatDate(movie.release_date)}
                     </span>
                   </div>
                 )}

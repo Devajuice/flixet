@@ -19,7 +19,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import WatchlistButton from "@/components/WatchlistButton";
-import VideoPlayer from "@/components/VideoPlayer";
+import dynamic from "next/dynamic";
 import MediaCard from "@/components/MediaCard";
 import ScrollRow from "@/components/ScrollRow";
 import ShareButton from "@/components/ShareButton";
@@ -30,10 +30,23 @@ import {
 } from "@/components/Skeleton";
 import { useContinueWatching } from "@/context/ContinueWatchingContext";
 import { useHistory } from "@/context/HistoryContext";
+import { formatDate } from "@/lib/utils";
+import {
+  getTVShowDetails,
+  getTVExternalIds,
+  getSeasonDetails,
+} from "@/lib/tmdbClient";
 
-const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+const VideoPlayer = dynamic(() => import("@/components/VideoPlayer"), {
+  ssr: false,
+});
+
 const OMDB_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY;
 const IMG = "https://image.tmdb.org/t/p";
+
+// Fixed reference date so "upcoming episode" checks stay deterministic across
+// renders and hydration.
+const TODAY = new Date().toISOString().slice(0, 10);
 
 function SkeletonPage() {
   return (
@@ -287,14 +300,8 @@ function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
     return h > 0 ? `${h}h ${min}m` : `${min}m`;
   };
   const rt = formatRT(ep.runtime);
-  const air = ep.air_date
-    ? new Date(ep.air_date).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : null;
-  const isFuture = ep.air_date && new Date(ep.air_date) > new Date();
+  const air = ep.air_date ? formatDate(ep.air_date) : null;
+  const isFuture = ep.air_date ? ep.air_date > TODAY : false;
 
   return (
     <motion.div
@@ -302,8 +309,9 @@ function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index * 0.03, 0.4) }}
-      tabIndex={0}
+      tabIndex={isFuture ? -1 : 0}
       role="button"
+      aria-disabled={isFuture}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -412,6 +420,7 @@ function TVShowDetailsContent({ params }) {
   const [externalIds, setExternalIds] = useState(null);
   const [showImdb, setShowImdb] = useState(undefined);
   const [omdbCache, setOmdbCache] = useState({});
+  const omdbCacheRef = useRef({});
   const { addToContinueWatching } = useContinueWatching();
   const { addToHistory } = useHistory();
 
@@ -428,20 +437,15 @@ function TVShowDetailsContent({ params }) {
 
   useEffect(() => {
     if (!showId) return;
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
     Promise.all([
-      fetch(
-        `https://api.themoviedb.org/3/tv/${showId}?api_key=${API_KEY}&append_to_response=credits,videos,recommendations,watch%2Fproviders`,
-      ),
-      fetch(
-        `https://api.themoviedb.org/3/tv/${showId}/external_ids?api_key=${API_KEY}`,
-      ),
+      getTVShowDetails(showId, { signal }),
+      getTVExternalIds(showId, { signal }),
     ])
-      .then((rs) => Promise.all(rs.map((r) => r.json())))
       .then(([showData, extData]) => {
-        if (showData.success === false || showData.status_code)
-          throw new Error(
-            showData.status_message || "Failed to fetch show data",
-          );
         setShow(showData);
         addToHistory({
           id: showData.id,
@@ -468,9 +472,19 @@ function TVShowDetailsContent({ params }) {
           setSelEpisode(paramEpisode && paramEpisode > 0 ? paramEpisode : 1);
         }
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [showId, seasonParam, episodeParam, addToHistory]);
+      .catch((err) => {
+        if (err.name === "AbortError") return;
+        setError(err.message || "Failed to fetch show data");
+      })
+      .finally(() => {
+        if (!signal.aborted) setLoading(false);
+      });
+
+    return () => controller.abort();
+    // seasonParam/episodeParam are read here but shouldn't retrigger the
+    // show fetch — they're handled by the season/episode effects below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showId, addToHistory]);
 
   useEffect(() => {
     if (!OMDB_KEY || !externalIds?.imdb_id) return;
@@ -497,41 +511,65 @@ function TVShowDetailsContent({ params }) {
 
   useEffect(() => {
     if (selSeason === null) return;
-    fetch(
-      `https://api.themoviedb.org/3/tv/${showId}/season/${selSeason}?api_key=${API_KEY}`,
-    )
-      .then((r) => r.json())
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    getSeasonDetails(showId, selSeason, { signal })
       .then((d) => setSeasonData(d))
-      .catch(console.error)
-      .finally(() => setLoadingSeason(false));
+      .catch((e) => {
+        if (e.name !== "AbortError") console.error(e);
+      })
+      .finally(() => {
+        if (!signal.aborted) setLoadingSeason(false);
+      });
+
+    return () => controller.abort();
   }, [selSeason, showId]);
 
+  // `omdbCacheRef` mirrors omdbCache so this effect doesn't re-run (and re-fire
+// every in-flight request) on each cache write. Fetch in parallel and commit
+// once, rather than one setState per episode.
   useEffect(() => {
     if (!OMDB_KEY || !externalIds?.imdb_id || !seasonData?.episodes) return;
-    seasonData.episodes.forEach((ep) => {
-      const key = `S${selSeason}E${ep.episode_number}`;
-      if (omdbCache[key] !== undefined) return;
-      fetch(
-        `https://www.omdbapi.com/?i=${externalIds.imdb_id}&Season=${selSeason}&Episode=${ep.episode_number}&apikey=${OMDB_KEY}`,
-      )
-        .then((r) => r.json())
-        .then((d) =>
-          setOmdbCache((prev) => ({
-            ...prev,
-            [key]:
-              d.imdbRating && d.imdbRating !== "N/A"
-                ? { rating: d.imdbRating }
-                : null,
-          })),
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    const pending = seasonData.episodes
+      .filter((ep) => omdbCacheRef.current[`S${selSeason}E${ep.episode_number}`] === undefined)
+      .map((ep) => ({
+        key: `S${selSeason}E${ep.episode_number}`,
+        request: fetch(
+          `https://www.omdbapi.com/?i=${externalIds.imdb_id}&Season=${selSeason}&Episode=${ep.episode_number}&apikey=${OMDB_KEY}`,
+          { signal },
         )
-        .catch(() =>
-          setOmdbCache((prev) => ({
-            ...prev,
-            [`S${selSeason}E${ep.episode_number}`]: null,
-          })),
-        );
+          .then((r) => r.json())
+          .then((d) =>
+            d.imdbRating && d.imdbRating !== "N/A"
+              ? { rating: d.imdbRating }
+              : null,
+          )
+          .catch(() => null),
+      }));
+
+    if (pending.length === 0) return;
+
+    Promise.all(pending.map((p) => p.request)).then((results) => {
+      if (signal.aborted) return;
+
+      setOmdbCache((prev) => {
+        const next = { ...prev };
+        pending.forEach((p, i) => {
+          next[p.key] = results[i];
+        });
+        omdbCacheRef.current = next;
+        return next;
+      });
     });
-  }, [seasonData, externalIds, selSeason, omdbCache]);
+
+    return () => controller.abort();
+  }, [seasonData, externalIds, selSeason]);
 
   useEffect(() => {
     if (showPlayer && show) {
@@ -623,7 +661,7 @@ function TVShowDetailsContent({ params }) {
     );
 
   const backdrop = show.backdrop_path
-    ? `${IMG}/original${show.backdrop_path}`
+    ? `${IMG}/w1280${show.backdrop_path}`
     : null;
   const poster = show.poster_path ? `${IMG}/w500${show.poster_path}` : null;
   const cast = show.credits?.cast?.slice(0, 16) || [];
@@ -707,6 +745,9 @@ function TVShowDetailsContent({ params }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowTrailer(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${show.name} trailer`}
             style={{
               position: "fixed",
               inset: 0,
@@ -734,6 +775,7 @@ function TVShowDetailsContent({ params }) {
             >
               <iframe
                 src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&rel=0`}
+                title={`${show.name} trailer`}
                 allow="autoplay; encrypted-media"
                 allowFullScreen
                 style={{ width: "100%", height: "100%", border: "none" }}
@@ -760,6 +802,7 @@ function TVShowDetailsContent({ params }) {
               fill
               sizes="100vw"
               priority
+              quality={75}
               style={{ objectFit: "cover" }}
             />
           </div>
@@ -950,10 +993,7 @@ function TVShowDetailsContent({ params }) {
                   >
                     <Calendar size={14} />
                     <span style={{ fontSize: "var(--text-sm)" }}>
-                      {new Date(show.first_air_date).toLocaleDateString(
-                        "en-US",
-                        { year: "numeric", month: "long", day: "numeric" },
-                      )}
+                      {formatDate(show.first_air_date)}
                     </span>
                   </div>
                 )}
@@ -1109,10 +1149,7 @@ function TVShowDetailsContent({ params }) {
                 <InfoCard
                   icon={<Calendar size={18} />}
                   label="Last Aired"
-                  value={new Date(show.last_air_date).toLocaleDateString(
-                    "en-US",
-                    { year: "numeric", month: "long", day: "numeric" },
-                  )}
+                  value={formatDate(show.last_air_date)}
                 />
               )}
               {show.in_production && (

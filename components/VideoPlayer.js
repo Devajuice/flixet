@@ -74,11 +74,17 @@ export default function VideoPlayer({
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      // Escape should dismiss the open server menu before the player itself.
+      if (showServerMenu) {
+        setShowServerMenu(false);
+        return;
+      }
+      onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, showServerMenu]);
 
   useEffect(() => {
     if (isOpen) {
@@ -91,9 +97,11 @@ export default function VideoPlayer({
   }, [isOpen, onWatchedSeconds]);
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
     };
   }, [isOpen]);
 
@@ -114,6 +122,9 @@ export default function VideoPlayer({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={displayTitle}
         style={{
           position: "fixed",
           inset: 0,
@@ -212,6 +223,8 @@ export default function VideoPlayer({
           <div style={{ position: "relative", flexShrink: 0 }}>
             <button
               onClick={() => setShowServerMenu((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={showServerMenu}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -244,6 +257,8 @@ export default function VideoPlayer({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
+                  role="menu"
+                  aria-label="Choose a streaming server"
                   style={{
                     position: "absolute",
                     top: "calc(100% + 8px)",
@@ -265,6 +280,8 @@ export default function VideoPlayer({
                         setActiveServer(i);
                         setShowServerMenu(false);
                       }}
+                      role="menuitemradio"
+                      aria-checked={activeServer === i}
                       style={{
                         width: "100%",
                         padding: "8px 12px",
@@ -356,6 +373,7 @@ export default function VideoPlayer({
           }}
           allowFullScreen
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          referrerPolicy="origin"
           title={`Watch ${displayTitle}`}
           onLoad={() => setIframeLoaded(true)}
         />

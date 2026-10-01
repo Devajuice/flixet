@@ -3,8 +3,13 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import MediaCard from "@/components/MediaCard";
+import { discoverTV } from "@/lib/tmdbClient";
 
-const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+const ANIME_PARAMS = {
+  with_genres: 16,
+  with_origin_country: "JP",
+  sort_by: "popularity.desc",
+};
 
 export default function AnimePage() {
   const [animeList, setAnimeList] = useState([]);
@@ -13,15 +18,13 @@ export default function AnimePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const observerTarget = useRef(null);
+  const inFlightPage = useRef(null);
 
   const fetchAnime = useCallback(async (page, reset = false) => {
     if (reset) setLoading(true);
     else setLoadingMore(true);
     try {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=16&with_origin_country=JP&sort_by=popularity.desc&page=${page}`,
-      );
-      const data = await res.json();
+      const data = await discoverTV({ ...ANIME_PARAMS, page });
       if (reset) {
         setAnimeList(data.results || []);
       } else {
@@ -50,8 +53,24 @@ export default function AnimePage() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore)
-          fetchAnime(currentPage + 1, false);
+        if (
+          !entries[0].isIntersecting ||
+          !hasMore ||
+          loading ||
+          loadingMore
+        ) {
+          return;
+        }
+
+        const nextPage = currentPage + 1;
+        if (inFlightPage.current === nextPage) return;
+        inFlightPage.current = nextPage;
+
+        fetchAnime(nextPage, false).finally(() => {
+          if (inFlightPage.current === nextPage) {
+            inFlightPage.current = null;
+          }
+        });
       },
       { threshold: 0.1 },
     );

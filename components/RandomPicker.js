@@ -2,8 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dices, Loader2 } from "lucide-react";
-
-const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+import { tmdbFetch } from "@/lib/tmdbClient";
 
 export default function RandomPicker({ variant = "header" }) {
   const router = useRouter();
@@ -15,9 +14,11 @@ export default function RandomPicker({ variant = "header" }) {
     try {
       const type = Math.random() < 0.5 ? "movie" : "tv";
       const page = 1 + Math.floor(Math.random() * 100);
-      const url = `https://api.themoviedb.org/3/discover/${type}?api_key=${API_KEY}&sort_by=popularity.desc&page=${page}&vote_count.gte=50`;
-      const res = await fetch(url);
-      const data = await res.json();
+      const data = await tmdbFetch(`discover/${type}`, {
+        sort_by: "popularity.desc",
+        page,
+        "vote_count.gte": 50,
+      });
       const results = data.results?.filter((r) => r.poster_path) || [];
       if (results.length === 0) throw new Error("No results");
       const pickItem = results[Math.floor(Math.random() * results.length)];

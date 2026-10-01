@@ -30,8 +30,14 @@ import {
   SkeletonWide,
   SkeletonHero,
 } from "@/components/Skeleton";
+import {
+  getPopularMovies,
+  getPopularTVShows,
+  getTopRatedMovies,
+  getTrendingAll,
+  discoverMovies,
+} from "@/lib/tmdbClient";
 
-const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const IMG = "https://image.tmdb.org/t/p";
 
 /* ── Browse by genre card grid ───────────────────────────────────── */
@@ -130,13 +136,14 @@ function HeroBanner({ items }) {
   const item = items[idx];
 
   useEffect(() => {
+    if (items.length < 2) return;
     const t = setInterval(() => setIdx((i) => (i + 1) % items.length), 8000);
     return () => clearInterval(t);
   }, [items.length]);
 
   if (!item) return null;
   const backdrop = item.backdrop_path
-    ? `${IMG}/original${item.backdrop_path}`
+    ? `${IMG}/w1280${item.backdrop_path}`
     : null;
   const title = item.title || item.name;
   const slug = item.media_type === "movie" ? "movie" : "tv";
@@ -167,7 +174,8 @@ function HeroBanner({ items }) {
               alt=""
               fill
               sizes="100vw"
-              priority
+              priority={idx === 0}
+              quality={75}
               style={{ objectFit: "cover" }}
             />
           )}
@@ -320,9 +328,7 @@ function HeroBanner({ items }) {
                   }}
                 >
                   <Clock size={11} />{" "}
-                  {new Date(
-                    item.release_date || item.first_air_date,
-                  ).getFullYear()}
+                  {String(item.release_date || item.first_air_date || "").slice(0, 4)}
                 </span>
               )}
             </div>
@@ -687,28 +693,30 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetches = [
-      fetch(
-        `https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`,
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    const onSettled = (data) => data?.results || [];
+
+    Promise.allSettled([
+      getTrendingAll({ signal }),
+      getPopularMovies(1, { signal }),
+      getPopularTVShows(1, { signal }),
+      getTopRatedMovies({ signal }),
+      discoverMovies(
+        { with_genres: 28, sort_by: "popularity.desc" },
+        { signal },
       ),
-      fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`),
-      fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}`),
-      fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`),
-      fetch(
-        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&sort_by=popularity.desc`,
-      ),
-    ];
-    Promise.all(fetches)
-      .then((rs) => Promise.all(rs.map((r) => r.json())))
-      .then(([t, pm, ptv, tr, ac]) => {
-        setTrending(t.results || []);
-        setPopMovies(pm.results || []);
-        setPopTV(ptv.results || []);
-        setTopRated(tr.results || []);
-        setAction(ac.results || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    ]).then(([t, pm, ptv, tr, ac]) => {
+      setTrending(onSettled(t.status === "fulfilled" ? t.value : null));
+      setPopMovies(onSettled(pm.status === "fulfilled" ? pm.value : null));
+      setPopTV(onSettled(ptv.status === "fulfilled" ? ptv.value : null));
+      setTopRated(onSettled(tr.status === "fulfilled" ? tr.value : null));
+      setAction(onSettled(ac.status === "fulfilled" ? ac.value : null));
+      setLoading(false);
+    });
+
+    return () => controller.abort();
   }, []);
 
   const heroItems = trending.filter((i) => i.backdrop_path).slice(0, 6);
@@ -777,7 +785,13 @@ export default function HomePage() {
                   <SkeletonCard key={i} width={240} height={360} />
                 ))
               : trending.map((item, i) => (
-                  <MediaCard key={item.id} item={item} index={i} variant="tile" cardWidth={240} />
+                  <MediaCard
+                    key={`${item.media_type}-${item.id}`}
+                    item={item}
+                    index={i}
+                    variant="tile"
+                    cardWidth={240}
+                  />
                 ))}
           </ScrollRow>
         </div>

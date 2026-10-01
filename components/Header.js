@@ -34,6 +34,10 @@ export default function Header() {
 
   const moviesButtonRef = useRef(null);
   const tvButtonRef = useRef(null);
+  const moviesPanelRef = useRef(null);
+  const tvPanelRef = useRef(null);
+  const mobileSearchTriggerRef = useRef(null);
+  const mobileMenuTriggerRef = useRef(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -68,6 +72,45 @@ export default function Header() {
   useEffect(() => {
     document.body.classList.remove("menu-open");
   }, [pathname]);
+
+  // Escape closes whichever overlay is open and returns focus to its trigger.
+  useEffect(() => {
+    if (
+      !showMobileSearch &&
+      !showMobileMenu &&
+      !showMoviesMenu &&
+      !showTVMenu
+    ) {
+      return;
+    }
+
+    const onKey = (e) => {
+      if (e.key !== "Escape") return;
+      if (showMobileSearch) {
+        setShowMobileSearch(false);
+        document.body.classList.remove("menu-open");
+        mobileSearchTriggerRef.current?.focus();
+      } else if (showMobileMenu) {
+        setShowMobileMenu(false);
+        document.body.classList.remove("menu-open");
+        mobileMenuTriggerRef.current?.focus();
+      } else if (showMoviesMenu) {
+        setShowMoviesMenu(false);
+        moviesButtonRef.current?.focus();
+      } else if (showTVMenu) {
+        setShowTVMenu(false);
+        tvButtonRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [
+    showMobileSearch,
+    showMobileMenu,
+    showMoviesMenu,
+    showTVMenu,
+  ]);
 
   useEffect(() => {
     const updatePositions = () => {
@@ -201,22 +244,50 @@ export default function Header() {
                 {navLinks.map((link) => {
                   const active = isActive(link.href);
                   if (link.dropdown) {
+                    const isMovies = link.dropdown === "movies";
+                    const open = isMovies ? showMoviesMenu : showTVMenu;
+                    const setOpen = isMovies
+                      ? setShowMoviesMenu
+                      : setShowTVMenu;
+
                     return (
                       <Link
                         key={link.href}
                         href={link.href}
                         ref={link.ref}
                         className={`nav-link${active ? " nav-link--active" : ""}`}
-                        onMouseEnter={() =>
-                          link.dropdown === "movies"
-                            ? setShowMoviesMenu(true)
-                            : setShowTVMenu(true)
-                        }
-                        onMouseLeave={() =>
-                          link.dropdown === "movies"
-                            ? setShowMoviesMenu(false)
-                            : setShowTVMenu(false)
-                        }
+                        aria-haspopup="true"
+                        aria-expanded={open}
+                        onClick={(e) => {
+                          // Let modified clicks behave like a normal navigation.
+                          if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                          e.preventDefault();
+                          setOpen(!open);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "ArrowDown") {
+                            e.preventDefault();
+                            setOpen(true);
+                            requestAnimationFrame(() => {
+                              const panel = isMovies
+                                ? moviesPanelRef.current
+                                : tvPanelRef.current;
+                              panel?.querySelector("a")?.focus();
+                            });
+                          }
+                        }}
+                        onFocus={() => setOpen(true)}
+                        onBlur={(e) => {
+                          // Keep the panel open when focus moves into it.
+                          if (e.currentTarget.contains(e.relatedTarget)) return;
+                          const panel = isMovies
+                            ? moviesPanelRef.current
+                            : tvPanelRef.current;
+                          if (panel?.contains(e.relatedTarget)) return;
+                          setOpen(false);
+                        }}
+                        onMouseEnter={() => setOpen(true)}
+                        onMouseLeave={() => setOpen(false)}
                       >
                         {link.label} <ChevronDown size={13} />
                       </Link>
@@ -253,6 +324,7 @@ export default function Header() {
                 }}
                 aria-label="Search"
                 className="mobile-search-btn"
+                ref={mobileSearchTriggerRef}
               >
                 <SearchIcon size={18} />
               </button>
@@ -263,6 +335,7 @@ export default function Header() {
                 }}
                 aria-label="Open menu"
                 className="mobile-menu-btn"
+                ref={mobileMenuTriggerRef}
               >
                 <Menu size={20} strokeWidth={2} />
               </button>
@@ -410,6 +483,7 @@ export default function Header() {
           <AnimatePresence>
             {showMoviesMenu && (
               <motion.div
+                ref={moviesPanelRef}
                 style={{
                   position: "absolute",
                   left: dropdownPositions.movies.left,
@@ -422,8 +496,16 @@ export default function Header() {
                 transition={{ duration: 0.18 }}
                 onMouseEnter={() => setShowMoviesMenu(true)}
                 onMouseLeave={() => setShowMoviesMenu(false)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Escape") return;
+                  e.preventDefault();
+                  setShowMoviesMenu(false);
+                  moviesButtonRef.current?.focus();
+                }}
               >
                 <div
+                  role="menu"
+                  aria-label="Movie genres"
                   style={{
                     background: "rgba(10, 10, 10, 0.9)",
                     backdropFilter: "blur(20px)",
@@ -498,6 +580,7 @@ export default function Header() {
           <AnimatePresence>
             {showTVMenu && (
               <motion.div
+                ref={tvPanelRef}
                 style={{
                   position: "absolute",
                   left: dropdownPositions.tv.left,
@@ -510,8 +593,16 @@ export default function Header() {
                 transition={{ duration: 0.18 }}
                 onMouseEnter={() => setShowTVMenu(true)}
                 onMouseLeave={() => setShowTVMenu(false)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Escape") return;
+                  e.preventDefault();
+                  setShowTVMenu(false);
+                  tvButtonRef.current?.focus();
+                }}
               >
                 <div
+                  role="menu"
+                  aria-label="TV genres"
                   style={{
                     background: "rgba(10, 10, 10, 0.9)",
                     backdropFilter: "blur(20px)",
@@ -643,6 +734,9 @@ export default function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search"
             style={{
               position: "fixed",
               inset: 0,
@@ -719,6 +813,9 @@ export default function Header() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Site menu"
               style={{
                 position: "fixed",
                 left: 0,

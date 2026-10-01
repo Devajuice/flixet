@@ -100,17 +100,27 @@ export function WatchlistProvider({ children }) {
     update([]);
   }, [update]);
 
+  const value = useMemo(
+    () => ({
+      watchlist,
+      addToWatchlist,
+      removeFromWatchlist,
+      isInWatchlist,
+      clearWatchlist,
+      loading,
+    }),
+    [
+      watchlist,
+      addToWatchlist,
+      removeFromWatchlist,
+      isInWatchlist,
+      clearWatchlist,
+      loading,
+    ],
+  );
+
   return (
-    <WatchlistContext.Provider
-      value={{
-        watchlist,
-        addToWatchlist,
-        removeFromWatchlist,
-        isInWatchlist,
-        clearWatchlist,
-        loading,
-      }}
-    >
+    <WatchlistContext.Provider value={value}>
       {children}
     </WatchlistContext.Provider>
   );

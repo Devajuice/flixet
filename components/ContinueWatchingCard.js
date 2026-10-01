@@ -37,7 +37,7 @@ export default function ContinueWatchingCard({ item }) {
     ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
     : item.backdrop_path
       ? `https://image.tmdb.org/t/p/w500${item.backdrop_path}`
-      : "/placeholder.jpg";
+      : "/placeholder.png";
 
   const linkUrl =
     item.type === "tv"
@@ -50,7 +50,7 @@ export default function ContinueWatchingCard({ item }) {
       <button
         onClick={handleRemove}
         className="cw-remove"
-        aria-label="Remove from continue watching"
+        aria-label={`Remove ${item.title || item.name} from continue watching`}
         style={{
           position: "absolute",
           top: 6,
@@ -80,7 +80,7 @@ export default function ContinueWatchingCard({ item }) {
               src={imageUrl}
               alt={item.title || item.name}
               fill
-              sizes="(max-width: 768px) 140px, 140px"
+              sizes="(max-width: 768px) 140px, 180px"
               style={{ objectFit: "cover", display: "block" }}
             />
 

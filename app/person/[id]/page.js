@@ -18,19 +18,12 @@ import {
   Skeleton as SkeletonEl,
   SkeletonText,
 } from "@/components/Skeleton";
+import { formatDate as formatPersonDate } from "@/lib/utils";
+import { getPersonDetails } from "@/lib/tmdbClient";
 
-const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const IMG = "https://image.tmdb.org/t/p";
 
-function formatDate(dateStr) {
-  if (!dateStr) return null;
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
+const formatDate = formatPersonDate;
 
 function buildCredits(combined) {
   const cast = combined?.cast || [];
@@ -73,20 +66,24 @@ function PersonDetailsContent({ params }) {
 
   useEffect(() => {
     if (!personId) return;
-    fetch(
-      `https://api.themoviedb.org/3/person/${personId}?api_key=${API_KEY}&append_to_response=combined_credits`,
-    )
-      .then((r) => r.json())
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    getPersonDetails(personId, { signal })
       .then((data) => {
-        if (data.success === false || data.status_code)
-          throw new Error(
-            data.status_message || "Failed to fetch person data",
-          );
         setPerson(data);
         setCredits(buildCredits(data.combined_credits));
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (err.name === "AbortError") return;
+        setError(err.message || "Failed to fetch person data");
+      })
+      .finally(() => {
+        if (!signal.aborted) setLoading(false);
+      });
+
+    return () => controller.abort();
   }, [personId]);
 
   if (loading)

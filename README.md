@@ -101,11 +101,15 @@ yarn install
 Create a `.env.local` file in the root directory:
 
 ```bash
-NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_api_key_here
+TMDB_API_KEY=your_tmdb_api_key_here
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_OMDB_API_KEY=your_omdb_api_key_here
 NEXT_PUBLIC_TMDB_REGION=IN
 ```
+
+> `TMDB_API_KEY` is read server-side only. Browser requests go through the
+> `/api/tmdb/[...path]` proxy, which caches responses and keeps the key out of
+> the client bundle.
 
 4. **Run the development server:**
 
@@ -145,14 +149,18 @@ Flixet/
 │   ├── ScrollRow.js          # Horizontal scrollable row (inline section header)
 │   ├── MediaCard.js          # Universal media card (Next.js Image)
 │   ├── CatalogPage.js        # Shared Movies/TV browse template (genre rail, sort, filter drawer)
-│   ├── CastSection.js        # Cast display component
-│   ├── VideoPlayer.js        # Embedded video player with server switching
+│   ├── VideoPlayer.js        # Embedded video player with server switching (lazy-loaded)
 │   ├── WatchlistButton.js    # Add/remove watchlist button
 │   ├── ContinueWatchingSection.js  # Resume watching section
 │   ├── Skeleton.js          # Reusable loading skeleton components
 │   ├── SearchResults.js     # Search results grid
 │   ├── RandomPicker.js       # Random movie/TV picker (header + mobile menu)
 │   └── ShareButton.js        # Share / copy-link button
+├── app/api/tmdb/[...path]/  # Server-side TMDB proxy (caches, hides API key)
+├── lib/
+│   ├── tmdb.js              # Server-side TMDB helpers (revalidated fetch)
+│   ├── tmdbClient.js        # Browser helpers that call the /api/tmdb proxy
+│   └── utils.js             # Date/runtime/text formatting
 ├── context/
 │   ├── WatchlistContext.js   # Watchlist state management
 │   ├── ContinueWatchingContext.js  # Continue watching state
@@ -281,7 +289,7 @@ Full UI overhaul in a Bold / Disney+ inspired direction (black base with an ambe
 2. Go to [Vercel](https://vercel.com)
 3. Import your repository
 4. Add environment variables:
-   - `NEXT_PUBLIC_TMDB_API_KEY`
+   - `TMDB_API_KEY`
    - `NEXT_PUBLIC_SITE_URL`
    - `NEXT_PUBLIC_OMDB_API_KEY` (optional, for episode ratings)
    - `NEXT_PUBLIC_TMDB_REGION` (optional, for watch providers)
@@ -300,7 +308,7 @@ This is a standard Next.js app and can be deployed to:
 
 | Variable                   | Description                      | Required        |
 | -------------------------- | -------------------------------- | --------------- |
-| `NEXT_PUBLIC_TMDB_API_KEY` | Your TMDb API key                | ✅ Yes          |
+| `TMDB_API_KEY`             | Your TMDb API key (server-side)  | ✅ Yes          |
 | `NEXT_PUBLIC_SITE_URL`     | Your deployed site URL           | ⚠️ Recommended |
 | `NEXT_PUBLIC_OMDB_API_KEY` | Your OMDB API key (episode ratings) | ⚠️ Recommended |
 | `NEXT_PUBLIC_TMDB_REGION`  | TMDb region for watch providers (e.g. `IN`, `US`, `GB`) | ⚠️ Optional |

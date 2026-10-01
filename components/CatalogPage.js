@@ -19,8 +19,9 @@ import {
   RotateCcw,
 } from "lucide-react";
 import MediaCard from "@/components/MediaCard";
+import { tmdbFetch } from "@/lib/tmdbClient";
 
-const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+const EMPTY_GENRE_MAP = Object.freeze({});
 
 const YEAR_OPTIONS = [
   { value: "", label: "All Years" },
@@ -94,6 +95,8 @@ function CatalogContent({
   const [minRating, setMinRating] = useState("");
   const [sortOpen, setSortOpen] = useState(false);
   const observerTarget = useRef(null);
+  const abortRef = useRef(null);
+  const inFlightPage = useRef(null);
 
   const activeFilterCount = [
     activeGenre,
@@ -115,18 +118,26 @@ function CatalogContent({
     ) => {
       if (reset) setLoading(true);
       else setLoadingMore(true);
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       try {
-        let url = `https://api.themoviedb.org/3/discover/${type}?api_key=${API_KEY}&page=${page}&sort_by=${sort}`;
         const gId = genre || (genreParam && genreMap[genreParam]);
-        if (gId) url += `&with_genres=${gId}`;
+        const params = { page, sort_by: sort };
+
+        if (gId) params.with_genres = gId;
         if (year) {
           const [start, end] = year.split("-");
-          url += `&${dateField}.gte=${start}-01-01`;
-          url += `&${dateField}.lte=${end || start}-12-31`;
+          params[`${dateField}.gte`] = `${start}-01-01`;
+          params[`${dateField}.lte`] = `${end || start}-12-31`;
         }
-        if (rating) url += `&vote_average.gte=${rating}`;
-        const res = await fetch(url);
-        const data = await res.json();
+        if (rating) params["vote_average.gte"] = rating;
+
+        const data = await tmdbFetch(`discover/${type}`, params, {
+          signal: controller.signal,
+        });
+
         if (reset) {
           setItems(data.results || []);
           setTotalResults(data.total_results || 0);
@@ -142,34 +153,53 @@ function CatalogContent({
         setCurrentPage(page);
         setHasMore(page < data.total_pages && page < 500);
       } catch (e) {
-        console.error(e);
+        if (e.name !== "AbortError") console.error(e);
+        if (reset && e.name !== "AbortError") {
+          setItems([]);
+          setTotalResults(0);
+        }
       } finally {
-        setLoading(false);
-        setLoadingMore(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+          setLoadingMore(false);
+        }
       }
     },
     [type, genreParam, sortBy, activeGenre, yearRange, minRating, dateField, genreMap],
   );
 
   useEffect(() => {
+    inFlightPage.current = null;
     setItems([]);
     setCurrentPage(1);
     setHasMore(true);
     fetchItems(1, true, sortBy, activeGenre, yearRange, minRating);
   }, [fetchItems, sortBy, activeGenre, yearRange, minRating]);
 
+  useEffect(() => () => abortRef.current?.abort(), []);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore)
-          fetchItems(
-            currentPage + 1,
-            false,
-            sortBy,
-            activeGenre,
-            yearRange,
-            minRating,
-          );
+        if (
+          !entries[0].isIntersecting ||
+          !hasMore ||
+          loading ||
+          loadingMore
+        ) {
+          return;
+        }
+
+        const nextPage = currentPage + 1;
+        if (inFlightPage.current === nextPage) return;
+        inFlightPage.current = nextPage;
+
+        fetchItems(nextPage, false, sortBy, activeGenre, yearRange, minRating)
+          .finally(() => {
+            if (inFlightPage.current === nextPage) {
+              inFlightPage.current = null;
+            }
+          });
       },
       { threshold: 0.1 },
     );
@@ -242,6 +272,7 @@ function CatalogContent({
         <div className="catalog-genre-rail">
           <button
             onClick={() => setActiveGenre(null)}
+            aria-pressed={!activeGenre}
             className={`catalog-genre-chip${!activeGenre ? " is-active" : ""}`}
           >
             <Layers size={13} /> All
@@ -250,6 +281,7 @@ function CatalogContent({
             <button
               key={g.id}
               onClick={() => setActiveGenre((prev) => (prev === g.id ? null : g.id))}
+              aria-pressed={activeGenre === g.id}
               className={`catalog-genre-chip${activeGenre === g.id ? " is-active" : ""}`}
             >
               {g.name}
@@ -263,6 +295,11 @@ function CatalogContent({
             <button
               className="catalog-sort-trigger"
               onClick={() => setSortOpen((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={sortOpen}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setSortOpen(false);
+              }}
             >
               <TrendingUp size={15} color="var(--accent)" />
               <span>Sort</span>
@@ -280,12 +317,16 @@ function CatalogContent({
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.18 }}
                   className="catalog-sort-menu"
+                  role="menu"
+                  aria-label="Sort by"
                 >
                   {sortOptions.map((opt) => {
                     const SIcon = opt.icon;
                     return (
                       <button
                         key={opt.value}
+                        role="menuitemradio"
+                        aria-checked={sortBy === opt.value}
                         onClick={() => {
                           setSortBy(opt.value);
                           setSortOpen(false);
@@ -341,6 +382,12 @@ function CatalogContent({
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
               className="catalog-drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Filters"
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setShowFilters(false);
+              }}
             >
               <div className="catalog-drawer-head">
                 <div>
@@ -350,6 +397,7 @@ function CatalogContent({
                 <button
                   className="catalog-drawer-close"
                   onClick={() => setShowFilters(false)}
+                  aria-label="Close filters"
                 >
                   <X size={16} />
                 </button>
@@ -1003,7 +1051,7 @@ export default function CatalogPage({
   type,
   genres,
   genreNames,
-  genreMap = {},
+  genreMap = EMPTY_GENRE_MAP,
   dateField,
   pluralLabel,
 }) {

@@ -4,8 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Film, Tv, Sparkles, Calendar, TrendingUp } from "lucide-react";
 import Link from "next/link";
-
-const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+import { getUpcomingMovies, getOnTheAirTV } from "@/lib/tmdbClient";
+import { formatDate as formatReleaseDate } from "@/lib/utils";
 
 /**
  * ComingSoonPage — shared component for /coming-soon/movies and /coming-soon/tv
@@ -26,19 +26,16 @@ export default function ComingSoonPage({ type, CardComponent }) {
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
 
   const observerTarget = useRef(null);
+  const inFlightPage = useRef(null);
 
   const fetchItems = useCallback(async (page, reset = false) => {
     if (reset) setLoading(true);
     else setLoadingMore(true);
 
     try {
-      const endpoint = isMovie
-        ? `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=en-US&page=${page}&region=US`
-        : `https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}&language=en-US&page=${page}`;
-
-      const response = await fetch(endpoint);
-      if (!response.ok) throw new Error("Fetch failed");
-      const data = await response.json();
+      const data = isMovie
+        ? await getUpcomingMovies(page)
+        : await getOnTheAirTV(page);
 
       if (reset) {
         setItems(data.results || []);
@@ -73,9 +70,24 @@ export default function ComingSoonPage({ type, CardComponent }) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
-          fetchItems(currentPage + 1, false);
+        if (
+          !entries[0].isIntersecting ||
+          !hasMore ||
+          loading ||
+          loadingMore
+        ) {
+          return;
         }
+
+        const nextPage = currentPage + 1;
+        if (inFlightPage.current === nextPage) return;
+        inFlightPage.current = nextPage;
+
+        fetchItems(nextPage, false).finally(() => {
+          if (inFlightPage.current === nextPage) {
+            inFlightPage.current = null;
+          }
+        });
       },
       { threshold: 0.1 },
     );
@@ -88,11 +100,7 @@ export default function ComingSoonPage({ type, CardComponent }) {
 
   const formatDate = (str) => {
     if (!str) return "";
-    return new Date(str).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    return formatReleaseDate(str);
   };
 
   /* ─── Loading screen ─────────────────────────────────────────── */

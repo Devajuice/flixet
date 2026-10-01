@@ -121,17 +121,26 @@ export function ContinueWatchingProvider({ children }) {
     [continueWatching],
   );
 
+  const value = useMemo(
+    () => ({
+      continueWatching,
+      addToContinueWatching,
+      removeFromContinueWatching,
+      clearContinueWatching,
+      getProgress,
+      formatTime, // Export helper
+    }),
+    [
+      continueWatching,
+      addToContinueWatching,
+      removeFromContinueWatching,
+      clearContinueWatching,
+      getProgress,
+    ],
+  );
+
   return (
-    <ContinueWatchingContext.Provider
-      value={{
-        continueWatching,
-        addToContinueWatching,
-        removeFromContinueWatching,
-        clearContinueWatching,
-        getProgress,
-        formatTime, // Export helper
-      }}
-    >
+    <ContinueWatchingContext.Provider value={value}>
       {children}
     </ContinueWatchingContext.Provider>
   );

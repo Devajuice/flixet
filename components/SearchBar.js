@@ -1,19 +1,21 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Search, X, Film, Tv, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { searchMulti } from "@/lib/tmdbClient";
 
-const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const IMG = "https://image.tmdb.org/t/p";
 
-function debounce(fn, delay) {
+function createDebounced(fn, delay) {
   let timer;
-  return function (...args) {
+  const debounced = function (...args) {
     clearTimeout(timer);
     timer = setTimeout(() => fn.apply(this, args), delay);
   };
+  debounced.cancel = () => clearTimeout(timer);
+  return debounced;
 }
 
 export default function SearchBar({ autoFocus }) {
@@ -24,48 +26,72 @@ export default function SearchBar({ autoFocus }) {
   const [focused, setFocused] = useState(false);
   const searchRef = useRef(null);
   const router = useRouter();
-  const searchContentRef = useRef(null);
+  const requestIdRef = useRef(0);
+  const abortRef = useRef(null);
 
-  const searchContent = async (searchQuery) => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`,
-      );
-      if (!response.ok) throw new Error("Search request failed");
-      const data = await response.json();
-      const filtered = (data.results || [])
-        .filter(
-          (item) => item.media_type === "movie" || item.media_type === "tv",
-        )
-        .filter((item) => item.poster_path)
-        .slice(0, 8);
-      setResults(filtered);
-      setIsOpen(true);
-    } catch (error) {
-      console.error("Search error:", error);
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const runSearch = useMemo(
+    () =>
+      async (searchQuery) => {
+        const requestId = ++requestIdRef.current;
+        const controller = new AbortController();
+        abortRef.current?.abort();
+        abortRef.current = controller;
 
-  searchContentRef.current = searchContent;
+        setLoading(true);
+        try {
+          const data = await searchMulti(searchQuery, 1, {
+            signal: controller.signal,
+          });
 
-  const debouncedSearch = useRef(
-    debounce((searchQuery) => {
-      if (searchQuery.trim().length >= 2) {
-        searchContentRef.current(searchQuery);
-      } else {
-        setResults([]);
-        setIsOpen(false);
-      }
-    }, 300),
-  ).current;
+          // Ignore responses that a newer keystroke has already superseded.
+          if (requestId !== requestIdRef.current) return;
+
+          const filtered = (data.results || [])
+            .filter(
+              (item) => item.media_type === "movie" || item.media_type === "tv",
+            )
+            .filter((item) => item.poster_path)
+            .slice(0, 8);
+          setResults(filtered);
+          setIsOpen(true);
+        } catch (error) {
+          if (error.name === "AbortError") return;
+          if (requestId !== requestIdRef.current) return;
+          console.error("Search error:", error);
+          setResults([]);
+        } finally {
+          if (requestId === requestIdRef.current) setLoading(false);
+        }
+      },
+    [],
+  );
+
+  const debouncedSearch = useMemo(
+    () =>
+      createDebounced((searchQuery) => {
+        if (searchQuery.trim().length >= 2) {
+          runSearch(searchQuery);
+        } else {
+          requestIdRef.current++;
+          setResults([]);
+          setIsOpen(false);
+          setLoading(false);
+        }
+      }, 300),
+    [runSearch],
+  );
 
   useEffect(() => {
     debouncedSearch(query);
   }, [query, debouncedSearch]);
+
+  useEffect(
+    () => () => {
+      debouncedSearch.cancel();
+      abortRef.current?.abort();
+    },
+    [debouncedSearch],
+  );
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -152,7 +178,6 @@ export default function SearchBar({ autoFocus }) {
               color: "var(--text-primary)",
               fontSize: "var(--text-sm)",
               fontFamily: "var(--font-sans)",
-              outline: "none",
               transition: "all 0.2s ease",
             }}
           />
@@ -160,6 +185,7 @@ export default function SearchBar({ autoFocus }) {
             <button
               type="button"
               onClick={clearSearch}
+              aria-label="Clear search"
               style={{
                 position: "absolute",
                 right: 10,
