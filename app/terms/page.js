@@ -13,7 +13,76 @@ import {
   Edit,
   Ban,
   Mail,
+  HelpCircle,
 } from "lucide-react";
+import Accordion from "@/components/Accordion";
+
+const TERMS_FAQ = [
+  {
+    title: "Do I need an account to watch?",
+    subtitle: "Accounts, sign-in and what we store",
+    icon: <HelpCircle size={17} />,
+    content: (
+      <p className="terms-text">
+        No. Flixet requires no account, no sign-in and no payment details. Your
+        watchlist, continue-watching progress and viewing history are stored
+        only in your own browser&apos;s local storage — we never receive them.
+        Clearing your browser data will erase them permanently.
+      </p>
+    ),
+  },
+  {
+    title: "Is Flixet really free?",
+    subtitle: "Cost, ads and donations",
+    icon: <HelpCircle size={17} />,
+    content: (
+      <p className="terms-text">
+        Yes. The Website is provided at no cost and we do not sell your data or
+        ask for payment information. Third-party embed providers may operate
+        their own infrastructure, and keeping Flixet running may eventually
+        depend on voluntary support.
+      </p>
+    ),
+  },
+  {
+    title: "Who owns the titles on the site?",
+    subtitle: "Content rights and attribution",
+    icon: <Copyright size={17} />,
+    content: (
+      <p className="terms-text">
+        Flixet does not host any video files. Titles, artwork and metadata are
+        the property of their respective studios and distributors, and are
+        sourced from publicly available third-party APIs. All trademarks remain
+        the property of their owners.
+      </p>
+    ),
+  },
+  {
+    title: "Can I use Flixet on a TV or phone?",
+    subtitle: "Supported devices",
+    icon: <Globe size={17} />,
+    content: (
+      <p className="terms-text">
+        The Website is responsive and works in any modern browser on desktop,
+        tablet and mobile. Playback quality and provider availability are
+        decided by the third-party embed used for each title, not by Flixet.
+      </p>
+    ),
+  },
+  {
+    title: "How do I report a problem or a takedown request?",
+    subtitle: "DMCA, copyright and contact",
+    icon: <Mail size={17} />,
+    content: (
+      <p className="terms-text">
+        Use the contact details listed under &quot;Contact Information&quot; at
+        the bottom of this page. Copyright holders should follow the formal
+        process described in our DMCA policy so a request can be actioned
+        promptly.
+      </p>
+    ),
+  },
+];
 
 export default function TermsOfService() {
   return (
@@ -68,6 +137,19 @@ export default function TermsOfService() {
           max-width: 680px;
           margin: 14px auto 0;
           line-height: 1.85;
+        }
+
+        /* ── FAQ accordion ──────────────────────────────── */
+        .terms-faq {
+          margin-bottom: 32px;
+        }
+
+        .terms-faq-title {
+          font-size: 20px;
+          font-weight: 800;
+          color: rgba(255, 255, 255, 0.88);
+          margin-bottom: 14px;
+          letter-spacing: -0.01em;
         }
 
         /* ── Section cards ─────────────────────────────── */
@@ -326,6 +408,17 @@ export default function TermsOfService() {
             our website, you agree to be bound by these terms.
           </p>
         </div>
+
+        {/* Quick answers */}
+        <section className="terms-faq" aria-labelledby="terms-faq-title">
+          <h2 id="terms-faq-title" className="terms-faq-title">
+            Quick answers
+          </h2>
+          <Accordion
+            defaultOpen={[TERMS_FAQ[0].title]}
+            items={TERMS_FAQ}
+          />
+        </section>
 
         {[
           {

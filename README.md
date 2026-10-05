@@ -16,9 +16,9 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 📱 **Bottom Sheet Menu** - Replace the old side drawer with a bottom sheet optimized for one-handed mobile use
 - 🏠 **Cinematic Home** - Auto-rotating hero carousel, genre card grid, and editor's spotlight section
 - 🏷️ **Split-Tile Cards** - Cards redesigned with a poster area + info bar (title, year, type pill); used across the home rows and shared catalog grids with a responsive 2-column episode list
-- 🗂️ **Rich Browse Pages** - Movies and TV share a redesigned catalog page with a genre rail, inline sort dropdown, and slide-in filter drawer
+- 🗂️ **Rich Browse Pages** - Movies and TV share a redesigned catalog page with a genre rail, inline sort dropdown, slide-in filter drawer, and an Infinite/Pages view toggle
 - ⚡ **Fast Performance** - Built with Next.js 16 with Turbopack
-- 🎯 **Advanced Filters** - Filter by genre, year, rating, and more
+- 🎯 **Advanced Filters** - Filter by genre, rating, decade presets, a dual-thumb year slider, or an exact release-date range
 - 🚀 **Coming Soon** - Dedicated pages for upcoming movies and airing TV shows
 - ♾️ **Infinite Scroll** - Seamlessly load more content as you browse
 - 🎞️ **Continue Watching** - Pick up right where you left off with episode tracking
@@ -32,6 +32,12 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 🔗 **Share Buttons** - Share movies and shows via native share or copy link
 - 🎲 **Random Picker** - One-click random movie/TV show discovery
 - 📈 **Real Progress Tracking** - Watch time measured and stored as viewing progress
+- 🔔 **Toast Notifications** - Non-blocking feedback for share, watchlist, and error states, with optional undo actions
+- 💬 **Rich Tooltips** - Contextual hints on hover *and* keyboard focus, flipping automatically at screen edges
+- 📑 **FAQ Accordions** - Collapsible "Quick answers" panels on the Terms, Privacy, and DMCA pages
+- 🔢 **Paged Browsing** - Toggle the catalog between infinite scroll and page-number pagination
+- 🎚️ **Range Slider** - Dual-thumb year filter, fully keyboard-operable, debounced so a drag costs one request
+- 📅 **Date Range Picker** - Calendar popover for exact release-date filtering (single or from/to range)
 
 ## To Do
 
@@ -57,6 +63,8 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - [x] ~~Mobile Bottom Sheet Menu~~
 - [x] ~~Split-Tile Card Redesign (home rows + catalog grids)~~
 - [x] ~~Episode List Improvements (2-column grid, compact mobile cards)~~
+- [x] ~~UI Primitives (toast, tooltip, accordion, pagination, range slider, calendar)~~
+- [x] ~~Paged Browsing Mode (toggle alongside infinite scroll)~~
 
 ## 🛠️ Tech Stack
 
@@ -150,12 +158,18 @@ Flixet/
 │   ├── MediaCard.js          # Universal media card (Next.js Image)
 │   ├── CatalogPage.js        # Shared Movies/TV browse template (genre rail, sort, filter drawer)
 │   ├── VideoPlayer.js        # Embedded video player with server switching (lazy-loaded)
-│   ├── WatchlistButton.js    # Add/remove watchlist button
+│   ├── WatchlistButton.js    # Add/remove watchlist button (tooltip + toast)
 │   ├── ContinueWatchingSection.js  # Resume watching section
 │   ├── Skeleton.js          # Reusable loading skeleton components
 │   ├── SearchResults.js     # Search results grid
 │   ├── RandomPicker.js       # Random movie/TV picker (header + mobile menu)
-│   └── ShareButton.js        # Share / copy-link button
+│   ├── ShareButton.js        # Share / copy-link button
+│   ├── ToastContainer.js     # Toast stack renderer (messenger)
+│   ├── Tooltip.js            # Viewport-fixed tooltip with edge flipping
+│   ├── Accordion.js          # Collapsible panels with roving arrow-key nav
+│   ├── Pagination.js         # Page-number pager with elision
+│   ├── RangeSlider.js        # Dual-thumb min/max slider
+│   ├── Calendar.js           # Date / date-range calendar popover
 ├── app/api/tmdb/[...path]/  # Server-side TMDB proxy (caches, hides API key)
 ├── lib/
 │   ├── tmdb.js              # Server-side TMDB helpers (revalidated fetch)
@@ -164,7 +178,8 @@ Flixet/
 ├── context/
 │   ├── WatchlistContext.js   # Watchlist state management
 │   ├── ContinueWatchingContext.js  # Continue watching state
-│   └── HistoryContext.js     # Recently viewed history state
+│   ├── HistoryContext.js     # Recently viewed history state
+│   └── ToastContext.js       # Toast queue + useToastActions() helpers
 ├── public/                   # Static assets (icons, images)
 └── .env.local                # Environment variables
 ```
@@ -266,6 +281,72 @@ Full UI overhaul in a Bold / Disney+ inspired direction (black base with an ambe
 - **Overflow Handling**: Long titles and metadata properly truncate on all screen sizes
 - **Mobile Padding**: Consistent container padding across all pages (search, movies, TV shows)
 
+### UI Primitives
+
+Hand-rolled, dependency-free components in `components/` that cover the
+interactions this app needed but had no library for. Each one reads the design
+tokens from `app/globals.css`, so they inherit the amber/black theme with no
+per-component theming.
+
+| Component | Replaces | Used by |
+| --------- | -------- | ------- |
+| `ToastContainer.js` + `context/ToastContext.js` | jQuery EasyUI `messager` | Share, watchlist, random picker, filters |
+| `Tooltip.js` | `tooltip` | `WatchlistButton`, `RandomPicker` |
+| `Accordion.js` | `accordion` | Terms, Privacy, DMCA "Quick answers" |
+| `Pagination.js` | `pagination` | `CatalogPage` (Movies / TV) |
+| `RangeSlider.js` | `slider` | `CatalogPage` year filter |
+| `Calendar.js` | `calendar` / `datebox` | `CatalogPage` release-date filter |
+
+**Toast notifications** — mounted once at the root via `ToastProvider`
+(`app/layout.js:81`). `useToastActions()` exposes `success / error / warning /
+info / progress` plus `update` and `dismiss`.
+
+- Stacks bottom-right on desktop, bottom-centre above the mobile nav on small screens
+- Auto-dismiss countdown **pauses on hover** so long messages stay readable
+- Optional `action` button — the watchlist uses it for a one-tap **Undo**
+- Capped at 4; the oldest is dropped so new messages always get screen time
+- Errors announce assertively via `role="alert"`, everything else politely
+
+**Tooltips** — replace the native `title=` attributes that cannot be styled and
+do not show on keyboard focus.
+
+- Shown on hover **and** on focus, so they are reachable without a mouse
+- Position `fixed` and re-measured on scroll/resize, so they escape the
+  `overflow-x: auto` of horizontal scroll rows
+- Flip to the opposite side near viewport edges; dismiss on `Escape`
+
+**Accordions** — used for the "Quick answers" block on the three legal pages.
+
+- `aria-expanded` + `aria-controls` on each header, panel exposed as a
+  `role="region"` labelled by its header
+- Roving `↑`/`↓`/`Home`/`End` keyboard navigation between headers
+- Height-animated panels via framer-motion's `height: auto`
+
+**Pagination** — an opt-in alternative to infinite scroll on the catalog pages.
+
+- Toolbar toggle switches between **Infinite** and **Pages**
+- Elides the middle of long ranges (`1 2 3 … 500`) and clamps to 500 pages, the
+  same ceiling the infinite-scroll observers use
+- Shows a `Showing X–Y of Z` range and marks the current page with `aria-current`
+
+**Range slider** — dual-thumb year filter replacing single-decade presets.
+
+- Dragging anywhere on the track moves the nearer thumb
+- Full keyboard support (`←/→` step, `PageUp/PageDown` jump, `Home/End` snap)
+- Each thumb is a focusable `role="slider"` with `aria-valuetext`
+- **Debounced 350ms** before it hits TMDb — sweeping the track costs one request,
+  not one per frame
+
+**Date range picker** — exact release-date filtering.
+
+- Single or from/to range mode; the range highlight inverts between endpoints
+- Month grid built from plain year/month/day integers rather than `Date`, and
+  "today" resolved through `useSyncExternalStore`, so there is no timezone drift
+  between server and client markup
+- Arrow keys move day-to-day across month boundaries; `PageUp`/`PageDown` flip months
+- Preset chips, the slider and the calendar all write to one `dateFilter`, so
+  they stay in sync no matter which one you use last
+
 ### Accessibility
 
 - **Keyboard Navigation**: `:focus-visible` styles for all interactive elements
@@ -273,6 +354,10 @@ Full UI overhaul in a Bold / Disney+ inspired direction (black base with an ambe
 - **ARIA Labels**: Proper labeling on search input, buttons, and controls
 - **Reduced Motion**: Respects `prefers-reduced-motion` user setting
 - **Screen Reader Support**: `.sr-only` utility class for screen reader-only content
+- **Tooltips on Focus**: `Tooltip` opens on keyboard focus, not just hover, and closes on `Escape`
+- **Composite Widgets**: Accordion headers use `aria-expanded`/`aria-controls` with roving arrow-key navigation; the slider exposes each thumb as `role="slider"` with `aria-valuetext`; the calendar uses `role="grid"`/`gridcell`; the pager marks the current page with `aria-current="page"`
+- **Live Regions**: Toasts announce politely, errors assertively
+- **No Keyboard Traps**: Every new popover closes on `Escape` and on outside click
 
 ### Performance Optimizations
 

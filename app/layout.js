@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { WatchlistProvider } from "@/context/WatchlistContext";
 import { ContinueWatchingProvider } from "@/context/ContinueWatchingContext";
 import { HistoryProvider } from "@/context/HistoryContext";
+import { ToastProvider } from "@/context/ToastContext";
 
 export const metadata = {
   metadataBase: new URL("https://flixet.vercel.app"),
@@ -77,28 +78,30 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body suppressHydrationWarning>
-        <WatchlistProvider>
-          <ContinueWatchingProvider>
-            <HistoryProvider>
-            <a href="#main-content" className="skip-to-content">
-              Skip to main content
-            </a>
-            <Header />
-            <main
-              id="main-content"
-              style={{
-                minHeight: "100vh",
-                paddingBottom: "var(--space-16)",
-              }}
-            >
-              {children}
-            </main>
-            <Footer />
-            <SpeedInsights />
-            <Analytics />
-            </HistoryProvider>
-          </ContinueWatchingProvider>
-        </WatchlistProvider>
+        <ToastProvider>
+          <WatchlistProvider>
+            <ContinueWatchingProvider>
+              <HistoryProvider>
+                <a href="#main-content" className="skip-to-content">
+                  Skip to main content
+                </a>
+                <Header />
+                <main
+                  id="main-content"
+                  style={{
+                    minHeight: "100vh",
+                    paddingBottom: "var(--space-16)",
+                  }}
+                >
+                  {children}
+                </main>
+                <Footer />
+                <SpeedInsights />
+                <Analytics />
+              </HistoryProvider>
+            </ContinueWatchingProvider>
+          </WatchlistProvider>
+        </ToastProvider>
       </body>
     </html>
   );

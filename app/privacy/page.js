@@ -10,7 +10,71 @@ import {
   FileText,
   Mail,
   AlertCircle,
+  HelpCircle,
 } from "lucide-react";
+import Accordion from "@/components/Accordion";
+
+const PRIVACY_FAQ = [
+  {
+    title: "Do you track me across other websites?",
+    subtitle: "Analytics and third-party measurement",
+    icon: <Eye size={17} />,
+    content: (
+      <p className="prv-text">
+        We use privacy-focused, aggregate analytics to count visits and
+        understand which pages are useful. These tools record no names, email
+        addresses or watchlists, and cannot identify you personally.
+      </p>
+    ),
+  },
+  {
+    title: "Where is my watchlist stored?",
+    subtitle: "Local storage, never our servers",
+    icon: <Lock size={17} />,
+    content: (
+      <p className="prv-text">
+        Entirely in your own browser&apos;s local storage. It never leaves your
+        device and is never transmitted to us. That also means we cannot recover
+        it for you, and clearing site data will permanently erase it.
+      </p>
+    ),
+  },
+  {
+    title: "Do you use advertising cookies?",
+    subtitle: "Ad tech and remarketing",
+    icon: <Cookie size={17} />,
+    content: (
+      <p className="prv-text">
+        No advertising or remarketing cookies are set by Flixet. Some third-party
+        video embed providers may set their own cookies when a title plays; their
+        handling of that data is governed by their own policies, not this page.
+      </p>
+    ),
+  },
+  {
+    title: "Can I be removed from data you hold?",
+    subtitle: "Access, correction and deletion",
+    icon: <Users size={17} />,
+    content: (
+      <p className="prv-text">
+        Because we hold no personal accounts, there is generally nothing tied to
+        your identity to delete. If you have contacted us by email and want that
+        correspondence removed, contact us and we will action it.
+      </p>
+    ),
+  },
+  {
+    title: "How do I contact the privacy team?",
+    subtitle: "Questions and requests",
+    icon: <Mail size={17} />,
+    content: (
+      <p className="prv-text">
+        Use the contact details published on this Website. We aim to respond to
+        privacy questions within a reasonable timeframe.
+      </p>
+    ),
+  },
+];
 
 export default function PrivacyPolicy() {
   return (
@@ -67,7 +131,20 @@ export default function PrivacyPolicy() {
           line-height: 1.85;
         }
 
-        /* ── Section cards ─────────────────────────────── */
+        /* ── FAQ accordion ──────────────────────────────── */
+        .prv-faq {
+          margin-bottom: 32px;
+        }
+
+        .prv-faq-title {
+          font-size: 20px;
+          font-weight: 800;
+          color: rgba(255, 255, 255, 0.88);
+          margin-bottom: 14px;
+          letter-spacing: -0.01em;
+        }
+
+/* ── Section cards ─────────────────────────────── */
         .prv-section {
           margin-bottom: 16px;
           background: rgba(255, 255, 255, 0.02);
@@ -329,6 +406,14 @@ export default function PrivacyPolicy() {
             protect your data while using Flixet.
           </p>
         </div>
+
+        {/* Quick answers */}
+        <section className="prv-faq" aria-labelledby="prv-faq-title">
+          <h2 id="prv-faq-title" className="prv-faq-title">
+            Quick answers
+          </h2>
+          <Accordion defaultOpen={[PRIVACY_FAQ[0].title]} items={PRIVACY_FAQ} />
+        </section>
 
         {[
           {

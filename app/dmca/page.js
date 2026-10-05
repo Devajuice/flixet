@@ -8,13 +8,95 @@ import {
   FileText,
   CheckCircle,
   XCircle,
+  HelpCircle,
 } from "lucide-react";
+import Accordion from "@/components/Accordion";
+
+const DMCA_FAQ = [
+  {
+    title: "Does Flixet host or store any video?",
+    subtitle: "Why this changes everything",
+    icon: <HelpCircle size={17} />,
+    content: (
+      <p className="dmca-text">
+        No. Flixet operates as an index only. We store no video files on our
+        servers and upload nothing; every title is embedded from an external
+        provider, which is why a notice naming a specific Flixet-hosted file
+        cannot be actioned by us.
+      </p>
+    ),
+  },
+  {
+    title: "What makes a notice valid?",
+    subtitle: "The six required elements",
+    icon: <FileText size={17} />,
+    content: (
+      <p className="dmca-text">
+        A valid notice must identify the copyrighted work, identify the
+        infringing material with enough detail for us to locate it, provide your
+        contact details, state a good-faith belief that the use is not authorised
+        by the owner, and provide a statement of accuracy plus a physical or
+        electronic signature from the rights holder.
+      </p>
+    ),
+  },
+  {
+    title: "What happens after I send a notice?",
+    subtitle: "Review and removal timeline",
+    icon: <CheckCircle size={17} />,
+    content: (
+      <p className="dmca-text">
+        We review every complete notice, then disable links to the material
+        identified and notify the affected provider. Repeat infringers have
+        their access suspended. We aim to acknowledge valid notices promptly.
+      </p>
+    ),
+  },
+  {
+    title: "What if my notice was rejected?",
+    subtitle: "Counter-notice and re-submission",
+    icon: <XCircle size={17} />,
+    content: (
+      <p className="dmca-text">
+        A notice may be rejected if it is incomplete, lacks a good-faith
+        statement or signature, or targets material we do not host or link. You
+        may correct the deficiencies and re-submit, or the alleged infringer may
+        file a counter-notice.
+      </p>
+    ),
+  },
+  {
+    title: "How long does a claim take?",
+    subtitle: "Filing channels and contact",
+    icon: <Mail size={17} />,
+    content: (
+      <p className="dmca-text">
+        Send the complete notice to the address published on this page. Social
+        or support messages do not constitute formal notices — the signed notice
+        must arrive by email or post to be actionable.
+      </p>
+    ),
+  },
+];
 
 export default function DMCAPage() {
   return (
     <>
       <style>{`
-        /* ── Container ─────────────────────────────────── */
+
+        /* ── Container ─────────────────────────────────── *//* ── FAQ accordion ──────────────────────────────── */
+        .dmca-faq {
+          margin-bottom: 32px;
+        }
+
+        .dmca-faq-title {
+          font-size: 20px;
+          font-weight: 800;
+          color: rgba(255, 255, 255, 0.88);
+          margin-bottom: 14px;
+          letter-spacing: -0.01em;
+        }
+
         .dmca-container {
           max-width: 1000px;
           margin: 0 auto;
@@ -332,6 +414,14 @@ export default function DMCAPage() {
             from external sources.
           </p>
         </div>
+
+        {/* Quick answers */}
+        <section className="dmca-faq" aria-labelledby="dmca-faq-title">
+          <h2 id="dmca-faq-title" className="dmca-faq-title">
+            Quick answers
+          </h2>
+          <Accordion defaultOpen={[DMCA_FAQ[0].title]} items={DMCA_FAQ} />
+        </section>
 
         {/* Sections */}
         {[

@@ -1,7 +1,6 @@
 "use client";
-import { useState, useEffect, useRef, useCallback, Suspense } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   SlidersHorizontal,
@@ -17,11 +16,23 @@ import {
   Search,
   Layers,
   RotateCcw,
+  LayoutGrid,
+  ListRestart,
 } from "lucide-react";
 import MediaCard from "@/components/MediaCard";
+import RangeSlider from "@/components/RangeSlider";
+import DateRangePicker from "@/components/Calendar";
+import Pagination from "@/components/Pagination";
 import { tmdbFetch } from "@/lib/tmdbClient";
 
 const EMPTY_GENRE_MAP = Object.freeze({});
+/* Frozen so re-picking "no date filter" is identity-stable and does not refetch. */
+const EMPTY_DATE_RANGE = Object.freeze({ start: "", end: "" });
+
+const PAGE_SIZE = 20;
+const MAX_PAGES = 500;
+const MIN_YEAR = 1970;
+const MAX_YEAR = new Date().getFullYear() + 2;
 
 const YEAR_OPTIONS = [
   { value: "", label: "All Years" },
@@ -33,6 +44,18 @@ const YEAR_OPTIONS = [
   { value: "2000-2009", label: "2000s" },
   { value: "1990-1999", label: "1990s" },
 ];
+
+/** Expands a preset chip value ("2020-2023") into ISO bounds. */
+function presetToRange(value) {
+  if (!value) return { start: "", end: "" };
+  const [start, end] = value.split("-");
+  return { start: `${start}-01-01`, end: `${end || start}-12-31` };
+}
+
+const YEAR_PRESET_RANGE = Object.freeze(
+  Object.fromEntries(YEAR_OPTIONS.map((o) => [o.value, presetToRange(o.value)])),
+);
+
 const RATING_OPTIONS = [
   { value: "", label: "Any Rating" },
   { value: "9", label: "9+ ★" },
@@ -87,20 +110,46 @@ function CatalogContent({
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
   const [activeGenre, setActiveGenre] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [yearRange, setYearRange] = useState("");
+  const [dateFilter, setDateFilter] = useState(EMPTY_DATE_RANGE);
   const [minRating, setMinRating] = useState("");
   const [sortOpen, setSortOpen] = useState(false);
+  const [viewMode, setViewMode] = useState("infinite");
   const observerTarget = useRef(null);
   const abortRef = useRef(null);
   const inFlightPage = useRef(null);
 
+  /* Slider value is derived so preset chips, the calendar and the slider all
+     stay in sync. A half-picked range leaves that end at the track limit. */
+  const sliderValue = useMemo(() => {
+    const lo = dateFilter.start
+      ? Number(dateFilter.start.slice(0, 4))
+      : MIN_YEAR;
+    const hi = dateFilter.end ? Number(dateFilter.end.slice(0, 4)) : MAX_YEAR;
+    return [
+      Math.min(Math.max(lo, MIN_YEAR), MAX_YEAR),
+      Math.min(Math.max(hi, MIN_YEAR), MAX_YEAR),
+    ];
+  }, [dateFilter]);
+
+  const activeYearPreset = useMemo(
+    () =>
+      YEAR_OPTIONS.find((o) => {
+        const range = YEAR_PRESET_RANGE[o.value];
+        return range.start === dateFilter.start && range.end === dateFilter.end;
+      })?.value ?? "",
+    [dateFilter],
+  );
+
+  const hasDateFilter = Boolean(dateFilter.start || dateFilter.end);
+
   const activeFilterCount = [
     activeGenre,
-    yearRange,
+    hasDateFilter,
     minRating,
     sortBy !== "popularity.desc",
   ].filter(Boolean).length;
@@ -113,7 +162,7 @@ function CatalogContent({
       reset = false,
       sort = sortBy,
       genre = activeGenre,
-      year = yearRange,
+      dates = dateFilter,
       rating = minRating,
     ) => {
       if (reset) setLoading(true);
@@ -127,11 +176,8 @@ function CatalogContent({
         const params = { page, sort_by: sort };
 
         if (gId) params.with_genres = gId;
-        if (year) {
-          const [start, end] = year.split("-");
-          params[`${dateField}.gte`] = `${start}-01-01`;
-          params[`${dateField}.lte`] = `${end || start}-12-31`;
-        }
+        if (dates.start) params[`${dateField}.gte`] = dates.start;
+        if (dates.end) params[`${dateField}.lte`] = dates.end;
         if (rating) params["vote_average.gte"] = rating;
 
         const data = await tmdbFetch(`discover/${type}`, params, {
@@ -150,8 +196,9 @@ function CatalogContent({
             ];
           });
         }
+        setTotalPages(data.total_pages || 0);
         setCurrentPage(page);
-        setHasMore(page < data.total_pages && page < 500);
+        setHasMore(page < data.total_pages && page < MAX_PAGES);
       } catch (e) {
         if (e.name !== "AbortError") console.error(e);
         if (reset && e.name !== "AbortError") {
@@ -165,7 +212,7 @@ function CatalogContent({
         }
       }
     },
-    [type, genreParam, sortBy, activeGenre, yearRange, minRating, dateField, genreMap],
+    [type, genreParam, sortBy, activeGenre, dateFilter, minRating, dateField, genreMap],
   );
 
   useEffect(() => {
@@ -173,16 +220,27 @@ function CatalogContent({
     setItems([]);
     setCurrentPage(1);
     setHasMore(true);
-    fetchItems(1, true, sortBy, activeGenre, yearRange, minRating);
-  }, [fetchItems, sortBy, activeGenre, yearRange, minRating]);
+    fetchItems(1, true, sortBy, activeGenre, dateFilter, minRating);
+  }, [fetchItems, sortBy, activeGenre, dateFilter, minRating]);
 
   useEffect(() => () => abortRef.current?.abort(), []);
+
+  /* Paged mode loads one page at a time; page 1 comes from the reset effect.
+     Filter changes are deliberately excluded — the reset effect above already
+     rewinds to page 1, and including them would double-fetch every keystroke. */
+  useEffect(() => {
+    if (viewMode !== "pages" || currentPage <= 1) return;
+    inFlightPage.current = null;
+    fetchItems(currentPage, true, sortBy, activeGenre, dateFilter, minRating);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, currentPage]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (
           !entries[0].isIntersecting ||
+          viewMode !== "infinite" ||
           !hasMore ||
           loading ||
           loadingMore
@@ -194,7 +252,7 @@ function CatalogContent({
         if (inFlightPage.current === nextPage) return;
         inFlightPage.current = nextPage;
 
-        fetchItems(nextPage, false, sortBy, activeGenre, yearRange, minRating)
+        fetchItems(nextPage, false, sortBy, activeGenre, dateFilter, minRating)
           .finally(() => {
             if (inFlightPage.current === nextPage) {
               inFlightPage.current = null;
@@ -213,17 +271,34 @@ function CatalogContent({
     loading,
     loadingMore,
     currentPage,
+    viewMode,
     fetchItems,
     sortBy,
     activeGenre,
-    yearRange,
+    dateFilter,
     minRating,
   ]);
+
+  const applyYearPreset = (value) => {
+    setDateFilter(YEAR_PRESET_RANGE[value]);
+  };
+
+  /* Dragging emits a value per frame, and each filter change refetches. Debounce
+     so a sweep across the track costs one request, not sixty. */
+  const sliderTimer = useRef(null);
+  const applyYearSlider = useCallback(([lo, hi]) => {
+    clearTimeout(sliderTimer.current);
+    sliderTimer.current = setTimeout(() => {
+      setDateFilter({ start: `${lo}-01-01`, end: `${hi}-12-31` });
+    }, 350);
+  }, []);
+
+  useEffect(() => () => clearTimeout(sliderTimer.current), []);
 
   const resetAll = () => {
     setSortBy("popularity.desc");
     setActiveGenre(null);
-    setYearRange("");
+    setDateFilter(EMPTY_DATE_RANGE);
     setMinRating("");
   };
 
@@ -356,6 +431,27 @@ function CatalogContent({
             )}
           </button>
 
+          <div
+            className="catalog-viewtoggle"
+            role="group"
+            aria-label="Result layout"
+          >
+            <button
+              onClick={() => setViewMode("infinite")}
+              aria-pressed={viewMode === "infinite"}
+              className={`catalog-viewtoggle-btn${viewMode === "infinite" ? " is-active" : ""}`}
+            >
+              <ListRestart size={14} /> Infinite
+            </button>
+            <button
+              onClick={() => setViewMode("pages")}
+              aria-pressed={viewMode === "pages"}
+              className={`catalog-viewtoggle-btn${viewMode === "pages" ? " is-active" : ""}`}
+            >
+              <LayoutGrid size={14} /> Pages
+            </button>
+          </div>
+
           {(activeFilterCount > 0 || genreParam) && (
             <button onClick={resetAll} className="catalog-reset-btn">
               <RotateCcw size={14} /> Reset
@@ -425,22 +521,55 @@ function CatalogContent({
                   </div>
                 </div>
 
-                {/* Year */}
+                {/* Year presets */}
                 <div className="catalog-field">
                   <div className="catalog-field-label">
-                    <Calendar size={14} color="var(--accent)" /> Year
+                    <Calendar size={14} color="var(--accent)" /> Release Year
                   </div>
                   <div className="catalog-chips">
                     {YEAR_OPTIONS.map((opt) => (
                       <button
                         key={opt.value}
-                        onClick={() => setYearRange(opt.value)}
-                        className={`catalog-chip-sm${yearRange === opt.value ? " is-active" : ""}`}
+                        onClick={() => applyYearPreset(opt.value)}
+                        className={`catalog-chip-sm${activeYearPreset === opt.value ? " is-active" : ""}`}
                       >
                         {opt.label}
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Fine-grained year range */}
+                <div className="catalog-field">
+                  <div className="catalog-field-label">
+                    <SlidersHorizontal size={14} color="var(--accent)" /> Year
+                    Range
+                  </div>
+                  <RangeSlider
+                    min={MIN_YEAR}
+                    max={MAX_YEAR}
+                    step={1}
+                    value={sliderValue}
+                    onChange={applyYearSlider}
+                    label="Release year"
+                    formatValue={(v) => String(v)}
+                  />
+                </div>
+
+                {/* Exact date range */}
+                <div className="catalog-field">
+                  <div className="catalog-field-label">
+                    <Calendar size={14} color="var(--accent)" /> Exact Dates
+                  </div>
+                  <DateRangePicker
+                    mode="range"
+                    value={dateFilter}
+                    onChange={setDateFilter}
+                    min={`${MIN_YEAR}-01-01`}
+                    max={`${MAX_YEAR}-12-31`}
+                    label="Release date range"
+                    placeholder="Pick a release date range"
+                  />
                 </div>
 
                 {/* Rating */}
@@ -518,13 +647,23 @@ function CatalogContent({
                 <p>Loading more…</p>
               </div>
             )}
-            {!hasMore && items.length > 0 && (
+            {!hasMore && viewMode === "infinite" && items.length > 0 && (
               <div className="catalog-end">
                 <Sparkles size={16} color="var(--accent)" />
                 <p>You&apos;ve reached the end of the catalog</p>
               </div>
             )}
           </div>
+
+          {viewMode === "pages" && (
+            <Pagination
+              page={currentPage}
+              totalPages={Math.min(totalPages, MAX_PAGES)}
+              totalResults={totalResults}
+              pageSize={PAGE_SIZE}
+              onChange={setCurrentPage}
+            />
+          )}
         </>
       )}
 
@@ -744,6 +883,37 @@ function CatalogContent({
           font-weight: var(--font-bold);
           color: var(--accent);
           background: #fff;
+        }
+        .catalog-viewtoggle {
+          display: inline-flex;
+          padding: 3px;
+          gap: 3px;
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid var(--border);
+        }
+        .catalog-viewtoggle-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 7px 13px;
+          border-radius: 9px;
+          font-size: var(--text-xs);
+          font-weight: var(--font-semibold);
+          color: var(--text-tertiary);
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+        .catalog-viewtoggle-btn:hover {
+          color: #fff;
+        }
+        .catalog-viewtoggle-btn.is-active {
+          color: #000;
+          background: linear-gradient(135deg, #d97706, #f59e0b);
+          box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
         }
         .catalog-reset-btn {
           display: inline-flex;

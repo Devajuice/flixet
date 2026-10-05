@@ -2,9 +2,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Share2, Check } from "lucide-react";
+import { useToastActions } from "@/context/ToastContext";
 
 export default function ShareButton({ title, href }) {
   const [copied, setCopied] = useState(false);
+  const toast = useToastActions();
 
   const handleShare = async (e) => {
     e.stopPropagation();
@@ -27,9 +29,11 @@ export default function ShareButton({ title, href }) {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      toast.success("Link copied to clipboard");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy link:", err);
+      toast.error("Could not copy the link");
     }
   };
 

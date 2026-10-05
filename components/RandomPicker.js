@@ -3,10 +3,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dices, Loader2 } from "lucide-react";
 import { tmdbFetch } from "@/lib/tmdbClient";
+import Tooltip from "@/components/Tooltip";
+import { useToastActions } from "@/context/ToastContext";
 
 export default function RandomPicker({ variant = "header" }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const toast = useToastActions();
 
   const pick = async () => {
     if (loading) return;
@@ -26,6 +29,7 @@ export default function RandomPicker({ variant = "header" }) {
       setLoading(false);
     } catch (err) {
       console.error("Random pick failed:", err);
+      toast.error("Couldn't find anything to pick — try again");
       setLoading(false);
     }
   };
@@ -62,42 +66,43 @@ export default function RandomPicker({ variant = "header" }) {
   }
 
   return (
-    <button
-      onClick={pick}
-      disabled={loading}
-      aria-label="Pick a random movie or show"
-      title="Surprise Me — pick a random movie or show"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 6,
-        padding: "9px 14px",
-        borderRadius: "var(--radius-lg)",
-        background: "rgba(255,255,255,0.06)",
-        border: "1px solid var(--border)",
-        color: "var(--text-secondary)",
-        fontSize: "var(--text-sm)",
-        fontWeight: "var(--font-semibold)",
-        cursor: loading ? "wait" : "pointer",
-        whiteSpace: "nowrap",
-        transition: "all 0.2s",
-        flexShrink: 0,
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = "var(--accent-border)";
-        e.currentTarget.style.color = "var(--accent)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "var(--border)";
-        e.currentTarget.style.color = "var(--text-secondary)";
-      }}
-    >
-      {loading ? (
-        <Loader2 size={15} style={{ animation: "spin 0.9s linear infinite" }} />
-      ) : (
-        <Dices size={15} />
-      )}
-      {loading ? "Picking..." : "Surprise Me"}
-    </button>
+    <Tooltip content="Surprise Me — pick a random movie or show" placement="bottom">
+      <button
+        onClick={pick}
+        disabled={loading}
+        aria-label="Pick a random movie or show"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "9px 14px",
+          borderRadius: "var(--radius-lg)",
+          background: "rgba(255,255,255,0.06)",
+          border: "1px solid var(--border)",
+          color: "var(--text-secondary)",
+          fontSize: "var(--text-sm)",
+          fontWeight: "var(--font-semibold)",
+          cursor: loading ? "wait" : "pointer",
+          whiteSpace: "nowrap",
+          transition: "all 0.2s",
+          flexShrink: 0,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = "var(--accent-border)";
+          e.currentTarget.style.color = "var(--accent)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = "var(--border)";
+          e.currentTarget.style.color = "var(--text-secondary)";
+        }}
+      >
+        {loading ? (
+          <Loader2 size={15} style={{ animation: "spin 0.9s linear infinite" }} />
+        ) : (
+          <Dices size={15} />
+        )}
+        {loading ? "Picking..." : "Surprise Me"}
+      </button>
+    </Tooltip>
   );
 }
