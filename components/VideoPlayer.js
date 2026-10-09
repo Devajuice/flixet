@@ -7,7 +7,7 @@ const SERVERS = {
   movie: [
     {
       label: "VidCore",
-      url: (id) => `https://vidcore.net/movie/${id}?theme=3b82f6`,
+      url: (id) => `https://vidcore.io/movie/${id}?theme=3b82f6`,
     },
     {
       label: "VidLink",
@@ -16,7 +16,7 @@ const SERVERS = {
     },
     {
       label: "VidSrc",
-      url: (id) => `https://vidsrc.me/embed/movie?tmdb=${id}`,
+      url: (id) => `https://vidsrc.sh/embed/movie?tmdb=${id}`,
     },
     { label: "2embed", url: (id) => `https://www.2embed.cc/embed/${id}` },
   ],
@@ -24,7 +24,7 @@ const SERVERS = {
     {
       label: "VidCore",
       url: (id, s, e) =>
-        `https://vidcore.net/tv/${id}/${s}/${e}?theme=3b82f6`,
+        `https://vidcore.io/tv/${id}/${s}/${e}?theme=3b82f6`,
     },
     {
       label: "VidLink",
@@ -34,7 +34,7 @@ const SERVERS = {
     {
       label: "VidSrc",
       url: (id, s, e) =>
-        `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`,
+        `https://vidsrc.sh/embed/tv?tmdb=${id}&season=${s}&episode=${e}`,
     },
     {
       label: "2embed",
