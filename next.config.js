@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    // TMDB already serves appropriately sized images; bypass Vercel Image Optimization
+    // to avoid transformation quota/402 (OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED).
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -8,12 +11,6 @@ const nextConfig = {
         pathname: '/t/p/**',
       },
     ],
-    formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    // Covers every rendered size in the app: avatars/thumbnails through to
-    // posters and backdrops. Next picks the smallest entry >= the rendered width.
-    imageSizes: [36, 44, 84, 140, 180, 200, 300, 500],
-    minimumCacheTTL: 60 * 60 * 24 * 7,
   },
   reactStrictMode: true,
 };
