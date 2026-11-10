@@ -6,6 +6,10 @@ import { X, Server, ChevronDown, ChevronUp, Play } from "lucide-react";
 const SERVERS = {
   movie: [
     {
+      label: "CineSrc",
+      url: (id) => `https://cinesrc.st/embed/movie/${id}`,
+    },
+    {
       label: "VidCore",
       url: (id) => `https://vidcore.io/movie/${id}?theme=3b82f6`,
     },
@@ -21,6 +25,10 @@ const SERVERS = {
     { label: "2embed", url: (id) => `https://www.2embed.cc/embed/${id}` },
   ],
   tv: [
+    {
+      label: "CineSrc",
+      url: (id, s, e) => `https://cinesrc.st/embed/tv/${id}?s=${s}&e=${e}`,
+    },
     {
       label: "VidCore",
       url: (id, s, e) =>
@@ -372,8 +380,8 @@ export default function VideoPlayer({
             zIndex: 1,
           }}
           allowFullScreen
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          referrerPolicy="origin"
+          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+          referrerPolicy="no-referrer"
           title={`Watch ${displayTitle}`}
           onLoad={() => setIframeLoaded(true)}
         />

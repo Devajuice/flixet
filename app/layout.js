@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
@@ -7,6 +8,13 @@ import { WatchlistProvider } from "@/context/WatchlistContext";
 import { ContinueWatchingProvider } from "@/context/ContinueWatchingContext";
 import { HistoryProvider } from "@/context/HistoryContext";
 import { ToastProvider } from "@/context/ToastContext";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+  weight: ["300", "400", "500", "600", "700", "800"],
+});
 
 export const metadata = {
   metadataBase: new URL("https://flixet.vercel.app"),
@@ -69,15 +77,7 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-      </head>
-      <body suppressHydrationWarning>
+      <body className={plusJakartaSans.variable} suppressHydrationWarning>
         <ToastProvider>
           <WatchlistProvider>
             <ContinueWatchingProvider>

@@ -217,7 +217,7 @@ Flixet/
 
 - **Multiple Sources**: Automatically embeds content from reliable third-party sources
 - **Default Player**: VidCore with an amber-themed UI, switchable at any time
-- **Server Switching**: If one server has issues, try another (VidCore, VidLink, VidSrc, 2embed)
+- **Server Switching**: If one server has issues, try another (VidCore, VidLink, VidSrc, CineSrc, 2embed)
 - **HD Quality**: Most content available in high definition
 
 ### Actor / Person Pages
