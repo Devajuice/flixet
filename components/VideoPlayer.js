@@ -381,7 +381,7 @@ export default function VideoPlayer({
           }}
           allowFullScreen
           allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-          referrerPolicy="no-referrer"
+          referrerPolicy="strict-origin-when-cross-origin"
           title={`Watch ${displayTitle}`}
           onLoad={() => setIframeLoaded(true)}
         />
