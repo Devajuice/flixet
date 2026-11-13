@@ -1,30 +1,33 @@
 # 🎬 Flixet
 
-A modern, free movie and TV show streaming aggregator built with Next.js. Stream thousands of movies, TV shows, and anime without any subscription.
+A modern, free movie and TV show streaming aggregator built with Next.js. Stream thousands of movies and TV shows without any subscription.
 
 ## ✨ Features
 
 - 🆓 **100% Free** - No subscription, no account required
-- 🎬 **Huge Library** - Thousands of movies, TV shows, and anime
+- 🎬 **Huge Library** - Thousands of movies and TV shows
 - 📱 **Fully Responsive** - Perfect experience on mobile, tablet, and desktop
 - 🔍 **Smart Search** - Instant search with real-time results across movies and TV
 - 📚 **Personal Watchlist** - Save your favorite content to watch later
 - 🔄 **Multiple Servers** - Switch between streaming sources if one doesn't work
 - 📺 **TV Show Support** - Full season and episode selection with OMDB ratings
-- 🎨 **Modern UI** - Bold, Disney+-inspired black interface with an amber/orange accent design system
+- ⭐ **External Ratings** - IMDb, Rotten Tomatoes, and Metacritic scores on movie/TV detail pages (via OMDB, when available)
+- ⏱️ **Movie End Time** - Movie pages show estimated finish time based on runtime and your device’s current time
+- 🎨 **Modern UI** - Cinematic dark/glass interface with a neutral palette, white primary actions, and yellow rating accents
 - 💊 **Floating Navbar** - A pill-shaped, glass-morphism navbar that floats and stays centered while scrolling
-- 📱 **Bottom Sheet Menu** - Replace the old side drawer with a bottom sheet optimized for one-handed mobile use
-- 🏠 **Cinematic Home** - Auto-rotating hero carousel, genre card grid, and editor's spotlight section
-- 🏷️ **Split-Tile Cards** - Cards redesigned with a poster area + info bar (title, year, type pill); used across the home rows and shared catalog grids with a responsive 2-column episode list
+- 📱 **Bottom Sheet Menu** - Mobile bottom sheet menu optimized for one-handed use
+- 🏠 **Cinematic Home** - Auto-rotating hero carousel, genre card grid, and uniform content rows
+- 🏷️ **Split-Tile Cards** - Poster + info-bar cards used consistently across home rows and catalog grids
 - 🗂️ **Rich Browse Pages** - Movies and TV share a redesigned catalog page with a genre rail, inline sort dropdown, slide-in filter drawer, and an Infinite/Pages view toggle
-- ⚡ **Fast Performance** - Built with Next.js 16 with Turbopack
+- ⚡ **Fast Performance** - Built with Next.js 16 (App Router, Turbopack) with optimized font loading
 - 🎯 **Advanced Filters** - Filter by genre, rating, decade presets, a dual-thumb year slider, or an exact release-date range
 - 🚀 **Coming Soon** - Dedicated pages for upcoming movies and airing TV shows
 - ♾️ **Infinite Scroll** - Seamlessly load more content as you browse
 - 🎞️ **Continue Watching** - Pick up right where you left off with episode tracking
-- 🖼️ **Optimized Images** - Next.js Image component for automatic optimization
-- ♿️ **Accessibility** - Focus states, skip-to-content, reduced-motion support
+- 🖼️ **Image Handling** - Next.js `Image` with unoptimized delivery for TMDB assets to avoid Vercel image-transformation quota issues
+- ♿️ **Accessibility** - Focus states, skip-to-content, reduced-motion support, and ARIA improvements
 - 💫 **Loading Skeletons** - Smooth loading states with shimmer animations
+- 🧯 **Route Resilience** - Route-level loading/error boundaries for key pages
 - ⌨️ **Debounced Search** - Optimized search input with 300ms delay
 - 🎭 **Actor Pages** - Dedicated pages with filmography split into Known For / Movies / TV
 - 🔥 **Top Rated & Trending TV** - Sort the TV browse page by rating or popularity
@@ -77,7 +80,7 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - **API:** TMDB (The Movie Database) + OMDB
 - **Deployment:** Vercel
 - **Storage:** LocalStorage for watchlist and continue watching persistence
-- **Image Optimization:** Next.js Image component with automatic WebP/AVIF conversion
+- **Image Delivery:** Next.js `Image` with TMDB direct (unoptimized) loading to avoid Vercel image-transform quota issues
 
 ## 🚀 Getting Started
 
@@ -141,7 +144,7 @@ Flixet/
 │   ├── person/[id]/          # Actor/person detail page (filmography tabs)
 │   ├── movies/               # Browse movies with filters
 │   ├── tv/                   # Browse TV shows (incl. Top Rated / Trending sorts)
-│   ├── anime/                # Browse anime
+
 │   ├── coming-soon/
 │   │   ├── movies/           # Upcoming movies page
 │   │   └── tv/               # On-the-air TV shows page
@@ -215,10 +218,16 @@ Flixet/
 
 ### Streaming
 
-- **Multiple Sources**: Automatically embeds content from reliable third-party sources
-- **Default Player**: VidCore with an amber-themed UI, switchable at any time
-- **Server Switching**: If one server has issues, try another (VidCore, VidLink, VidSrc, CineSrc, 2embed)
+- **Multiple Sources**: Embedded playback from third-party providers with in-player server switching
+- **Default Player**: CineSrc by default, with a loading hint to try another server if playback stalls
+- **Server Options**: CineSrc, VidCore, VidLink, VidEasy, VidSrc, AutoEmbed (TV), and 2embed (availability varies by title/region)
 - **HD Quality**: Most content available in high definition
+
+### Ratings & Movie Details
+
+- **TMDB + OMDB Ratings**: Detail pages show TMDB scores and, when available via OMDB, IMDb, Rotten Tomatoes, and Metacritic
+- **End Time Estimate**: Movie pages display an estimated finish time based on runtime and your device’s current time
+- **Episode Ratings**: TV episode ratings fetched and cached via OMDB where available
 
 ### Actor / Person Pages
 
@@ -231,19 +240,16 @@ Flixet/
 - **Sort Modes**: Toggle between Top Rated (`vote_average.desc`) and Trending (`popularity.desc`)
 - **Quick Access**: Switch sorts from the header dropdown or the mobile menu
 
-### Visual Redesign
+### Visual Design & UX
 
-Full UI overhaul in a Bold / Disney+ inspired direction (black base with an amber/orange accent):
-
-- **Amber design system**: Accent moved from blue (#3b82f6) to amber (#f59e0b), with a pure-black background base, Plus Jakarta Sans typography, and amber glow/gradient shadows that unify every page, card, player, spinner, and empty state.
-- **Cinematic home page**: Auto-rotating hero carousel with a glowing accent bar, pill meta badges, and numbered/glowing dot navigation; a "Browse by Genre" card grid; and a new "Editor's Spotlight" editorial section.
-- **Floating pill navbar**: The navbar is now a centered, pill-shaped, glass-morphism bar that floats at the top of the viewport and stays centered while the page scrolls beneath it (active-route highlighting with an amber pill + glowing underline).
-- **Mobile bottom sheet menu**: The previous full-height side drawer was replaced with a bottom sheet that slides up from the bottom — a drag handle, thumb-friendly 4-tile quick-access grid (Home / Movies / TV / Anime), quick-action buttons (Watchlist / Search), and a random picker make one-handed navigation easy.
-- **Glass search dropdown**: The search results dropdown uses a semi-transparent, blurred (glass) background and larger, touch-friendly result rows on mobile.
-- **Split-tile cards**: Media cards were redesigned as "split tiles" — a large poster area on top (2:3) with a fixed info bar below showing the title (2-line clamp), year, and a Movie/TV pill. Used full-width in the shared catalog grids and at a fixed 240px in the home scroll rows, with equal-width stretching in grids and snug shrink-wrapping in scroll rows.
-- **Episode list improvements**: The TV show episode list renders as a 2-column grid on desktop (with skeletons matching the grid so there's no layout shift) and collapses to compact horizontal cards on mobile — small 16:9 thumbnail, single-line title, rating and meta — instead of the previous tall stacked layout.
-- **Shared browse template** (`CatalogPage.js`): Movies and TV now render from one component — always-visible genre pill rail, a custom sort dropdown, a slide-in filter drawer, animated grid transitions, and rich empty/end states.
-- **Player re-theme**: Embedded player URL params updated to match the amber accent.
+- **Cinematic dark theme**: Navy/near-black backgrounds with subtle gradients, glass surfaces, white primary actions, and yellow rating accents
+- **Cinematic home page**: Auto-rotating hero carousel and genre quick-links with uniform, catalog-sized content cards across home rows
+- **Floating pill navbar**: Centered, glass-morphism navbar that floats/stays centered while scrolling, with an active filled-pill link state
+- **Mobile bottom sheet menu**: Bottom sheet navigation with quick-access tiles and actions
+- **Split-tile cards**: Uniform poster + info-bar cards in home rows and catalog grids (home rows sized to match catalog cards)
+- **Episode list improvements**: Responsive 2-column episode grid on desktop and compact mobile episode cards
+- **Shared browse template** (`CatalogPage.js`): Movies and TV share one browse experience (genre rail, sort dropdown, filter drawer, animated grid transitions, empty/end states)
+- **Route resilience**: Loading and error boundaries for key routes (details/search/app-level fallbacks)
 
 ### Recently Viewed
 
@@ -361,7 +367,8 @@ do not show on keyboard focus.
 
 ### Performance Optimizations
 
-- **Image Optimization**: Next.js Image component with automatic WebP/AVIF conversion
+- **Direct TMDB image delivery**: `next/image` runs with `unoptimized: true` (bypassing Vercel image transformations) to avoid transformation quota/402 issues while still using appropriately sized TMDB assets
+- **Optimized font loading**: Plus Jakarta Sans loaded via `next/font` for better performance and layout stability
 - **Debounced Search**: 300ms delay prevents unnecessary API calls while typing
 - **Loading Skeletons**: Reusable skeleton components with shimmer animations
 - **Memoized Callbacks**: `useCallback` for expensive operations like fetch functions
@@ -454,22 +461,22 @@ Built this while learning:
 Flixet uses a consistent design system defined in `app/globals.css`:
 
 ### Color Tokens
-- `--bg`, `--bg-secondary`, `--bg-tertiary`, `--bg-elevated` - Black theme backgrounds
+- `--bg`, `--bg-secondary`, `--bg-tertiary`, `--bg-elevated` - Cinematic navy/near-black backgrounds
 - `--text-primary`, `--text-secondary`, `--text-tertiary`, `--text-muted` - Text hierarchy
-- `--accent` (#f59e0b), `--accent-hover` (#fbbf24) - Primary amber accent
-- `--gold` (#f5c518), `--gold-subtle`, `--gold-border` - IMDB-style ratings
-- `--border`, `--border-hover` - Border colors
+- `--accent`, `--accent-hover`, `--accent-subtle`, `--accent-border` - Neutral/white action accents
+- `--gold` (#f5c518), `--gold-subtle`, `--gold-border` - Rating highlights (IMDb/stars)
+- `--border`, `--border-hover`, `--surface`, `--glass-*` - Borders and glass surfaces
 
 ### Typography
-- Font: Plus Jakarta Sans (300–900 weights)
+- Font: Plus Jakarta Sans (300–900 weights, loaded via `next/font`)
 - Scale: `--text-xs` (0.75rem) → `--text-4xl` (2.25rem)
 - Weights: `--font-light` through `--font-extrabold`
 
 ### Spacing & Layout
 - `--space-1` → `--space-20` - Consistent spacing scale
-- `--radius-sm` → `--radius-full` - Border radius tokens
+- `--radius-sm` → `--radius-hero` / `--radius-full` - Border radius tokens
 - `--shadow-sm` → `--shadow-xl` - Shadow depth tokens
-- `--transition-fast`, `--transition-base`, `--transition-slow` - Animation timing
+- `--transition-fast`, `--transition-base`, `--transition-slow` - Animation timing (150–250ms)
 
 ---
 

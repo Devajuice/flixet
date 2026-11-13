@@ -31,14 +31,13 @@ export default function ScrollRow({
           padding: "0 var(--container-padding)",
         }}
       >
-        {/* Blue accent bar */}
+        {/* Accent bar */}
         <span
           style={{
-            width: 4,
+            width: 3,
             height: 22,
             borderRadius: 2,
-            background: "linear-gradient(180deg, #d97706, #fbbf24)",
-            boxShadow: "0 0 12px rgba(59,130,246,0.4)",
+            background: "rgba(255,255,255,0.7)",
             flexShrink: 0,
           }}
         />
@@ -72,6 +71,7 @@ export default function ScrollRow({
           </div>
         </div>
 
+        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)", margin: "0 4px" }} />
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
           {href && (
             <Link

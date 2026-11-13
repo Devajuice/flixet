@@ -1,0 +1,46 @@
+# Example Nginx snippet: route public traffic through Anubis to the app
+# Adapt server_name, TLS cert paths, and upstreams for your environment.
+# This does NOT modify existing app configs; apply in your Nginx deployment.
+
+upstream anubis_upstream {
+    server 127.0.0.1:8923; # or anubis:8923 if Nginx runs in the same Docker network
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    server_name example.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+
+    # ssl_certificate     /etc/letsencrypt/live/example.com/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+
+    location / {
+        proxy_pass http://anubis_upstream;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host  $host;
+
+        # WebSocket/upgrade support (safe to include generally)
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        $connection_upgrade;
+
+        proxy_read_timeout 300;
+        proxy_send_timeout 300;
+    }
+}
+
+# Required for $connection_upgrade mapping (place in http {} context if not already present):
+# map $http_upgrade $connection_upgrade {
+#     default upgrade;
+#     ''      close;
+# }

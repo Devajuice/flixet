@@ -8,45 +8,74 @@ const SERVERS = {
     {
       label: "CineSrc",
       url: (id) => `https://cinesrc.st/embed/movie/${id}`,
+      referrerPolicy: "no-referrer",
     },
     {
       label: "VidCore",
       url: (id) => `https://vidcore.io/movie/${id}?theme=3b82f6`,
+      referrerPolicy: "strict-origin-when-cross-origin",
     },
     {
       label: "VidLink",
       url: (id) =>
         `https://vidlink.pro/movie/${id}?primaryColor=3b82f6&autoplay=true`,
+      referrerPolicy: "strict-origin-when-cross-origin",
+    },
+    {
+      label: "VidEasy",
+      url: (id) => `https://player.videasy.net/movie/${id}`,
+      referrerPolicy: "strict-origin-when-cross-origin",
     },
     {
       label: "VidSrc",
       url: (id) => `https://vidsrc.sh/embed/movie?tmdb=${id}`,
+      referrerPolicy: "strict-origin-when-cross-origin",
     },
-    { label: "2embed", url: (id) => `https://www.2embed.cc/embed/${id}` },
+    {
+      label: "2embed",
+      url: (id) => `https://www.2embed.cc/embed/${id}`,
+      referrerPolicy: "strict-origin-when-cross-origin",
+    },
   ],
   tv: [
     {
       label: "CineSrc",
       url: (id, s, e) => `https://cinesrc.st/embed/tv/${id}?s=${s}&e=${e}`,
+      referrerPolicy: "no-referrer",
     },
     {
       label: "VidCore",
       url: (id, s, e) =>
         `https://vidcore.io/tv/${id}/${s}/${e}?theme=3b82f6`,
+      referrerPolicy: "strict-origin-when-cross-origin",
     },
     {
       label: "VidLink",
       url: (id, s, e) =>
         `https://vidlink.pro/tv/${id}/${s}/${e}?primaryColor=3b82f6&autoplay=true&nextbutton=true`,
+      referrerPolicy: "strict-origin-when-cross-origin",
+    },
+    {
+      label: "VidEasy",
+      url: (id, s, e) => `https://player.videasy.net/tv/${id}/${s}/${e}`,
+      referrerPolicy: "strict-origin-when-cross-origin",
+    },
+    {
+      label: "AutoEmbed",
+      url: (id, s, e) =>
+        `https://player.autoembed.cc/embed/tv/${id}/${s}/${e}`,
+      referrerPolicy: "strict-origin-when-cross-origin",
     },
     {
       label: "VidSrc",
       url: (id, s, e) =>
         `https://vidsrc.sh/embed/tv?tmdb=${id}&season=${s}&episode=${e}`,
+      referrerPolicy: "strict-origin-when-cross-origin",
     },
     {
       label: "2embed",
       url: (id, s, e) => `https://www.2embed.cc/embedtv/${id}?s=${s}&e=${e}`,
+      referrerPolicy: "strict-origin-when-cross-origin",
     },
   ],
 };
@@ -62,18 +91,26 @@ export default function VideoPlayer({
   onNextEpisode,
   hasNext,
   onWatchedSeconds,
+  defaultServer,
 }) {
-  const [activeServer, setActiveServer] = useState(0);
+  const servers = SERVERS[type] || SERVERS.movie;
+  const getDefaultServerIndex = () => {
+    if (!defaultServer) return 0;
+    const idx = servers.findIndex((s) => s.label === defaultServer);
+    return idx >= 0 ? idx : 0;
+  };
+
+  const [activeServer, setActiveServer] = useState(() => getDefaultServerIndex());
   const [showServerMenu, setShowServerMenu] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const openedAt = useRef(null);
 
-  const resetKey = `${isOpen}-${id}-${season ?? ""}-${episode ?? ""}`;
+  const resetKey = `${isOpen}-${id}-${season ?? ""}-${episode ?? ""}-${type}-${defaultServer ?? ""}`;
   const [prevResetKey, setPrevResetKey] = useState(resetKey);
   if (resetKey !== prevResetKey) {
     setPrevResetKey(resetKey);
     if (isOpen) {
-      setActiveServer(0);
+      setActiveServer(getDefaultServerIndex());
       setShowServerMenu(false);
       setIframeLoaded(false);
     }
@@ -113,11 +150,12 @@ export default function VideoPlayer({
     };
   }, [isOpen]);
 
-  const servers = SERVERS[type] || SERVERS.movie;
+  const active = servers[activeServer] || servers[0];
   const serverUrl =
     type === "tv"
-      ? servers[activeServer]?.url(id, season, episode)
-      : servers[activeServer]?.url(id);
+      ? active?.url(id, season, episode)
+      : active?.url(id);
+  const iframeReferrerPolicy = active?.referrerPolicy || "strict-origin-when-cross-origin";
   const displayTitle =
     type === "tv" ? `${title} — S${season}E${episode}` : title;
 
@@ -215,17 +253,17 @@ export default function VideoPlayer({
                   alignItems: "center",
                   gap: 6,
                   padding: "clamp(6px, 1.5vw, 7px) clamp(10px, 2vw, 12px)",
-                  borderRadius: "var(--radius-lg)",
-                  background: "var(--accent)",
+                  borderRadius: "var(--radius-full)",
+                  background: "#ffffff",
                   border: "none",
-                  color: "#fff",
+                  color: "#0b1220",
                   fontSize: "clamp(12px, 2.5vw, var(--text-sm))",
                   fontWeight: "var(--font-bold)",
                   cursor: "pointer",
                   whiteSpace: "nowrap",
                 }}
               >
-                Next Episode <Play size={14} fill="currentColor" />
+                Next Episode <Play size={14} fill="currentColor" style={{ marginLeft: 1 }} />
               </button>
             )}
           <div style={{ position: "relative", flexShrink: 0 }}>
@@ -298,10 +336,10 @@ export default function VideoPlayer({
                         textAlign: "left",
                         cursor: "pointer",
                         background:
-                          activeServer === i ? "var(--accent)" : "transparent",
+                          activeServer === i ? "#ffffff" : "transparent",
                         border: "none",
                         color:
-                          activeServer === i ? "#fff" : "var(--text-secondary)",
+                          activeServer === i ? "#0b1220" : "var(--text-secondary)",
                         fontWeight:
                           activeServer === i
                             ? "var(--font-bold)"
@@ -320,7 +358,7 @@ export default function VideoPlayer({
                             width: 6,
                             height: 6,
                             borderRadius: "50%",
-                            background: "#fff",
+                            background: "#0b1220",
                           }}
                         />
                       )}
@@ -366,6 +404,15 @@ export default function VideoPlayer({
             >
               Loading player...
             </p>
+            <p
+              style={{
+                marginTop: 6,
+                fontSize: "var(--text-xs)",
+                color: "var(--text-muted)",
+              }}
+            >
+              If playback doesn’t start, try switching servers.
+            </p>
           </div>
         )}
 
@@ -381,7 +428,7 @@ export default function VideoPlayer({
           }}
           allowFullScreen
           allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-          referrerPolicy="strict-origin-when-cross-origin"
+          referrerPolicy={iframeReferrerPolicy}
           title={`Watch ${displayTitle}`}
           onLoad={() => setIframeLoaded(true)}
         />

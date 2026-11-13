@@ -18,8 +18,6 @@ import {
   Zap,
   Film,
   Drama,
-  Flame,
-  Sparkles,
 } from "lucide-react";
 import MediaCard from "@/components/MediaCard";
 import ScrollRow from "@/components/ScrollRow";
@@ -27,7 +25,6 @@ import ContinueWatchingSection from "@/components/ContinueWatchingSection";
 import { useHistory } from "@/context/HistoryContext";
 import {
   SkeletonCard,
-  SkeletonWide,
   SkeletonHero,
 } from "@/components/Skeleton";
 import {
@@ -48,7 +45,7 @@ function GenreQuickLinks() {
     { name: "Horror", slug: "horror", href: "/movies?genre=horror", icon: <Ghost size={22} /> },
     { name: "Sci-Fi", slug: "sci-fi", href: "/movies?genre=sci-fi", icon: <Rocket size={22} /> },
     { name: "Romance", slug: "romance", href: "/movies?genre=romance", icon: <Heart size={22} /> },
-    { name: "Anime", slug: "", href: "/anime", icon: <Sparkles size={22} /> },
+    { name: "Drama", slug: "drama", href: "/movies?genre=drama", icon: <Film size={22} /> },
     { name: "Thriller", slug: "thriller", href: "/movies?genre=thriller", icon: <Clapperboard size={22} /> },
     { name: "Top Rated", slug: "top_rated", href: "/movies?sort=top_rated", icon: <Star size={22} /> },
   ];
@@ -542,146 +539,6 @@ function SectionHeader({ title, icon, href, subtitle }) {
   );
 }
 
-/* ── Featured spotlight (two large editorial cards) ─────────────── */
-function SpotlightSection({ items, loading }) {
-  const top = (items || []).slice(0, 2);
-  if (!loading && top.length < 2) return null;
-
-  return (
-    <section style={{ marginTop: 44 }}>
-      <SectionHeader
-        title="Editor's Spotlight"
-        icon={<Flame size={20} color="var(--accent)" />}
-        subtitle="Hand-picked standouts"
-      />
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 16,
-        }}
-      >
-        {loading
-          ? Array.from({ length: 2 }).map((_, i) => (
-              <div
-                key={i}
-                className="skeleton"
-                style={{ height: 200, borderRadius: "var(--radius-xl)" }}
-              />
-            ))
-          : top.map((item, i) => {
-              const isMovie = item.media_type === "movie" || item.title ? true : false;
-              const slug = isMovie ? "movie" : "tv";
-              const img = item.backdrop_path || item.poster_path;
-              const title = item.title || item.name;
-              return (
-                <Link
-                  key={item.id}
-                  href={`/${slug}/${item.id}`}
-                  style={{ textDecoration: "none" }}
-                >
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1, duration: 0.35 }}
-                    whileHover={{ y: -4 }}
-                    style={{
-                      position: "relative",
-                      height: 220,
-                      borderRadius: "var(--radius-xl)",
-                      overflow: "hidden",
-                      cursor: "pointer",
-                      border: "1px solid var(--border)",
-                      boxShadow: "var(--shadow-lg)",
-                      transition:
-                        "border-color var(--transition-base), box-shadow var(--transition-base)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = "var(--accent-border)";
-                      e.currentTarget.style.boxShadow =
-                        "0 16px 48px rgba(59,130,246,0.18)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = "var(--border)";
-                      e.currentTarget.style.boxShadow = "var(--shadow-lg)";
-                    }}
-                  >
-                    {img && (
-                      <Image
-                        src={`${IMG}/w780${img}`}
-                        alt={title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        style={{ objectFit: "cover", display: "block" }}
-                      />
-                    )}
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background:
-                          "linear-gradient(to top, rgba(11,15,26,0.95) 0%, rgba(11,15,26,0.3) 50%, transparent 75%)",
-                      }}
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        padding: 20,
-                      }}
-                    >
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 6,
-                          fontSize: "var(--text-xs)",
-                          fontWeight: "var(--font-bold)",
-                          color: "var(--accent)",
-                          marginBottom: 8,
-                        }}
-                      >
-                        <Sparkles size={12} /> #{i + 1} Spotlight
-                      </span>
-                      <h3
-                        style={{
-                          fontSize: "var(--text-lg)",
-                          fontWeight: "var(--font-extrabold)",
-                          color: "var(--text-primary)",
-                          margin: 0,
-                          letterSpacing: "-0.01em",
-                        }}
-                      >
-                        {title}
-                      </h3>
-                      {item.vote_average > 0 && (
-                        <span
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 4,
-                            marginTop: 6,
-                            fontSize: "var(--text-xs)",
-                            fontWeight: "var(--font-semibold)",
-                            color: "var(--gold)",
-                          }}
-                        >
-                          <Star size={12} fill="currentColor" />{" "}
-                          {item.vote_average.toFixed(1)} · Trending
-                        </span>
-                      )}
-                    </div>
-                  </motion.div>
-                </Link>
-              );
-            })}
-      </div>
-    </section>
-  );
-}
-
 /* ── Page ─────────────────────────────────────────────────────────── */
 export default function HomePage() {
   const { history } = useHistory();
@@ -761,17 +618,12 @@ export default function HomePage() {
                   type={item.type}
                   index={i}
                   variant="tile"
-                  cardWidth={240}
+                  cardWidth={160}
                 />
               ))}
             </ScrollRow>
           </div>
         )}
-
-        {/* Featured spotlight */}
-        <div style={{ marginTop: 44 }}>
-          <SpotlightSection items={topRated} loading={loading} />
-        </div>
 
         {/* Trending */}
         <div style={{ marginTop: 44 }}>
@@ -782,7 +634,7 @@ export default function HomePage() {
           >
             {loading
               ? Array.from({ length: 12 }).map((_, i) => (
-                  <SkeletonCard key={i} width={240} height={360} />
+                  <SkeletonCard key={i} width={160} height={240} />
                 ))
               : trending.map((item, i) => (
                   <MediaCard
@@ -790,7 +642,7 @@ export default function HomePage() {
                     item={item}
                     index={i}
                     variant="tile"
-                    cardWidth={240}
+                    cardWidth={160}
                   />
                 ))}
           </ScrollRow>
@@ -805,10 +657,10 @@ export default function HomePage() {
           >
             {loading
               ? Array.from({ length: 12 }).map((_, i) => (
-                  <SkeletonCard key={i} width={240} height={360} />
+                  <SkeletonCard key={i} width={160} height={240} />
                 ))
               : popularMovies.map((item, i) => (
-                  <MediaCard key={item.id} item={item} type="movie" index={i} variant="tile" cardWidth={240} />
+                  <MediaCard key={item.id} item={item} type="movie" index={i} variant="tile" cardWidth={160} />
                 ))}
           </ScrollRow>
         </div>
@@ -821,16 +673,17 @@ export default function HomePage() {
             href="/tv"
           >
             {loading
-              ? Array.from({ length: 10 }).map((_, i) => (
-                  <SkeletonWide key={i} />
+              ? Array.from({ length: 12 }).map((_, i) => (
+                  <SkeletonCard key={i} width={160} height={240} />
                 ))
               : popularTV.map((item, i) => (
                   <MediaCard
                     key={item.id}
                     item={item}
                     type="tv"
-                    variant="backdrop"
                     index={i}
+                    variant="tile"
+                    cardWidth={160}
                   />
                 ))}
           </ScrollRow>
@@ -845,10 +698,10 @@ export default function HomePage() {
           >
             {loading
               ? Array.from({ length: 12 }).map((_, i) => (
-                  <SkeletonCard key={i} width={240} height={360} />
+                  <SkeletonCard key={i} width={160} height={240} />
                 ))
               : topRated.map((item, i) => (
-                  <MediaCard key={item.id} item={item} type="movie" index={i} variant="tile" cardWidth={240} />
+                  <MediaCard key={item.id} item={item} type="movie" index={i} variant="tile" cardWidth={160} />
                 ))}
           </ScrollRow>
         </div>
@@ -862,10 +715,10 @@ export default function HomePage() {
           >
             {loading
               ? Array.from({ length: 12 }).map((_, i) => (
-                  <SkeletonCard key={i} width={240} height={360} />
+                  <SkeletonCard key={i} width={160} height={240} />
                 ))
               : action.map((item, i) => (
-                  <MediaCard key={item.id} item={item} type="movie" index={i} variant="tile" cardWidth={240} />
+                  <MediaCard key={item.id} item={item} type="movie" index={i} variant="tile" cardWidth={160} />
                 ))}
           </ScrollRow>
         </div>

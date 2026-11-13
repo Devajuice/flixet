@@ -1,0 +1,39 @@
+# Example Docker Compose: Anubis in front of the Flixet (Next.js) app
+# This is a TEMPLATE for self-hosted/container deployment. Do not replace existing app configs.
+# Usage (example): copy/adapt, set secrets, then `docker compose -f docker-compose.anubis.example.yml up -d`
+
+services:
+  app:
+    # Build or reference your existing app image. Ensure it listens on 3000 internally.
+    # build: ../..
+    image: your-flixet-app-image:latest
+    environment:
+      - NODE_ENV=production
+      # Provide required runtime env vars for the app here or via env_file (TMDB keys, etc.)
+      # - TMDB_API_KEY=...
+    expose:
+      - "3000"
+    restart: unless-stopped
+
+  anubis:
+    image: ghcr.io/techarohq/anubis:latest
+    depends_on:
+      - app
+    env_file:
+      - ./anubis.env
+    environment:
+      # Override/ensure target points to the app service
+      - TARGET=http://app:3000
+      # Optionally point to mounted policy file (verify flag/name for your Anubis version)
+      - POLICY_FNAME=/data/botPolicy.yaml
+    volumes:
+      - ./botPolicy.example.yaml:/data/botPolicy.yaml:ro
+    ports:
+      # Expose Anubis to your public reverse proxy / load balancer (or directly for testing)
+      - "8923:8923"
+    restart: unless-stopped
+
+# Public entrypoint options:
+# 1) Terminate TLS at Nginx/Caddy on the host and proxy_pass to localhost:8923 (recommended).
+# 2) Put a TLS-terminating proxy container in this compose file in front of Anubis.
+# Do NOT expose the app service directly to the public internet.

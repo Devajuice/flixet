@@ -18,11 +18,11 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export const metadata = {
   metadataBase: new URL("https://flixet.vercel.app"),
-  title: "Flixet - Watch Movies, TV Shows and Anime Free",
+  title: "Flixet - Watch Movies & TV Shows Free",
   description:
-    "Stream Movies, TV shows and Anime for free. No subscription required. Watch thousands of movies and series online.",
+    "Stream movies and TV shows for free. No subscription required. Watch thousands of movies and series online.",
   keywords:
-    "free movies, watch movies online, stream tv shows, free streaming, movies online, anime streaming",
+    "free movies, watch movies online, stream tv shows, free streaming, movies online, tv series streaming",
   authors: [{ name: "Devajuice" }],
   creator: "Devajuice",
   publisher: "Devajuice",
@@ -46,23 +46,23 @@ export const metadata = {
     locale: "en_US",
     url: "https://flixet.vercel.app",
     siteName: "Flixet",
-    title: "Flixet - Watch Movies, TV Shows and Anime",
+    title: "Flixet - Watch Movies & TV Shows",
     description:
-      "Stream thousands of Movies, TV shows and Anime for free. No subscription required.",
+      "Stream thousands of movies and TV shows for free. No subscription required.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Flixet - Free Movies, TV Shows and Anime",
+        alt: "Flixet - Free Movies & TV Shows",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Flixet - Watch Movies, TV Shows & Anime",
+    title: "Flixet - Watch Movies & TV Shows",
     description:
-      "Stream Movies, TV shows and Anime for free. No subscription required.",
+      "Stream movies and TV shows for free. No subscription required.",
     images: ["/og-image.png"],
   },
 };

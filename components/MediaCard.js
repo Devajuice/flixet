@@ -25,17 +25,24 @@ function MediaCard({
   const [hovered, setHovered] = useState(false);
 
   const mediaType = type || item.media_type || (item.title ? "movie" : "tv");
-  const href = `/${mediaType === "movie" ? "movie" : "tv"}/${item.id}`;
+  const href =
+    item.href ||
+    (item.tmdbId
+      ? `/${item.tmdbMediaType || "tv"}/${item.tmdbId}`
+      : `/${mediaType === "movie" ? "movie" : "tv"}/${item.id}`);
   const title = item.title || item.name;
 
+  const directImage = item.imageUrl || item.coverImage || null;
   const imgPath =
     variant === "backdrop"
       ? item.backdrop_path || item.poster_path
       : item.poster_path;
 
-  const imgSrc = imgPath
-    ? `${IMG}${variant === "backdrop" ? "/w780" : "/w342"}${imgPath}`
-    : null;
+  const imgSrc = directImage
+    ? directImage
+    : imgPath
+      ? `${IMG}${variant === "backdrop" ? "/w780" : "/w342"}${imgPath}`
+      : null;
 
   const width = variant === "backdrop" ? 240 : variant === "tile" ? 240 : 140;
 

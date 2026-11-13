@@ -1,0 +1,19 @@
+# Example Caddy snippet: route public traffic through Anubis to the app
+# Adapt domain and upstream for your environment.
+# Caddy will provision TLS automatically when given a valid public domain.
+
+example.com {
+    encode gzip zstd
+
+    reverse_proxy 127.0.0.1:8923 {
+        # Caddy forwards Host and X-Forwarded-* headers by default.
+        # If Anubis runs in Docker on the same network, use: reverse_proxy anubis:8923
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+    }
+}
+
+# For local testing without automatic HTTPS:
+# :8080 {
+#     reverse_proxy 127.0.0.1:8923
+# }

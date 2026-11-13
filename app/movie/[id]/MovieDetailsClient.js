@@ -240,6 +240,12 @@ export default function MovieDetails({ params }) {
   const [showPlayer, setShowPlayer] = useState(false);
   const [showTrailer, setShowTrailer] = useState(false);
   const [imdbRating, setImdbRating] = useState(undefined);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(timer);
+  }, []);
   const { addToContinueWatching } = useContinueWatching();
   const { addToHistory } = useHistory();
   const hasAdded = useRef(false);
@@ -279,13 +285,22 @@ export default function MovieDetails({ params }) {
             `https://www.omdbapi.com/?i=${extData.imdb_id}&apikey=${OMDB_KEY}`,
           )
             .then((r) => r.json())
-            .then((d) =>
-              setImdbRating(
-                d.imdbRating && d.imdbRating !== "N/A"
-                  ? { rating: d.imdbRating, votes: d.imdbVotes }
-                  : null,
-              ),
-            )
+            .then((d) => {
+              const ratings = Array.isArray(d.Ratings) ? d.Ratings : [];
+              const rt = ratings.find((r) => r.Source === "Rotten Tomatoes")?.Value;
+              const meta = ratings.find((r) => r.Source === "Metacritic")?.Value || (d.Metascore && d.Metascore !== "N/A" ? `${d.Metascore}/100` : null);
+              const hasImdb = d.imdbRating && d.imdbRating !== "N/A";
+              if (hasImdb || rt || meta) {
+                setImdbRating({
+                  rating: hasImdb ? d.imdbRating : null,
+                  votes: d.imdbVotes && d.imdbVotes !== "N/A" ? d.imdbVotes : null,
+                  rottenTomatoes: rt || null,
+                  metacritic: meta || null,
+                });
+              } else {
+                setImdbRating(null);
+              }
+            })
             .catch(() => setImdbRating(null));
         } else setImdbRating(null);
       })
@@ -598,7 +613,7 @@ export default function MovieDetails({ params }) {
               }}
             >
               <ScoreRing score={movie.vote_average || 0} />
-              {imdbRating && (
+              {imdbRating?.rating && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <span
                     style={{
@@ -631,6 +646,56 @@ export default function MovieDetails({ params }) {
                       ({imdbRating.votes})
                     </span>
                   )}
+                </div>
+              )}
+              {imdbRating?.rottenTomatoes && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span
+                    style={{
+                      background: "#fa320a",
+                      color: "#fff",
+                      fontSize: 10,
+                      fontWeight: 900,
+                      padding: "2px 6px",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    RT
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "var(--text-base)",
+                      fontWeight: "var(--font-bold)",
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {imdbRating.rottenTomatoes}
+                  </span>
+                </div>
+              )}
+              {imdbRating?.metacritic && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span
+                    style={{
+                      background: "#66cc33",
+                      color: "#000",
+                      fontSize: 10,
+                      fontWeight: 900,
+                      padding: "2px 6px",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    MC
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "var(--text-base)",
+                      fontWeight: "var(--font-bold)",
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {imdbRating.metacritic}
+                  </span>
                 </div>
               )}
               <div
@@ -668,6 +733,9 @@ export default function MovieDetails({ params }) {
                     <Clock size={14} />
                     <span style={{ fontSize: "var(--text-sm)" }}>
                       {formatRuntime(movie.runtime)}
+                    </span>
+                    <span style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>
+                      • Ends at {new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date(now + movie.runtime * 60 * 1000))}
                     </span>
                   </div>
                 )}

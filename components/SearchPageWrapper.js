@@ -217,7 +217,7 @@ export default function SearchPageWrapper({ query, data }) {
               lineHeight: 1.7,
             }}
           >
-            Type in the search bar above to find movies, TV shows, and more.
+            Type in the search bar above to find movies and TV shows.
           </p>
           <div
             style={{

@@ -347,7 +347,13 @@ function EpisodeCard({ ep, isActive, onClick, omdb, index }) {
         {isActive && !isFuture && (
           <div className="episode-thumb-overlay">
             <div className="episode-play-btn">
-              <Play size={16} fill="white" color="white" strokeWidth={0} />
+              <Play
+                size={16}
+                fill="#0b1220"
+                color="#0b1220"
+                strokeWidth={0}
+                style={{ marginLeft: 2 }}
+              />
             </div>
           </div>
         )}
@@ -492,13 +498,22 @@ function TVShowDetailsContent({ params }) {
       `https://www.omdbapi.com/?i=${externalIds.imdb_id}&apikey=${OMDB_KEY}`,
     )
       .then((r) => r.json())
-      .then((d) =>
-        setShowImdb(
-          d.imdbRating && d.imdbRating !== "N/A"
-            ? { rating: d.imdbRating, votes: d.imdbVotes }
-            : null,
-        ),
-      )
+      .then((d) => {
+        const ratings = Array.isArray(d.Ratings) ? d.Ratings : [];
+        const rt = ratings.find((r) => r.Source === "Rotten Tomatoes")?.Value;
+        const meta = ratings.find((r) => r.Source === "Metacritic")?.Value || (d.Metascore && d.Metascore !== "N/A" ? `${d.Metascore}/100` : null);
+        const hasImdb = d.imdbRating && d.imdbRating !== "N/A";
+        if (hasImdb || rt || meta) {
+          setShowImdb({
+            rating: hasImdb ? d.imdbRating : null,
+            votes: d.imdbVotes && d.imdbVotes !== "N/A" ? d.imdbVotes : null,
+            rottenTomatoes: rt || null,
+            metacritic: meta || null,
+          });
+        } else {
+          setShowImdb(null);
+        }
+      })
       .catch(() => setShowImdb(null));
   }, [externalIds]);
 
@@ -939,7 +954,7 @@ function TVShowDetailsContent({ params }) {
               }}
             >
               <ScoreRing score={show.vote_average || 0} />
-              {showImdb && (
+              {showImdb?.rating && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <span
                     style={{
@@ -972,6 +987,56 @@ function TVShowDetailsContent({ params }) {
                       ({showImdb.votes})
                     </span>
                   )}
+                </div>
+              )}
+              {showImdb?.rottenTomatoes && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span
+                    style={{
+                      background: "#fa320a",
+                      color: "#fff",
+                      fontSize: 10,
+                      fontWeight: 900,
+                      padding: "2px 6px",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    RT
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "var(--text-base)",
+                      fontWeight: "var(--font-bold)",
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {showImdb.rottenTomatoes}
+                  </span>
+                </div>
+              )}
+              {showImdb?.metacritic && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span
+                    style={{
+                      background: "#66cc33",
+                      color: "#000",
+                      fontSize: 10,
+                      fontWeight: 900,
+                      padding: "2px 6px",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    MC
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "var(--text-base)",
+                      fontWeight: "var(--font-bold)",
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {showImdb.metacritic}
+                  </span>
                 </div>
               )}
               <div
@@ -1574,13 +1639,28 @@ function TVShowDetailsContent({ params }) {
         }
         .season-scroll {
           flex: 1;
+          min-width: 0;
           display: flex;
           gap: 6px;
           overflow-x: auto;
-          scrollbar-width: none;
-          msoverflowstyle: none;
+          overflow-y: hidden;
+          overscroll-behavior-x: contain;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+          -ms-overflow-style: auto;
           -webkit-overflow-scrolling: touch;
-          padding: 2px 0;
+          padding: 2px 0 6px;
+          scroll-behavior: smooth;
+        }
+        .season-scroll::-webkit-scrollbar {
+          height: 6px;
+        }
+        .season-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .season-scroll::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.25);
+          border-radius: var(--radius-full);
         }
         .season-btn {
           padding: 8px 14px;
@@ -1686,10 +1766,12 @@ function TVShowDetailsContent({ params }) {
           width: 36px;
           height: 36px;
           border-radius: 50%;
-          background: var(--accent);
+          background: #ffffff;
+          color: #0b1220;
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
         }
         .episode-info {
           flex: 1;

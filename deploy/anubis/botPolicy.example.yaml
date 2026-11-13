@@ -1,0 +1,49 @@
+# Example Anubis bot policy (sensible defaults / template)
+# Review and adapt for your Anubis version: field names/options may differ by release.
+# Mount as /data/botPolicy.yaml (or path expected by your version) and reference via POLICY_FNAME.
+
+bots:
+  # --- Allow legitimate search engine crawlers (adjust to your SEO needs) ---
+  - name: googlebot
+    user_agent_regex: 'Googlebot|Google-InspectionTool|AdsBot-Google|Mediapartners-Google'
+    action: allow
+
+  - name: bingbot
+    user_agent_regex: 'bingbot|BingPreview|msnbot'
+    action: allow
+
+  - name: duckduckbot
+    user_agent_regex: 'DuckDuckBot'
+    action: allow
+
+  - name: slurp
+    user_agent_regex: 'Slurp'
+    action: allow
+
+  # --- Allow common uptime/monitoring (edit or remove) ---
+  - name: uptime-monitors
+    user_agent_regex: 'UptimeRobot|Pingdom|StatusCake'
+    action: allow
+
+  # --- Allow your own API & webhook routes (EDIT THESE) ---
+  # Replace paths with any machine-to-machine endpoints that must not be challenged.
+  - name: internal-api-and-webhooks
+    path_regex: '^/(api/tmdb|api/webhooks|api/health)(/.*)?$'
+    action: allow
+
+  # --- Allow static/well-known resources if needed ---
+  - name: well-known
+    path_regex: '^/(robots\.txt|sitemap\.xml|favicon\.ico|site\.webmanifest)(\?.*)?$'
+    action: allow
+
+  # --- Default: challenge browsers/unknown bots with proof-of-work ---
+  - name: default-challenge
+    action: challenge
+    # challenge:
+    #   difficulty: 4
+    #   algorithm: fast
+
+# Notes:
+# - If you have authenticated API clients, prefer allowlisting by path + trusted network/auth
+#   at your edge in addition to (or instead of) UA rules.
+# - Keep webhook endpoints narrowly scoped; do not broadly allow /api/* unless required.

@@ -9,7 +9,6 @@ import {
   Home,
   Tv,
   ChevronDown,
-  Sparkles,
   Bookmark,
   Menu,
   X,
@@ -175,7 +174,6 @@ export default function Header() {
       ref: tvButtonRef,
       dropdown: "tv",
     },
-    { href: "/anime", label: "Anime", icon: Sparkles },
     { href: "/watchlist", label: "Watchlist", icon: Bookmark },
   ];
 
@@ -184,7 +182,6 @@ export default function Header() {
     if (href === "/movies")
       return pathname === "/movies" || pathname.startsWith("/movie/");
     if (href === "/tv") return pathname === "/tv" || pathname.startsWith("/tv/");
-    if (href === "/anime") return pathname === "/anime";
     if (href === "/watchlist") return pathname === "/watchlist";
     return pathname === href;
   };
@@ -210,21 +207,19 @@ export default function Header() {
           transition={{ duration: 0.45, ease: "easeOut" }}
           style={{
             background: scrolled
-              ? "rgba(0, 0, 0, 0.92)"
-              : "rgba(0, 0, 0, 0.6)",
-            border: scrolled
-              ? "1px solid rgba(255, 255, 255, 0.1)"
-              : "1px solid rgba(255, 255, 255, 0.06)",
+              ? "rgba(11, 18, 32, 0.72)"
+              : "rgba(255, 255, 255, 0.05)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
             boxShadow: scrolled
-              ? "0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05)"
-              : "0 4px 16px rgba(0, 0, 0, 0.3)",
+              ? "0 12px 40px rgba(0, 0, 0, 0.45)"
+              : "0 8px 24px rgba(0, 0, 0, 0.25)",
             width: "100%",
             maxWidth: 1200,
             zIndex: 1000,
             borderRadius: "var(--radius-full)",
-            backdropFilter: "blur(24px) saturate(1.8)",
-            WebkitBackdropFilter: "blur(24px) saturate(1.8)",
-            transition: "background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
+            backdropFilter: "blur(20px) saturate(1.4)",
+            WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+            transition: "background 200ms ease, box-shadow 200ms ease, border-color 200ms ease",
             pointerEvents: "auto",
           }}
         >
@@ -367,11 +362,12 @@ export default function Header() {
           width: 34px;
           height: 34px;
           border-radius: var(--radius-lg);
-          background: linear-gradient(135deg, #d97706, #f59e0b);
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.12);
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+          backdrop-filter: blur(12px);
         }
         .header-logo span {
           font-size: var(--text-xl);
@@ -388,19 +384,9 @@ export default function Header() {
           position: relative;
         }
         .nav-link--active {
-          color: var(--accent) !important;
-          background: var(--accent-subtle);
-        }
-        .nav-link--active::after {
-          content: "";
-          position: absolute;
-          left: 14px;
-          right: 14px;
-          bottom: 6px;
-          height: 2px;
-          border-radius: 2px;
-          background: linear-gradient(90deg, #d97706, #fbbf24);
-          box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+          color: var(--text-primary) !important;
+          background: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.14);
         }
         .header-search {
           position: relative;
@@ -903,7 +889,7 @@ export default function Header() {
                     { href: "/", label: "Home", icon: Home },
                     { href: "/movies", label: "Movies", icon: Film },
                     { href: "/tv", label: "TV", icon: Tv },
-                    { href: "/anime", label: "Anime", icon: Sparkles },
+                    { href: "/watchlist", label: "Watchlist", icon: Bookmark },
                   ].map((item) => (
                     <Link
                       key={item.href}

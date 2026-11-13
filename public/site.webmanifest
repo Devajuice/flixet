@@ -1,7 +1,7 @@
 {
-  "name": "Flixet - Watch Movies, TV Shows & Anime",
+  "name": "Flixet - Watch Movies & TV Shows",
   "short_name": "Flixet",
-  "description": "Stream unlimited movies, TV shows, and anime for free. Discover trending content, create watchlists, and enjoy seamless streaming on any device.",
+  "description": "Stream unlimited movies and TV shows for free. Discover trending content, create watchlists, and enjoy seamless streaming on any device.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -86,12 +86,6 @@
       "short_name": "TV Shows",
       "description": "Explore TV series and episodes",
       "url": "/tv"
-    },
-    {
-      "name": "Browse Anime",
-      "short_name": "Anime",
-      "description": "Watch anime series and movies",
-      "url": "/anime"
     },
     {
       "name": "My Watchlist",
