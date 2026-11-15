@@ -493,17 +493,17 @@ export default function Header() {
                   role="menu"
                   aria-label="Movie genres"
                   style={{
-                    background: "rgba(10, 10, 10, 0.9)",
-                    backdropFilter: "blur(20px)",
-                    WebkitBackdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255, 255, 255, 0.06)",
+                    background: "rgba(12, 14, 20, 0.55)",
+                    backdropFilter: "blur(22px) saturate(1.7)",
+                    WebkitBackdropFilter: "blur(22px) saturate(1.7)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
                     borderTop: "2px solid var(--accent)",
                     borderRadius: "var(--radius-xl)",
                     padding: 16,
                     minWidth: 210,
                     maxHeight: 380,
                     overflowY: "auto",
-                    boxShadow: "0 24px 64px rgba(0, 0, 0, 0.6), 0 0 24px rgba(245, 158, 11, 0.1)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08), 0 24px 64px rgba(0,0,0,0.6), 0 0 24px rgba(212, 175, 55, 0.12)",
                   }}
                 >
                   <p
@@ -527,8 +527,8 @@ export default function Header() {
                     style={{
                       display: "block",
                       padding: "8px 12px",
-                      background: "linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.08))",
-                      border: "1px solid rgba(245, 158, 11, 0.25)",
+                      background: "linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(251, 191, 36, 0.08))",
+                      border: "1px solid rgba(212, 175, 55, 0.25)",
                       borderRadius: "var(--radius-lg)",
                       fontSize: "var(--text-sm)",
                       fontWeight: "var(--font-bold)",
@@ -590,17 +590,17 @@ export default function Header() {
                   role="menu"
                   aria-label="TV genres"
                   style={{
-                    background: "rgba(10, 10, 10, 0.9)",
-                    backdropFilter: "blur(20px)",
-                    WebkitBackdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255, 255, 255, 0.06)",
+                    background: "rgba(12, 14, 20, 0.55)",
+                    backdropFilter: "blur(22px) saturate(1.7)",
+                    WebkitBackdropFilter: "blur(22px) saturate(1.7)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
                     borderTop: "2px solid var(--accent)",
                     borderRadius: "var(--radius-xl)",
                     padding: 16,
                     minWidth: 210,
                     maxHeight: 380,
                     overflowY: "auto",
-                    boxShadow: "0 24px 64px rgba(0, 0, 0, 0.6), 0 0 24px rgba(245, 158, 11, 0.1)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08), 0 24px 64px rgba(0,0,0,0.6), 0 0 24px rgba(212, 175, 55, 0.12)",
                   }}
                 >
                   <p
@@ -667,8 +667,8 @@ export default function Header() {
                     style={{
                       display: "block",
                       padding: "8px 12px",
-                      background: "linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.08))",
-                      border: "1px solid rgba(245, 158, 11, 0.25)",
+                      background: "linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(251, 191, 36, 0.08))",
+                      border: "1px solid rgba(212, 175, 55, 0.25)",
                       borderRadius: "var(--radius-lg)",
                       fontSize: "var(--text-sm)",
                       fontWeight: "var(--font-bold)",
@@ -756,8 +756,8 @@ export default function Header() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "rgba(245, 158, 11, 0.1)",
-                  border: "1px solid rgba(245, 158, 11, 0.25)",
+                  background: "rgba(212, 175, 55, 0.1)",
+                  border: "1px solid rgba(212, 175, 55, 0.25)",
                   borderRadius: "50%",
                   color: "var(--accent)",
                   cursor: "pointer",
@@ -808,13 +808,13 @@ export default function Header() {
                 right: 0,
                 bottom: 0,
                 zIndex: 99999,
-                background: "rgba(0, 0, 0, 0.98)",
-                backdropFilter: "blur(24px)",
-                WebkitBackdropFilter: "blur(24px)",
+                background: "rgba(12, 14, 20, 0.6)",
+                backdropFilter: "blur(24px) saturate(1.6)",
+                WebkitBackdropFilter: "blur(24px) saturate(1.6)",
                 borderTopLeftRadius: "var(--radius-2xl)",
                 borderTopRightRadius: "var(--radius-2xl)",
-                border: "1px solid rgba(255, 255, 255, 0.06)",
-                boxShadow: "0 -8px 48px rgba(0, 0, 0, 0.8)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06), 0 -8px 48px rgba(0, 0, 0, 0.8)",
                 maxHeight: "82vh",
                 overflowY: "auto",
                 paddingBottom: 24,
@@ -864,8 +864,8 @@ export default function Header() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: "rgba(245, 158, 11, 0.1)",
-                    border: "1px solid rgba(245, 158, 11, 0.2)",
+                    background: "rgba(212, 175, 55, 0.1)",
+                    border: "1px solid rgba(212, 175, 55, 0.2)",
                     borderRadius: "50%",
                     color: "var(--accent)",
                     cursor: "pointer",

@@ -104,8 +104,8 @@ function MediaCard({
                 objectFit: "cover",
                 display: "block",
                 transition: "all var(--transition-slow)",
-                transform: hovered ? "scale(1.05)" : "none",
-                filter: hovered ? "brightness(0.55)" : "none",
+                transform: hovered ? "scale(1.06)" : "none",
+                filter: hovered ? "brightness(0.45)" : "none",
               }}
             />
           ) : (
@@ -131,30 +131,68 @@ function MediaCard({
             </div>
           )}
 
-          {/* Dark gradient for legibility */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: hovered
-                ? "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.05) 100%)"
-                : "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 45%)",
-              transition: "background var(--transition-slow)",
-              pointerEvents: "none",
-            }}
-          />
-
-          {/* Play button — centered via flexbox */}
+          {/* Hover overlay with details */}
           <div
             style={{
               position: "absolute",
               inset: 0,
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: "column",
+              justifyContent: "flex-end",
+              background: hovered
+                ? "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.1) 100%)"
+                : "linear-gradient(to top, rgba(0,0,0,0.2) 0%, transparent 40%)",
+              transition: "background var(--transition-slow)",
               pointerEvents: "none",
+              opacity: hovered ? 1 : 0,
             }}
           >
+            <div style={{ padding: "10px 10px 12px" }}>
+              <p
+                style={{
+                  fontSize: "var(--text-sm)",
+                  fontWeight: "var(--font-bold)",
+                  color: "var(--text-primary)",
+                  margin: "0 0 6px",
+                  lineHeight: 1.3,
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                }}
+              >
+                {title}
+              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                {item.vote_average > 0 && (
+                  <span style={{ fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--gold)" }}>
+                    ★ {item.vote_average.toFixed(1)}
+                  </span>
+                )}
+                {year && (
+                  <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>{year}</span>
+                )}
+                <span
+                  style={{
+                    marginLeft: "auto",
+                    padding: "2px 6px",
+                    borderRadius: "var(--radius-full)",
+                    background: "var(--accent-subtle)",
+                    border: "1px solid var(--accent-border)",
+                    fontSize: 9,
+                    fontWeight: "var(--font-semibold)",
+                    color: "var(--accent)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {mediaType === "movie" ? "Movie" : "TV"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Play button */}
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
             <AnimatePresence>
               {hovered && (
                 <motion.div
@@ -165,43 +203,19 @@ function MediaCard({
                     width: 46,
                     height: 46,
                     borderRadius: "var(--radius-full)",
-                    background: "linear-gradient(135deg, #d97706, #f59e0b)",
+                    background: "linear-gradient(135deg, #b8962e, #e6c76a)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    boxShadow: "0 8px 28px rgba(245, 158, 11, 0.5)",
+                    boxShadow: "0 8px 28px rgba(212, 175, 55, 0.5)",
                   }}
                 >
-                  <Play size={19} fill="white" color="white" />
+                  <Play size={19} fill="#1a1405" color="#1a1405" />
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* Rating badge — top left */}
-          {item.vote_average > 0 && (
-            <div
-              style={{
-                position: "absolute",
-                top: "var(--space-2)",
-                left: "var(--space-2)",
-                display: "flex",
-                alignItems: "center",
-                gap: "var(--space-1)",
-                padding: "3px 8px",
-                background: "rgba(0,0,0,0.72)",
-                backdropFilter: "blur(8px)",
-                borderRadius: "var(--radius-md)",
-                fontSize: "var(--text-xs)",
-                fontWeight: "var(--font-bold)",
-                color: "var(--gold)",
-              }}
-            >
-              ★ {item.vote_average.toFixed(1)}
-            </div>
-          )}
-
-          {/* Watchlist button */}
           {!showRemove && (
             <div
               className="media-card-action"
@@ -230,14 +244,7 @@ function MediaCard({
             </div>
           )}
           {showRemove && (
-            <div
-              style={{
-                position: "absolute",
-                top: "var(--space-2)",
-                right: "var(--space-2)",
-                pointerEvents: "auto",
-              }}
-            >
+            <div style={{ position: "absolute", top: "var(--space-2)", right: "var(--space-2)", pointerEvents: "auto" }}>
               <motion.button
                 onClick={handleRemove}
                 whileHover={{ scale: 1.1 }}
@@ -260,72 +267,6 @@ function MediaCard({
               </motion.button>
             </div>
           )}
-        </div>
-
-        {/* Info bar */}
-        <div
-          style={{
-            padding: "10px 12px 12px",
-            display: "flex",
-            flexDirection: "column",
-            flex: 1,
-            gap: 4,
-          }}
-        >
-          <p
-            style={{
-              fontSize: "var(--text-sm)",
-              fontWeight: "var(--font-bold)",
-              color: "var(--text-primary)",
-              margin: 0,
-              lineHeight: 1.3,
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {title}
-          </p>
-          <div
-            style={{
-              marginTop: "auto",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            {year && (
-              <span
-                style={{
-                  fontSize: "var(--text-xs)",
-                  color: "var(--text-tertiary)",
-                  fontWeight: "var(--font-medium)",
-                }}
-              >
-                {year}
-              </span>
-            )}
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 3,
-                marginLeft: "auto",
-                padding: "2px 8px",
-                borderRadius: "var(--radius-full)",
-                background: "var(--accent-subtle)",
-                border: "1px solid var(--accent-border)",
-                fontSize: 10,
-                fontWeight: "var(--font-semibold)",
-                color: "var(--accent)",
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-              }}
-            >
-              {mediaType === "movie" ? "Movie" : "TV"}
-            </span>
-          </div>
         </div>
       </motion.div>
     );
@@ -409,16 +350,25 @@ function MediaCard({
           position: "absolute",
           inset: 0,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: "column",
+          justifyContent: "flex-end",
           background: hovered
-            ? "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.05) 100%)"
-            : "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 40%)",
+            ? "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 45%, transparent 100%)"
+            : "transparent",
           transition: "background var(--transition-slow)",
           pointerEvents: "none",
+          opacity: hovered ? 1 : 0,
         }}
       >
-        {/* Play button — centered by flexbox */}
+        <div style={{ padding: "var(--space-2) var(--space-3) var(--space-3)", pointerEvents: "none" }}>
+          <p style={{ fontSize: "var(--text-sm)", fontWeight: "var(--font-semibold)", color: "var(--text-primary)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</p>
+          <div style={{ display: "flex", gap: 6, alignItems: "center", marginTop: 2 }}>
+            {item.vote_average > 0 && <span style={{ fontSize: "var(--text-xs)", color: "var(--gold)", fontWeight: "var(--font-bold)" }}>★ {item.vote_average.toFixed(1)}</span>}
+            {year && <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>{year}</span>}
+          </div>
+        </div>
+      </div>
+      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
         <AnimatePresence>
           {hovered && (
             <motion.div
@@ -429,139 +379,35 @@ function MediaCard({
                 width: 48,
                 height: 48,
                 borderRadius: "var(--radius-full)",
-                background: "linear-gradient(135deg, #d97706, #f59e0b)",
+                background: "linear-gradient(135deg, #b8962e, #e6c76a)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 8px 32px rgba(245, 158, 11, 0.5)",
+                boxShadow: "0 8px 32px rgba(212, 175, 55, 0.5)",
               }}
             >
-              <Play size={20} fill="white" color="white" />
+              <Play size={20} fill="#1a1405" color="#1a1405" />
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Rating badge — top left */}
-        {item.vote_average > 0 && (
-          <div
-            style={{
-              position: "absolute",
-              top: "var(--space-2)",
-              left: "var(--space-2)",
-              display: "flex",
-              alignItems: "center",
-              gap: "var(--space-1)",
-              padding: "3px 8px",
-              background: "rgba(0,0,0,0.75)",
-              backdropFilter: "blur(8px)",
-              borderRadius: "var(--radius-md)",
-              fontSize: "var(--text-xs)",
-              fontWeight: "var(--font-bold)",
-              color: "var(--gold)",
-            }}
-          >
-            ★ {item.vote_average.toFixed(1)}
-          </div>
-        )}
-
-        {/* Remove button (watchlist) */}
-        {showRemove && (
-          <div
-            style={{
-              position: "absolute",
-              top: "var(--space-2)",
-              right: "var(--space-2)",
-              pointerEvents: "auto",
-            }}
-          >
-            <motion.button
-              onClick={handleRemove}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              aria-label={`Remove ${title} from watchlist`}
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: "var(--radius-md)",
-                background: "rgba(0,0,0,0.7)",
-                backdropFilter: "blur(8px)",
-                border: "1px solid var(--border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--text-secondary)",
-                cursor: "pointer",
-              }}
-            >
-              <X size={13} />
-            </motion.button>
-          </div>
-        )}
-
-        {/* Watchlist button (normal) */}
-        {!showRemove && (
-          <div
-            className="media-card-action"
-            style={{
-              position: "absolute",
-              top: "var(--space-2)",
-              right: "var(--space-2)",
-              opacity: hovered ? 1 : 0,
-              transform: hovered ? "translateY(0)" : "translateY(-4px)",
-              transition: "all var(--transition-base)",
-              pointerEvents: "auto",
-            }}
-          >
-            <WatchlistButton
-              item={{
-                id: item.id,
-                type: mediaType,
-                title,
-                name: title,
-                poster_path: item.poster_path,
-                vote_average: item.vote_average,
-                release_date: item.release_date,
-                first_air_date: item.first_air_date,
-              }}
-            />
-          </div>
-        )}
-
-        {/* Title — bottom */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: "var(--space-2) var(--space-3) var(--space-3)",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "var(--text-sm)",
-              fontWeight: "var(--font-semibold)",
-              color: "var(--text-primary)",
-              margin: 0,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {title}
-          </p>
-          {year && (
-            <span
-              style={{
-                fontSize: "var(--text-xs)",
-                color: "var(--text-tertiary)",
-              }}
-            >
-              {year}
-            </span>
-          )}
-        </div>
       </div>
+      {item.vote_average > 0 && (
+        <div style={{ position: "absolute", top: "var(--space-2)", left: "var(--space-2)", display: "flex", alignItems: "center", gap: "var(--space-1)", padding: "3px 8px", background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)", borderRadius: "var(--radius-md)", fontSize: "var(--text-xs)", fontWeight: "var(--font-bold)", color: "var(--gold)", opacity: hovered ? 1 : 0.9, transition: "opacity 0.2s" }}>
+          ★ {item.vote_average.toFixed(1)}
+        </div>
+      )}
+      {showRemove && (
+        <div style={{ position: "absolute", top: "var(--space-2)", right: "var(--space-2)", pointerEvents: "auto" }}>
+          <motion.button onClick={handleRemove} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} aria-label={`Remove ${title} from watchlist`} style={{ width: 28, height: 28, borderRadius: "var(--radius-md)", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-secondary)", cursor: "pointer" }}>
+            <X size={13} />
+          </motion.button>
+        </div>
+      )}
+      {!showRemove && (
+        <div className="media-card-action" style={{ position: "absolute", top: "var(--space-2)", right: "var(--space-2)", opacity: hovered ? 1 : 0, transform: hovered ? "translateY(0)" : "translateY(-4px)", transition: "all var(--transition-base)", pointerEvents: "auto" }}>
+          <WatchlistButton item={{ id: item.id, type: mediaType, title, name: title, poster_path: item.poster_path, vote_average: item.vote_average, release_date: item.release_date, first_air_date: item.first_air_date }} />
+        </div>
+      )}
     </motion.div>
   );
 

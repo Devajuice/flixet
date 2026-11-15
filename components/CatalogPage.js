@@ -119,9 +119,18 @@ function CatalogContent({
   const [minRating, setMinRating] = useState("");
   const [sortOpen, setSortOpen] = useState(false);
   const [viewMode, setViewMode] = useState("infinite");
+  const [region, setRegion] = useState("US");
+  const [streamingOnly, setStreamingOnly] = useState(false);
   const observerTarget = useRef(null);
   const abortRef = useRef(null);
   const inFlightPage = useRef(null);
+
+  useEffect(() => {
+    fetch("/api/region")
+      .then((r) => r.json())
+      .then((d) => setRegion(d?.region || "US"))
+      .catch(() => setRegion("US"));
+  }, []);
 
   /* Slider value is derived so preset chips, the calendar and the slider all
      stay in sync. A half-picked range leaves that end at the track limit. */
@@ -179,6 +188,10 @@ function CatalogContent({
         if (dates.start) params[`${dateField}.gte`] = dates.start;
         if (dates.end) params[`${dateField}.lte`] = dates.end;
         if (rating) params["vote_average.gte"] = rating;
+        if (streamingOnly) {
+          params.watch_region = region || "US";
+          params.with_watch_monetization_types = "flatrate|free|ads";
+        }
 
         const data = await tmdbFetch(`discover/${type}`, params, {
           signal: controller.signal,
@@ -212,7 +225,7 @@ function CatalogContent({
         }
       }
     },
-    [type, genreParam, sortBy, activeGenre, dateFilter, minRating, dateField, genreMap],
+    [type, genreParam, sortBy, activeGenre, dateFilter, minRating, dateField, genreMap, streamingOnly, region],
   );
 
   useEffect(() => {
@@ -420,6 +433,15 @@ function CatalogContent({
               )}
             </AnimatePresence>
           </div>
+
+          <button
+            onClick={() => setStreamingOnly((v) => !v)}
+            className={`catalog-filters-btn${streamingOnly ? " has-filters" : ""}`}
+            style={streamingOnly ? { borderColor: "var(--accent-border)", color: "var(--accent)", background: "var(--accent-subtle)" } : undefined}
+            title={`Streaming availability for ${region || "US"} (TMDb)`}
+          >
+            Streaming now ({region || "US"})
+          </button>
 
           <button
             onClick={() => setShowFilters(true)}
@@ -691,8 +713,8 @@ function CatalogContent({
           width: 10px;
           height: 10px;
           border-radius: 3px;
-          background: linear-gradient(135deg, #d97706, #fbbf24);
-          box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+          background: linear-gradient(135deg, #b8962e, #e6c76a);
+          box-shadow: 0 0 16px rgba(212, 175, 55, 0.5);
         }
         .catalog-header-row {
           display: flex;
@@ -719,8 +741,8 @@ function CatalogContent({
           font-size: var(--text-sm);
           font-weight: var(--font-semibold);
           color: var(--accent);
-          background: rgba(245, 158, 11, 0.12);
-          border: 1px solid rgba(245, 158, 11, 0.25);
+          background: rgba(212, 175, 55, 0.14);
+          border: 1px solid rgba(212, 175, 55, 0.35);
           white-space: nowrap;
         }
         .catalog-subtitle {
@@ -763,9 +785,9 @@ function CatalogContent({
         }
         .catalog-genre-chip.is-active {
           color: #fff;
-          background: linear-gradient(135deg, #d97706, #f59e0b);
+          background: linear-gradient(135deg, #b8962e, #e6c76a);
           border-color: transparent;
-          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
         }
         .catalog-toolbar {
           display: flex;
@@ -839,7 +861,7 @@ function CatalogContent({
         }
         .catalog-sort-item.is-active {
           color: var(--accent);
-          background: rgba(245, 158, 11, 0.1);
+          background: rgba(212, 175, 55, 0.15);
           font-weight: var(--font-semibold);
         }
         .catalog-sort-check {
@@ -867,9 +889,9 @@ function CatalogContent({
         }
         .catalog-filters-btn.has-filters {
           color: #fff;
-          background: linear-gradient(135deg, #d97706, #f59e0b);
+          background: linear-gradient(135deg, #b8962e, #e6c76a);
           border-color: transparent;
-          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
         }
         .catalog-filters-badge {
           display: inline-flex;
@@ -912,8 +934,8 @@ function CatalogContent({
         }
         .catalog-viewtoggle-btn.is-active {
           color: #000;
-          background: linear-gradient(135deg, #d97706, #f59e0b);
-          box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+          background: linear-gradient(135deg, #b8962e, #e6c76a);
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
         }
         .catalog-reset-btn {
           display: inline-flex;
@@ -948,10 +970,11 @@ function CatalogContent({
           z-index: 10000;
           display: flex;
           flex-direction: column;
-          background: rgba(10, 10, 10, 0.98);
-          backdrop-filter: blur(24px);
-          border-left: 1px solid var(--border);
-          box-shadow: -24px 0 80px rgba(0, 0, 0, 0.6);
+          background: rgba(12, 14, 20, 0.65);
+          backdrop-filter: blur(24px) saturate(1.6);
+          -webkit-backdrop-filter: blur(24px) saturate(1.6);
+          border-left: 1px solid rgba(255, 255, 255, 0.12);
+          box-shadow: inset 1px 0 0 rgba(255,255,255,0.06), -24px 0 80px rgba(0, 0, 0, 0.6);
         }
         .catalog-drawer-head {
           display: flex;
@@ -1032,9 +1055,9 @@ function CatalogContent({
         }
         .catalog-chip-lg.is-active {
           color: #fff;
-          background: linear-gradient(135deg, #d97706, #f59e0b);
+          background: linear-gradient(135deg, #b8962e, #e6c76a);
           border-color: transparent;
-          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
         }
         .catalog-chips {
           display: flex;
@@ -1056,7 +1079,7 @@ function CatalogContent({
         }
         .catalog-chip-sm.is-active {
           color: #fff;
-          background: linear-gradient(135deg, #d97706, #f59e0b);
+          background: linear-gradient(135deg, #b8962e, #e6c76a);
           border-color: transparent;
         }
         .catalog-drawer-actions {
@@ -1091,10 +1114,10 @@ function CatalogContent({
           font-size: var(--text-sm);
           font-weight: var(--font-bold);
           color: #fff;
-          background: linear-gradient(135deg, #d97706, #f59e0b);
+          background: linear-gradient(135deg, #b8962e, #e6c76a);
           border: none;
           cursor: pointer;
-          box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
+          box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
           transition: all 0.2s;
         }
         .catalog-done-btn:hover {
@@ -1130,8 +1153,8 @@ function CatalogContent({
           width: 72px;
           height: 72px;
           border-radius: 24px;
-          background: rgba(245, 158, 11, 0.1);
-          border: 1px solid rgba(245, 158, 11, 0.25);
+          background: rgba(212, 175, 55, 0.15);
+          border: 1px solid rgba(212, 175, 55, 0.35);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1158,10 +1181,10 @@ function CatalogContent({
           font-size: var(--text-sm);
           font-weight: var(--font-semibold);
           color: #fff;
-          background: linear-gradient(135deg, #d97706, #f59e0b);
+          background: linear-gradient(135deg, #b8962e, #e6c76a);
           border: none;
           cursor: pointer;
-          box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
+          box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
         }
         .catalog-observer {
           min-height: 60px;

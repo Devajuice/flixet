@@ -155,16 +155,19 @@ export default function TermsOfService() {
         /* ── Section cards ─────────────────────────────── */
         .terms-section {
           margin-bottom: 16px;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 12px;
+          background: rgba(12, 14, 20, 0.45);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
           padding: 28px 30px;
-          backdrop-filter: blur(10px);
-          transition: border-color 0.2s ease;
+          backdrop-filter: blur(18px) saturate(1.5);
+          -webkit-backdrop-filter: blur(18px) saturate(1.5);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .terms-section:hover {
-          border-color: rgba(245, 158, 11, 0.2);
+          border-color: rgba(212, 175, 55, 0.35);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 32px rgba(212, 175, 55, 0.08);
         }
 
         .terms-section-header {
@@ -250,15 +253,16 @@ export default function TermsOfService() {
 
         /* ── Warning box ───────────────────────────────── */
         .terms-warning {
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.07);
+          background: rgba(12, 14, 20, 0.5);
+          border: 1px solid rgba(212, 175, 55, 0.25);
           border-left: 3px solid var(--accent);
-          border-radius: 10px;
+          border-radius: 12px;
           padding: 14px 16px;
           margin: 16px 0;
           display: flex;
           gap: 12px;
           align-items: flex-start;
+          backdrop-filter: blur(12px);
         }
 
         .terms-warning svg {
@@ -281,11 +285,12 @@ export default function TermsOfService() {
 
         /* ── Disclaimer box ────────────────────────────── */
         .terms-disclaimer {
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 10px;
+          background: rgba(12, 14, 20, 0.5);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
           padding: 16px 18px;
           margin: 14px 0;
+          backdrop-filter: blur(12px);
         }
 
         .terms-disclaimer p {
@@ -299,14 +304,15 @@ export default function TermsOfService() {
 
         /* ── Contact card ──────────────────────────────── */
         .terms-contact-card {
-          background: var(--accent-subtle);
-          border: 1px solid var(--accent-border);
-          border-radius: 10px;
+          background: rgba(212, 175, 55, 0.08);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          border-radius: 12px;
           padding: 18px 20px;
           display: flex;
           align-items: center;
           gap: 14px;
           margin-top: 14px;
+          backdrop-filter: blur(12px);
         }
 
         .terms-contact-card svg {

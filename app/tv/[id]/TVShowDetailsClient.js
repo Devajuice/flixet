@@ -215,7 +215,7 @@ function CastCard({ actor }) {
           textAlign: "center",
           transition: "all var(--transition-base)",
           transform: hovered ? "translateY(-4px)" : "none",
-          boxShadow: hovered ? "0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(245, 158, 11, 0.15)" : "none",
+          boxShadow: hovered ? "0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(212, 175, 55, 0.2)" : "none",
         }}
       >
         <div
@@ -855,7 +855,7 @@ function TVShowDetailsContent({ params }) {
                   sizes="(max-width: 768px) 260px, 500px"
                   style={{
                     borderRadius: "var(--radius-xl)",
-                    boxShadow: "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(245, 158, 11, 0.15)",
+                    boxShadow: "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(212, 175, 55, 0.2)",
                     display: "block",
                   }}
                 />
@@ -1449,45 +1449,107 @@ function TVShowDetailsContent({ params }) {
                 </div>
 
                 {/* Episodes */}
-                {loadingSeason ? (
-                  <div className="episodes-list-loading">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="skeleton"
-                        style={{
-                          height: 110,
-                          borderRadius: "var(--radius-lg)",
-                        }}
-                      />
-                    ))}
-                  </div>
-                ) : episodes.length > 0 ? (
-                  <div className="episodes-list">
-                    {episodes.map((ep, idx) => (
-                      <EpisodeCard
-                        key={ep.id}
-                        ep={ep}
-                        isActive={selEpisode === ep.episode_number}
-                        onClick={() => setSelEpisode(ep.episode_number)}
-                        omdb={omdbCache[`S${selSeason}E${ep.episode_number}`]}
-                        index={idx}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="episodes-empty">
-                    <Tv size={32} style={{ marginBottom: 12, opacity: 0.3 }} />
-                    <p
-                      style={{
-                        fontSize: "var(--text-sm)",
-                        fontWeight: "var(--font-medium)",
-                      }}
-                    >
-                      No episodes available
-                    </p>
-                  </div>
-                )}
+                <div style={{ padding: "4px 0 0" }}>
+                  {loadingSeason ? (
+                    <div className="episodes-list-loading">
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="skeleton" style={{ height: 140, borderRadius: "var(--radius-xl)" }} />
+                      ))}
+                    </div>
+                  ) : episodes.length > 0 ? (() => {
+                    const selectedEp = episodes.find((e) => e.episode_number === selEpisode) || episodes[0];
+                    const isFutureEp = selectedEp?.air_date ? selectedEp.air_date > TODAY : false;
+                    return (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                        <div className="ep-detail-panel" style={{
+                          display: "grid",
+                          gridTemplateColumns: "minmax(0, 280px) 1fr",
+                          gap: 20,
+                          padding: 16,
+                          borderRadius: "var(--radius-xl)",
+                          background: "rgba(10,10,10,0.55)",
+                          border: "1px solid rgba(212,175,55,0.2)",
+                          backdropFilter: "blur(12px)",
+                        }}>
+                          <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "var(--radius-lg)", overflow: "hidden", background: "var(--bg-tertiary)" }}>
+                            {selectedEp?.still_path ? (
+                              <Image src={`${IMG}/w500${selectedEp.still_path}`} alt="" fill sizes="280px" style={{ objectFit: "cover" }} />
+                            ) : (
+                              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><Play size={28} color="var(--text-muted)" /></div>
+                            )}
+                          </div>
+                          <div style={{ minWidth: 0 }}>
+                            <p style={{ fontSize: "var(--text-xs)", color: "var(--accent)", fontWeight: "var(--font-bold)", letterSpacing: "0.08em", marginBottom: 6 }}>
+                              EPISODE {String(selectedEp?.episode_number || 0).padStart(2, "0")}
+                            </p>
+                            <h4 style={{ fontSize: "var(--text-xl)", fontWeight: "var(--font-bold)", color: "var(--text-primary)", margin: "0 0 8px", lineHeight: 1.3 }}>
+                              {selectedEp?.name || `Episode ${selectedEp?.episode_number}`}
+                            </h4>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10, fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>
+                              {selectedEp?.air_date && <span>{formatDate(selectedEp.air_date)}</span>}
+                              {selectedEp?.runtime ? <span>• {selectedEp.runtime >= 60 ? `${Math.floor(selectedEp.runtime/60)}h ${selectedEp.runtime%60}m` : `${selectedEp.runtime}m`}</span> : null}
+                              {selectedEp?.vote_average > 0 && <span style={{ color: "var(--gold)" }}>★ {selectedEp.vote_average.toFixed(1)}</span>}
+                            </div>
+                            {selectedEp?.overview ? (
+                              <p style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)", lineHeight: 1.7, margin: "0 0 14px", display: "-webkit-box", WebkitLineClamp: 4, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{selectedEp.overview}</p>
+                            ) : (
+                              <p style={{ fontSize: "var(--text-sm)", color: "var(--text-muted)", margin: "0 0 14px" }}>No overview available.</p>
+                            )}
+                            <button
+                              className="btn btn-primary"
+                              disabled={isFutureEp}
+                              onClick={() => { setSelEpisode(selectedEp.episode_number); setShowPlayer(true); }}
+                              style={{ opacity: isFutureEp ? 0.5 : 1, cursor: isFutureEp ? "not-allowed" : "pointer" }}
+                            >
+                              <Play size={16} fill="currentColor" /> {isFutureEp ? "Upcoming" : "Play Episode"}
+                            </button>
+                          </div>
+                        </div>
+                        <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 6, scrollbarWidth: "thin" }}>
+                          {episodes.map((ep) => {
+                            const active = selEpisode === ep.episode_number;
+                            const future = ep.air_date ? ep.air_date > TODAY : false;
+                            return (
+                              <button
+                                key={ep.id}
+                                onClick={() => !future && setSelEpisode(ep.episode_number)}
+                                disabled={future}
+                                title={ep.name || `Episode ${ep.episode_number}`}
+                                style={{
+                                  flex: "0 0 auto",
+                                  width: 132,
+                                  textAlign: "left",
+                                  padding: 8,
+                                  borderRadius: "var(--radius-lg)",
+                                  border: active ? "1px solid var(--accent-border)" : "1px solid var(--border)",
+                                  background: active ? "var(--accent-subtle)" : "rgba(255,255,255,0.03)",
+                                  cursor: future ? "not-allowed" : "pointer",
+                                  opacity: future ? 0.45 : 1,
+                                }}
+                              >
+                                <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "var(--radius-md)", overflow: "hidden", background: "var(--bg-tertiary)", marginBottom: 6 }}>
+                                  {ep.still_path ? (
+                                    <Image src={`${IMG}/w300${ep.still_path}`} alt="" fill sizes="132px" style={{ objectFit: "cover" }} />
+                                  ) : (
+                                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--text-muted)" }}>E{ep.episode_number}</div>
+                                  )}
+                                </div>
+                                <p style={{ fontSize: 11, fontWeight: "var(--font-semibold)", color: active ? "var(--accent)" : "var(--text-primary)", margin: 0, lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                  E{String(ep.episode_number).padStart(2,"0")} {ep.name || ""}
+                                </p>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })() : (
+                    <div className="episodes-empty">
+                      <Tv size={32} style={{ marginBottom: 12, opacity: 0.3 }} />
+                      <p style={{ fontSize: "var(--text-sm)", fontWeight: "var(--font-medium)" }}>No episodes available</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -1599,6 +1661,14 @@ function TVShowDetailsContent({ params }) {
           max-width: 100%;
           overflow: hidden;
         }
+        .ep-detail-panel {
+          grid-template-columns: minmax(0, 280px) 1fr;
+        }
+        @media (max-width: 768px) {
+          .ep-detail-panel {
+            grid-template-columns: 1fr !important;
+          }
+        }
         .episodes-empty {
           text-align: center;
           padding: 48px 20px;
@@ -1677,10 +1747,10 @@ function TVShowDetailsContent({ params }) {
           min-height: 36px;
         }
         .season-btn.active {
-          background: linear-gradient(135deg, #d97706, #f59e0b);
+          background: linear-gradient(135deg, #b8962e, #e6c76a);
           border-color: var(--accent);
-          color: #fff;
-          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+          color: #1a1405;
+          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
         }
         .season-count {
           opacity: 0.5;
@@ -1707,9 +1777,9 @@ function TVShowDetailsContent({ params }) {
           border-color: rgba(255, 255, 255, 0.1);
         }
         .episode-card.active {
-          background: rgba(245, 158, 11, 0.08);
-          border-color: rgba(245, 158, 11, 0.3);
-          box-shadow: 0 0 16px rgba(245, 158, 11, 0.1);
+          background: rgba(212, 175, 55, 0.12);
+          border-color: rgba(212, 175, 55, 0.35);
+          box-shadow: 0 0 16px rgba(212, 175, 55, 0.15);
         }
         .episode-card.future {
           cursor: default;

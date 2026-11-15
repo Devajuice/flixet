@@ -136,8 +136,8 @@ export default function DMCAPage() {
 
         /* ── Important notice banner ───────────────────── */
         .dmca-notice-box {
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.07);
+          background: rgba(12, 14, 20, 0.5);
+          border: 1px solid rgba(212, 175, 55, 0.25);
           border-left: 3px solid var(--accent);
           border-radius: 12px;
           padding: 20px 22px;
@@ -145,6 +145,7 @@ export default function DMCAPage() {
           display: flex;
           gap: 12px;
           align-items: flex-start;
+          backdrop-filter: blur(12px);
         }
 
         .dmca-notice-box svg {
@@ -168,16 +169,19 @@ export default function DMCAPage() {
         /* ── Section cards ─────────────────────────────── */
         .dmca-section {
           margin-bottom: 16px;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 12px;
+          background: rgba(12, 14, 20, 0.45);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
           padding: 28px 30px;
-          backdrop-filter: blur(10px);
-          transition: border-color 0.2s ease;
+          backdrop-filter: blur(18px) saturate(1.5);
+          -webkit-backdrop-filter: blur(18px) saturate(1.5);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .dmca-section:hover {
-          border-color: rgba(245, 158, 11, 0.2);
+          border-color: rgba(212, 175, 55, 0.35);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 32px rgba(212, 175, 55, 0.08);
         }
 
         .dmca-section-header {
@@ -264,7 +268,7 @@ export default function DMCAPage() {
         }
 
         .dmca-step-card:hover {
-          border-color: rgba(245, 158, 11, 0.25);
+          border-color: rgba(212, 175, 55, 0.35);
         }
 
         .dmca-step-number {
@@ -291,14 +295,15 @@ export default function DMCAPage() {
 
         /* ── Contact card ──────────────────────────────── */
         .dmca-contact-card {
-          background: var(--accent-subtle);
-          border: 1px solid var(--accent-border);
-          border-radius: 10px;
+          background: rgba(212, 175, 55, 0.08);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          border-radius: 12px;
           padding: 18px 20px;
           margin-top: 14px;
           display: flex;
           flex-direction: column;
           gap: 10px;
+          backdrop-filter: blur(12px);
         }
 
         .dmca-contact-item {

@@ -13,19 +13,21 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 📺 **TV Show Support** - Full season and episode selection with OMDB ratings
 - ⭐ **External Ratings** - IMDb, Rotten Tomatoes, and Metacritic scores on movie/TV detail pages (via OMDB, when available)
 - ⏱️ **Movie End Time** - Movie pages show estimated finish time based on runtime and your device’s current time
-- 🎨 **Modern UI** - Cinematic dark/glass interface with a neutral palette, white primary actions, and yellow rating accents
-- 💊 **Floating Navbar** - A pill-shaped, glass-morphism navbar that floats and stays centered while scrolling
-- 📱 **Bottom Sheet Menu** - Mobile bottom sheet menu optimized for one-handed use
-- 🏠 **Cinematic Home** - Auto-rotating hero carousel, genre card grid, and uniform content rows
-- 🏷️ **Split-Tile Cards** - Poster + info-bar cards used consistently across home rows and catalog grids
-- 🗂️ **Rich Browse Pages** - Movies and TV share a redesigned catalog page with a genre rail, inline sort dropdown, slide-in filter drawer, and an Infinite/Pages view toggle
+- 🎨 **Premium UI (redesigned)** - Cinematic dark UI with **liquid-glass** surfaces, **champagne gold** accents, and smooth motion
+- 💊 **Floating Navbar** - Glass pill header with redesigned dropdowns; mobile bottom sheet + full-screen search overlay
+- 📱 **Mobile-first navigation** - Bottom sheet menu optimized for one-handed use
+- 🏠 **Cinematic Home** - Auto-rotating hero with optional muted **YouTube trailer background** (when available), genre tiles, and content rows
+- 🏷️ **Hover-reveal cards** - Poster-first movie/TV cards that reveal details (title, rating, year, type) on hover
+- 🗂️ **Rich Browse Pages** - Movies/TV catalog with genre rail, sort, slide-in glass filter drawer, Infinite/Pages toggle
+- 🌍 **Auto region (OTT filter)** - “Streaming now (OTT)” uses **auto-detected region** (via server geo headers) with TMDb watch-provider filters
 - ⚡ **Fast Performance** - Built with Next.js 16 (App Router, Turbopack) with optimized font loading
-- 🎯 **Advanced Filters** - Filter by genre, rating, decade presets, a dual-thumb year slider, or an exact release-date range
+- 🎯 **Advanced Filters** - Genre, rating, year presets/slider, exact date range, and streaming availability toggle
 - 🚀 **Coming Soon** - Dedicated pages for upcoming movies and airing TV shows
 - ♾️ **Infinite Scroll** - Seamlessly load more content as you browse
 - 🎞️ **Continue Watching** - Pick up right where you left off with episode tracking
+- 📺 **TV experience (redesigned)** - Season selector pills + **episode rail with selected-episode detail panel** (poster, overview, play)
 - 🖼️ **Image Handling** - Next.js `Image` with unoptimized delivery for TMDB assets to avoid Vercel image-transformation quota issues
-- ♿️ **Accessibility** - Focus states, skip-to-content, reduced-motion support, and ARIA improvements
+- ♿️ **Accessibility** - Focus states, skip-to-content, reduced-motion support (including hero trailer behavior), and ARIA improvements
 - 💫 **Loading Skeletons** - Smooth loading states with shimmer animations
 - 🧯 **Route Resilience** - Route-level loading/error boundaries for key pages
 - ⌨️ **Debounced Search** - Optimized search input with 300ms delay
@@ -36,11 +38,10 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 🎲 **Random Picker** - One-click random movie/TV show discovery
 - 📈 **Real Progress Tracking** - Watch time measured and stored as viewing progress
 - 🔔 **Toast Notifications** - Non-blocking feedback for share, watchlist, and error states, with optional undo actions
-- 💬 **Rich Tooltips** - Contextual hints on hover *and* keyboard focus, flipping automatically at screen edges
-- 📑 **FAQ Accordions** - Collapsible "Quick answers" panels on the Terms, Privacy, and DMCA pages
+- 💬 **Rich Tooltips** - Contextual hints on hover *and* keyboard focus
+- 📑 **FAQ Accordions + redesigned Legal pages** - Collapsible Q&A on Terms/Privacy/DMCA with glass styling
 - 🔢 **Paged Browsing** - Toggle the catalog between infinite scroll and page-number pagination
-- 🎚️ **Range Slider** - Dual-thumb year filter, fully keyboard-operable, debounced so a drag costs one request
-- 📅 **Date Range Picker** - Calendar popover for exact release-date filtering (single or from/to range)
+- 🎚️ **Range Slider / 📅 Date Range Picker** - Year range + exact release-date filtering
 
 ## To Do
 
@@ -62,12 +63,14 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - [x] ~~Real Progress Tracking~~
 - [x] ~~Visual Redesign (blue theme, home + navbar + browse pages)~~
 - [x] ~~Floating Pill Navbar~~
-- [x] ~~Amber/Orange Color Scheme (black base)~~
+- [x] ~~Amber/Orange Color Scheme (black base)~~ → now **Premium champagne gold + liquid glass**
 - [x] ~~Mobile Bottom Sheet Menu~~
-- [x] ~~Split-Tile Card Redesign (home rows + catalog grids)~~
-- [x] ~~Episode List Improvements (2-column grid, compact mobile cards)~~
+- [x] ~~Split-Tile Card Redesign (home rows + catalog grids)~~ → now **poster hover-reveal cards**
+- [x] ~~Episode List Improvements (2-column grid, compact mobile cards)~~ → now **season pills + episode rail + detail panel**
 - [x] ~~UI Primitives (toast, tooltip, accordion, pagination, range slider, calendar)~~
 - [x] ~~Paged Browsing Mode (toggle alongside infinite scroll)~~
+- [x] ~~Hero trailer autoplay on Home/Movie (muted, reduced-motion aware)~~
+- [x] ~~Auto-detected region “Streaming now (OTT)” filter in catalog~~
 
 ## 🛠️ Tech Stack
 

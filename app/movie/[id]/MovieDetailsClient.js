@@ -241,10 +241,15 @@ export default function MovieDetails({ params }) {
   const [showTrailer, setShowTrailer] = useState(false);
   const [imdbRating, setImdbRating] = useState(undefined);
   const [now, setNow] = useState(() => Date.now());
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 60000);
     return () => clearInterval(timer);
+  }, []);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    setReduceMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }, []);
   const { addToContinueWatching } = useContinueWatching();
   const { addToHistory } = useHistory();
@@ -485,7 +490,28 @@ export default function MovieDetails({ params }) {
           overflow: "hidden",
         }}
       >
-        {backdrop && (
+        {trailer && !reduceMotion ? (
+          <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+            <iframe
+              title="Movie trailer background"
+              src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${trailer.key}&playsinline=1`}
+              allow="autoplay; encrypted-media"
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: "177.77vh",
+                height: "56.25vw",
+                minWidth: "100%",
+                minHeight: "100%",
+                transform: "translate(-50%, -50%)",
+                border: 0,
+                pointerEvents: "none",
+                opacity: 0.6,
+              }}
+            />
+          </div>
+        ) : backdrop ? (
           <div style={{ position: "absolute", inset: 0 }}>
             <Image
               src={backdrop}
@@ -497,13 +523,13 @@ export default function MovieDetails({ params }) {
               style={{ objectFit: "cover" }}
             />
           </div>
-        )}
+        ) : null}
         <div
           style={{
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to top, var(--bg) 0%, rgba(0, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0.4) 100%)",
+              "linear-gradient(to top, var(--bg) 0%, rgba(0, 0, 0, 0.65) 40%, rgba(0, 0, 0, 0.35) 100%)",
           }}
         />
       </div>

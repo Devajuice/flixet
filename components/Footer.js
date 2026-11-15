@@ -31,9 +31,8 @@ export default function Footer() {
       >
         {/* Disclaimer */}
         <div
+          className="liquid-glass"
           style={{
-            background: "rgba(245, 158, 11, 0.04)",
-            border: "1px solid rgba(245, 158, 11, 0.12)",
             borderLeft: "3px solid var(--accent)",
             borderRadius: "var(--radius-xl)",
             padding: "22px 24px",
@@ -335,9 +334,8 @@ export default function Footer() {
             Made with <Heart size={13} color="var(--accent)" fill="var(--accent)" /> by Flixet Team
           </div>
           <div
+            className="liquid-glass"
             style={{
-              background: "rgba(245, 158, 11, 0.04)",
-              border: "1px solid rgba(245, 158, 11, 0.1)",
               borderRadius: "var(--radius-lg)",
               padding: "16px 24px",
               display: "flex",

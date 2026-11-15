@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Play,
   Info,
@@ -33,6 +33,7 @@ import {
   getTopRatedMovies,
   getTrendingAll,
   discoverMovies,
+  tmdbFetch,
 } from "@/lib/tmdbClient";
 
 const IMG = "https://image.tmdb.org/t/p";
@@ -129,7 +130,9 @@ function GenreQuickLinks() {
 
 /* ── Hero banner (auto-rotating, cinematic) ──────────────────────── */
 function HeroBanner({ items }) {
+  const reduceMotion = useReducedMotion();
   const [idx, setIdx] = useState(0);
+  const [trailerKey, setTrailerKey] = useState(null);
   const item = items[idx];
 
   useEffect(() => {
@@ -137,6 +140,34 @@ function HeroBanner({ items }) {
     const t = setInterval(() => setIdx((i) => (i + 1) % items.length), 8000);
     return () => clearInterval(t);
   }, [items.length]);
+
+  useEffect(() => {
+    if (!item?.id || !item?.media_type) {
+      setTrailerKey(null);
+      return;
+    }
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      setTrailerKey(null);
+      return;
+    }
+    const controller = new AbortController();
+    const mediaType = item.media_type === "movie" ? "movie" : "tv";
+    tmdbFetch(`${mediaType}/${item.id}/videos`, { language: "en-US" }, { signal: controller.signal })
+      .then((data) => {
+        const vids = data?.results || [];
+        const pick =
+          vids.find((v) => v.site === "YouTube" && v.type === "Trailer") ||
+          vids.find((v) => v.site === "YouTube" && v.type === "Teaser") ||
+          vids.find((v) => v.site === "YouTube");
+        setTrailerKey(pick?.key || null);
+      })
+      .catch(() => setTrailerKey(null));
+    return () => controller.abort();
+  }, [item?.id, item?.media_type, idx]);
 
   if (!item) return null;
   const backdrop = item.backdrop_path
@@ -155,17 +186,36 @@ function HeroBanner({ items }) {
         background: "var(--bg)",
       }}
     >
-      {/* Background image + ambient glow */}
+      {/* Background image or trailer */}
       <AnimatePresence mode="wait">
         <motion.div
           key={idx}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: reduceMotion ? 0 : 0.8 }}
           style={{ position: "absolute", inset: 0 }}
         >
-          {backdrop && (
+          {trailerKey ? (
+            <iframe
+              title="Trailer background"
+              src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${trailerKey}&playsinline=1&enablejsapi=0`}
+              allow="autoplay; encrypted-media"
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: "177.77vh",
+                height: "56.25vw",
+                minWidth: "100%",
+                minHeight: "100%",
+                transform: "translate(-50%, -50%)",
+                border: 0,
+                pointerEvents: "none",
+                opacity: 0.55,
+              }}
+            />
+          ) : backdrop ? (
             <Image
               src={backdrop}
               alt=""
@@ -175,7 +225,7 @@ function HeroBanner({ items }) {
               quality={75}
               style={{ objectFit: "cover" }}
             />
-          )}
+          ) : null}
           {/* Deep cinematic fade from left */}
           <div
             style={{
@@ -185,13 +235,13 @@ function HeroBanner({ items }) {
                 "linear-gradient(to right, rgba(11,15,26,0.98) 0%, rgba(11,15,26,0.72) 35%, rgba(11,15,26,0.2) 75%)",
             }}
           />
-          {/* Blue ambient glow bottom-right */}
+          {/* Gold ambient glow bottom-right */}
           <div
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "radial-gradient(circle at 80% 100%, rgba(59,130,246,0.18) 0%, transparent 55%)",
+                "radial-gradient(circle at 80% 100%, rgba(212,175,55,0.18) 0%, transparent 55%)",
               pointerEvents: "none",
             }}
           />
@@ -225,10 +275,10 @@ function HeroBanner({ items }) {
         <AnimatePresence mode="wait">
           <motion.div
             key={idx}
-            initial={{ opacity: 0, y: 24 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.5 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+            transition={{ duration: reduceMotion ? 0 : 0.5 }}
             style={{ maxWidth: 640 }}
           >
             {/* Eyebrow kicker */}
@@ -246,7 +296,7 @@ function HeroBanner({ items }) {
                   height: 3,
                   borderRadius: 2,
                   background:
-                    "linear-gradient(90deg, #d97706, #fbbf24)",
+                    "linear-gradient(90deg, #b8962e, #e6c76a)",
                   boxShadow: "0 0 12px rgba(59,130,246,0.5)",
                 }}
               />
@@ -278,8 +328,8 @@ function HeroBanner({ items }) {
                   alignItems: "center",
                   gap: 4,
                   padding: "4px 10px",
-                  background: "rgba(245, 158, 11, 0.15)",
-                  border: "1px solid rgba(245, 158, 11, 0.3)",
+                  background: "rgba(212, 175, 55, 0.15)",
+                  border: "1px solid rgba(212, 175, 55, 0.35)",
                   borderRadius: "var(--radius-full)",
                   fontSize: "var(--text-xs)",
                   fontWeight: "var(--font-bold)",
@@ -400,7 +450,7 @@ function HeroBanner({ items }) {
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = "var(--accent-border)";
                     e.currentTarget.style.boxShadow =
-                      "0 0 20px rgba(245, 158, 11, 0.2)";
+                      "0 0 20px rgba(212, 175, 55, 0.25)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = "var(--border)";
@@ -434,13 +484,13 @@ function HeroBanner({ items }) {
                 borderRadius: 4,
                 background:
                   i === idx
-                    ? "linear-gradient(90deg, #d97706, #fbbf24)"
+                    ? "linear-gradient(90deg, #b8962e, #e6c76a)"
                     : "rgba(255,255,255,0.18)",
                 border: "none",
                 cursor: "pointer",
                 transition: "all var(--transition-base)",
                 boxShadow:
-                  i === idx ? "0 0 12px rgba(245, 158, 11, 0.4)" : "none",
+                  i === idx ? "0 0 12px rgba(212, 175, 55, 0.35)" : "none",
               }}
             />
           ))}
@@ -467,7 +517,7 @@ function SectionHeader({ title, icon, href, subtitle }) {
           width: 4,
           height: 22,
           borderRadius: 2,
-          background: "linear-gradient(180deg, #d97706, #fbbf24)",
+          background: "linear-gradient(180deg, #b8962e, #e6c76a)",
           boxShadow: "0 0 12px rgba(59,130,246,0.4)",
           flexShrink: 0,
         }}
