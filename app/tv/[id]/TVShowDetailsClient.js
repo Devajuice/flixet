@@ -47,6 +47,12 @@ const IMG = "https://image.tmdb.org/t/p";
 // Fixed reference date so "upcoming episode" checks stay deterministic across
 // renders and hydration.
 const TODAY = new Date().toISOString().slice(0, 10);
+const formatAirDateLocal = (dateString) => {
+  if (!dateString) return "";
+  const d = new Date(`${String(dateString).slice(0, 10)}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return formatDate(dateString);
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+};
 
 function SkeletonPage() {
   return (
@@ -1416,10 +1422,10 @@ function TVShowDetailsContent({ params }) {
                             <div className="ep-featured-badge">E{String(selectedEp?.episode_number || 0).padStart(2, "0")}</div>
                           </div>
                           <div className="ep-featured-info">
-                            <p className="ep-featured-kicker">Now selected</p>
+                            <p className="ep-featured-kicker">{isFutureEp ? "Upcoming episode" : "Now selected"}</p>
                             <h4 className="ep-featured-title">{selectedEp?.name || `Episode ${selectedEp?.episode_number}`}</h4>
                             <div className="ep-featured-meta">
-                              {selectedEp?.air_date && <span>{isFutureEp ? `Airs ${formatDate(selectedEp.air_date)}` : formatDate(selectedEp.air_date)}</span>}
+                              {selectedEp?.air_date && <span>{isFutureEp ? `Airs ${formatAirDateLocal(selectedEp.air_date)}` : formatAirDateLocal(selectedEp.air_date)}</span>}
                               {selectedEp?.runtime ? <span>{selectedEp.runtime >= 60 ? `${Math.floor(selectedEp.runtime/60)}h ${selectedEp.runtime%60}m` : `${selectedEp.runtime}m`}</span> : null}
                               {selectedEp?.vote_average > 0 && <span className="ep-featured-rating">★ {selectedEp.vote_average.toFixed(1)}</span>}
                               {isFutureEp && !selectedEp?.air_date && <span className="ep-featured-upcoming">Release date TBA</span>}
@@ -1435,10 +1441,10 @@ function TVShowDetailsContent({ params }) {
                           </div>
                         </div>
 
-                        {/* Episode list (horizontal rail) */}
-                        <div className="ep-rail-wrap">
-                          <p className="ep-rail-label">All episodes</p>
-                          <div className="ep-rail" role="listbox" aria-label="Episodes">
+                        {/* Episode grid */}
+                        <div className="ep-grid-wrap">
+                          <p className="ep-rail-label">Episodes</p>
+                          <div className="ep-grid" role="listbox" aria-label="Episodes">
                             {episodes.map((ep) => {
                               const active = selEpisode === ep.episode_number;
                               const future = ep.air_date ? ep.air_date > TODAY : false;
@@ -1447,27 +1453,11 @@ function TVShowDetailsContent({ params }) {
                                   key={ep.id}
                                   role="option"
                                   aria-selected={active}
-                                  className={`ep-rail-card ${active ? "active" : ""} ${future ? "future" : ""}`}
-                                  onClick={() => !future && setSelEpisode(ep.episode_number)}
-                                  disabled={future}
+                                  className={`ep-grid-btn ${active ? "active" : ""} ${future ? "future" : ""}`}
+                                  onClick={() => setSelEpisode(ep.episode_number)}
+                                  title={future ? (ep.air_date ? `Upcoming · Airs ${formatAirDateLocal(ep.air_date)}` : "Upcoming · Release date TBA") : (ep.name || `Episode ${ep.episode_number}`)}
                                 >
-                                  <div className="ep-rail-thumb">
-                                    {ep.still_path ? (
-                                      <Image src={`${IMG}/w300${ep.still_path}`} alt="" fill sizes="220px" style={{ objectFit: "cover" }} />
-                                    ) : (
-                                      <div className="ep-rail-thumb-fallback">E{ep.episode_number}</div>
-                                    )}
-                                    {active && <div className="ep-rail-active-indicator" />}
-                                  </div>
-                                  <div className="ep-rail-info">
-                                    <span className="ep-rail-num">Episode {ep.episode_number}</span>
-                                    <span className="ep-rail-name">{ep.name || `Episode ${ep.episode_number}`}</span>
-                                    {future ? (
-                                      <span className="ep-rail-airdate">{ep.air_date ? `Airs ${formatDate(ep.air_date)}` : "Release date TBA"}</span>
-                                    ) : ep.runtime ? (
-                                      <span className="ep-rail-dur">{ep.runtime}m</span>
-                                    ) : null}
-                                  </div>
+                                  EP{ep.episode_number}
                                 </button>
                               );
                             })}
@@ -1623,8 +1613,10 @@ function TVShowDetailsContent({ params }) {
           background-size: 6px 6px, 6px 6px; background-repeat: no-repeat;
         }
         .season-mobile-select:focus { outline: 2px solid rgba(229,9,20,0.45); outline-offset: 2px; }
-        .season-pills-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none; -ms-overflow-style: none; }
-        .season-pills-scroll::-webkit-scrollbar { display: none; }
+        .season-pills-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 10px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.28) transparent; -webkit-overflow-scrolling: touch; }
+        .season-pills-scroll::-webkit-scrollbar { height: 6px; }
+        .season-pills-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.28); border-radius: 3px; }
+        .season-pills-scroll::-webkit-scrollbar-track { background: transparent; }
         .season-pill {
           padding: 10px 20px;
           border-radius: 999px;
@@ -1657,24 +1649,30 @@ function TVShowDetailsContent({ params }) {
         .ep-featured-overview { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0 0 24px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
         .ep-featured-play { align-self: flex-start; padding: 12px 28px; font-size: 1rem; font-weight: 600; border-radius: 4px; }
         .ep-featured-play:disabled { opacity: 0.5; cursor: not-allowed; }
-        .ep-rail-wrap { }
+        .ep-grid-wrap { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; }
         .ep-rail-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 16px; }
-        .ep-rail { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
-        .ep-rail::-webkit-scrollbar { height: 6px; }
-        .ep-rail::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-        .ep-rail-card { flex: 0 0 220px; background: transparent; border: none; padding: 0; cursor: pointer; text-align: left; color: inherit; }
-        .ep-rail-card.future { opacity: 0.4; cursor: not-allowed; }
-        .ep-rail-thumb { position: relative; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; margin-bottom: 12px; background: var(--bg-tertiary); border: 2px solid transparent; transition: border-color 0.2s ease; }
-        .ep-rail-card:hover .ep-rail-thumb { border-color: rgba(255,255,255,0.3); }
-        .ep-rail-card.active .ep-rail-thumb { border-color: #e50914; }
-        .ep-rail-thumb img { object-fit: cover; }
-        .ep-rail-thumb-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-weight: 600; }
-        .ep-rail-active-indicator { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: #e50914; }
-        .ep-rail-info { display: flex; flex-direction: column; gap: 4px; }
-        .ep-rail-num { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-tertiary); }
-        .ep-rail-name { font-size: 0.95rem; font-weight: 500; color: #fff; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .ep-rail-dur { font-size: 0.8rem; color: var(--text-tertiary); }
-        .ep-rail-airdate { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+        .ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 10px; }
+        .ep-grid-btn {
+          position: relative;
+          padding: 12px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+          background: rgba(255,255,255,0.04); color: var(--text-secondary);
+          font-size: 0.85rem; font-weight: 700; letter-spacing: 0.02em; cursor: pointer;
+          transition: all 0.2s ease; text-align: center;
+        }
+        .ep-grid-btn:hover:not(:disabled) { color: #fff; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+        .ep-grid-btn.active { background: #e50914; border-color: #e50914; color: #fff; box-shadow: 0 8px 24px rgba(229,9,20,0.25); }
+        .ep-grid-btn.future { color: rgba(255,255,255,0.72); border-style: dashed; border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.02); }
+        .ep-grid-btn.future::after {
+          content: ""; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px;
+          border-radius: 50%; background: var(--gold, #f5c518); box-shadow: 0 0 0 2px rgba(0,0,0,0.15);
+        }
+        .ep-grid-btn.future:hover:not(:disabled) { color: #fff; border-color: rgba(229,9,20,0.45); background: rgba(229,9,20,0.08); }
+        .ep-grid-btn.future.active {
+          background: rgba(229,9,20,0.22); border-style: dashed; border-color: rgba(229,9,20,0.75);
+          color: #fff; box-shadow: 0 8px 24px rgba(229,9,20,0.18);
+        }
+        .ep-grid-btn.future.active::after { background: #fff; }
+        .ep-grid-btn:disabled { opacity: 0.35; cursor: not-allowed; }
         @media (max-width: 768px) {
           .tv-detail-grid {
             grid-template-columns: 1fr;
@@ -1710,21 +1708,9 @@ function TVShowDetailsContent({ params }) {
           .ep-featured-overview { font-size: 13px; line-height: 1.6; -webkit-line-clamp: 3; margin-bottom: 14px; }
           .ep-featured-play { width: 100%; justify-content: center; }
           .ep-rail-label { margin-bottom: 12px; }
-          .ep-rail { flex-direction: column; gap: 10px; overflow: visible; padding-bottom: 0; }
-          .ep-rail-card {
-            flex: none; width: 100%; display: grid; grid-template-columns: 132px minmax(0, 1fr);
-            gap: 12px; align-items: center; padding: 8px; border-radius: 12px;
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-          }
-          .ep-rail-card.active { background: rgba(229,9,20,0.08); border-color: rgba(229,9,20,0.35); }
-          .ep-rail-card:hover .ep-rail-thumb { border-color: transparent; }
-          .ep-rail-card.active .ep-rail-thumb { border-color: transparent; }
-          .ep-rail-thumb { margin-bottom: 0; border-radius: 8px; border: 0; aspect-ratio: 16/9; }
-          .ep-rail-active-indicator { height: 100%; width: 3px; right: auto; top: 0; bottom: 0; left: 0; }
-          .ep-rail-info { gap: 2px; min-width: 0; }
-          .ep-rail-num { font-size: 11px; }
-          .ep-rail-name { font-size: 14px; -webkit-line-clamp: 2; }
-          .ep-rail-dur, .ep-rail-airdate { font-size: 12px; }
+          .ep-grid-wrap { padding: 14px; border-radius: 14px; }
+          .ep-grid { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; }
+          .ep-grid-btn { padding: 10px 8px; font-size: 0.8rem; border-radius: 8px; }
         }
         @media (max-width: 480px) {
           .tv-poster-wrapper { max-width: 140px; }
@@ -1736,8 +1722,9 @@ function TVShowDetailsContent({ params }) {
           .ep-featured-media { min-height: 160px; }
           .ep-featured-title { font-size: 1.2rem; }
           .ep-featured-overview { -webkit-line-clamp: 2; }
-          .ep-rail-card { grid-template-columns: 112px minmax(0, 1fr); gap: 10px; padding: 7px; }
-          .ep-rail-name { font-size: 13px; }
+          .ep-grid-wrap { padding: 12px; }
+          .ep-grid { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 8px; }
+          .ep-grid-btn { padding: 10px 6px; font-size: 0.78rem; }
         }
       `}</style>
     </div>
