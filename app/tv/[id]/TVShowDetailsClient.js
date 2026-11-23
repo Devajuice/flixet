@@ -738,7 +738,7 @@ function TVShowDetailsContent({ params }) {
           : "#f59e0b";
 
   return (
-    <>
+    <div style={{ marginTop: "calc(-1 * (var(--header-height) + 32px))" }}>
       <VideoPlayer
         isOpen={showPlayer}
         onClose={() => setShowPlayer(false)}
@@ -1343,116 +1343,59 @@ function TVShowDetailsContent({ params }) {
               )}
             </div>
 
-            {/* Season + Episode selector */}
+            {/* Season + Episode selector (redesigned) */}
             {validSeasons.length > 0 && (
               <div className="tv-season-section">
-                {/* Header */}
-                <div
-                  className="tv-episode-header"
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 20,
-                  }}
-                >
-                  <div
-                    className="score-ring"
-                    style={{ display: "flex", alignItems: "center", gap: 10 }}
-                  >
-                    <h3
-                      style={{
-                        fontSize: "var(--text-lg)",
-                        fontWeight: "var(--font-bold)",
-                        color: "var(--text-primary)",
-                        margin: 0,
-                      }}
-                    >
-                      Episodes
+                <div className="tv-episode-header">
+                  <div className="tv-episode-heading">
+                    <p className="tv-episode-eyebrow">Episodes</p>
+                    <h3 className="tv-episode-title">
+                      {validSeasons.find((s) => s.season_number === selSeason)?.name || `Season ${selSeason}`}
                     </h3>
-                    <span
-                      style={{
-                        fontSize: "var(--text-sm)",
-                        color: "var(--text-muted)",
-                        fontWeight: "var(--font-medium)",
-                      }}
-                    >
-                      Season {selSeason}
-                    </span>
+                    <p className="tv-episode-subtitle">
+                      {episodes.length > 0 ? `${episodes.length} episodes` : "Browse episodes"}
+                    </p>
                   </div>
-                  {episodes.length > 0 && (
-                    <span
-                      style={{
-                        fontSize: "var(--text-xs)",
-                        color: "var(--text-tertiary)",
-                      }}
-                    >
-                      {episodes.length} episodes
-                    </span>
-                  )}
                 </div>
 
-                {/* Season selector with navigation */}
-                <div className="tv-season-selector">
-                  <button
-                    className="season-nav-btn"
-                    onClick={() => {
-                      const idx = validSeasons.findIndex(
-                        (s) => s.season_number === selSeason,
-                      );
-                      if (idx > 0) {
-                        setSelSeason(validSeasons[idx - 1].season_number);
-                        setSelEpisode(1);
-                      }
-                    }}
-                    disabled={currentSeasonIdx === 0}
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-
-                  <div className="season-scroll">
-                    {validSeasons.map((s) => (
-                      <motion.button
-                        key={s.id}
-                        onClick={() => {
-                          setSelSeason(s.season_number);
-                          setSelEpisode(1);
-                        }}
-                        whileTap={{ scale: 0.96 }}
-                        className={`season-btn ${selSeason === s.season_number ? "active" : ""}`}
-                      >
-                        {s.season_number}
-                        {s.episode_count && (
-                          <span className="season-count">
-                            ({s.episode_count})
-                          </span>
-                        )}
-                      </motion.button>
-                    ))}
+                {/* Season selector */}
+                <div className="season-pills-wrap" aria-label="Season selector">
+                  <div className="season-mobile-select-wrap">
+                    <label className="season-mobile-label" htmlFor="tv-season-select">Season</label>
+                    <select
+                      id="tv-season-select"
+                      className="season-mobile-select"
+                      value={selSeason}
+                      onChange={(e) => { setSelSeason(Number(e.target.value)); setSelEpisode(1); }}
+                    >
+                      {validSeasons.map((s) => (
+                        <option key={s.id} value={s.season_number}>
+                          {s.name || `Season ${s.season_number}`}{s.episode_count ? ` (${s.episode_count} eps)` : ""}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-
-                  <button
-                    className="season-nav-btn"
-                    onClick={() => {
-                      const idx = validSeasons.findIndex(
-                        (s) => s.season_number === selSeason,
+                  <div className="season-pills-scroll">
+                    {validSeasons.map((s) => {
+                      const active = selSeason === s.season_number;
+                      return (
+                        <button
+                          key={s.id}
+                          onClick={() => { setSelSeason(s.season_number); setSelEpisode(1); }}
+                          className={`season-pill ${active ? "active" : ""}`}
+                          aria-pressed={active}
+                        >
+                          {s.name || `Season ${s.season_number}`}
+                        </button>
                       );
-                      if (idx < validSeasons.length - 1) {
-                        setSelSeason(validSeasons[idx + 1].season_number);
-                        setSelEpisode(1);
-                      }
-                    }}
-                    disabled={!hasNextSeason}
-                  >
-                    <ChevronRightIcon size={16} />
-                  </button>
+                    })}
+                  </div>
                 </div>
 
-                {/* Episodes */}
-                <div style={{ padding: "4px 0 0" }}>
+                <div className="tv-episodes-wrap">
                   {loadingSeason ? (
                     <div className="episodes-list-loading">
-                      {Array.from({ length: 4 }).map((_, i) => (
+                      {Array.from({ length: 3 }).map((_, i) => (
                         <div key={i} className="skeleton" style={{ height: 140, borderRadius: "var(--radius-xl)" }} />
                       ))}
                     </div>
@@ -1460,86 +1403,75 @@ function TVShowDetailsContent({ params }) {
                     const selectedEp = episodes.find((e) => e.episode_number === selEpisode) || episodes[0];
                     const isFutureEp = selectedEp?.air_date ? selectedEp.air_date > TODAY : false;
                     return (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                        <div className="ep-detail-panel" style={{
-                          display: "grid",
-                          gridTemplateColumns: "minmax(0, 280px) 1fr",
-                          gap: 20,
-                          padding: 16,
-                          borderRadius: "var(--radius-xl)",
-                          background: "rgba(10,10,10,0.55)",
-                          border: "1px solid rgba(212,175,55,0.2)",
-                          backdropFilter: "blur(12px)",
-                        }}>
-                          <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "var(--radius-lg)", overflow: "hidden", background: "var(--bg-tertiary)" }}>
+                      <div className="ep-redesign">
+                        {/* Featured episode */}
+                        <div className="ep-featured">
+                          <div className="ep-featured-media">
                             {selectedEp?.still_path ? (
-                              <Image src={`${IMG}/w500${selectedEp.still_path}`} alt="" fill sizes="280px" style={{ objectFit: "cover" }} />
+                              <Image src={`${IMG}/w1280${selectedEp.still_path}`} alt={selectedEp?.name || `Episode ${selectedEp?.episode_number}`} fill sizes="(max-width: 900px) 100vw, 60vw" style={{ objectFit: "cover" }} />
                             ) : (
-                              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><Play size={28} color="var(--text-muted)" /></div>
+                              <div className="ep-featured-fallback"><Play size={48} color="rgba(255,255,255,0.4)" /></div>
                             )}
+                            <div className="ep-featured-gradient" />
+                            <div className="ep-featured-badge">E{String(selectedEp?.episode_number || 0).padStart(2, "0")}</div>
                           </div>
-                          <div style={{ minWidth: 0 }}>
-                            <p style={{ fontSize: "var(--text-xs)", color: "var(--accent)", fontWeight: "var(--font-bold)", letterSpacing: "0.08em", marginBottom: 6 }}>
-                              EPISODE {String(selectedEp?.episode_number || 0).padStart(2, "0")}
-                            </p>
-                            <h4 style={{ fontSize: "var(--text-xl)", fontWeight: "var(--font-bold)", color: "var(--text-primary)", margin: "0 0 8px", lineHeight: 1.3 }}>
-                              {selectedEp?.name || `Episode ${selectedEp?.episode_number}`}
-                            </h4>
-                            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10, fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>
-                              {selectedEp?.air_date && <span>{formatDate(selectedEp.air_date)}</span>}
-                              {selectedEp?.runtime ? <span>• {selectedEp.runtime >= 60 ? `${Math.floor(selectedEp.runtime/60)}h ${selectedEp.runtime%60}m` : `${selectedEp.runtime}m`}</span> : null}
-                              {selectedEp?.vote_average > 0 && <span style={{ color: "var(--gold)" }}>★ {selectedEp.vote_average.toFixed(1)}</span>}
+                          <div className="ep-featured-info">
+                            <p className="ep-featured-kicker">Now selected</p>
+                            <h4 className="ep-featured-title">{selectedEp?.name || `Episode ${selectedEp?.episode_number}`}</h4>
+                            <div className="ep-featured-meta">
+                              {selectedEp?.air_date && <span>{isFutureEp ? `Airs ${formatDate(selectedEp.air_date)}` : formatDate(selectedEp.air_date)}</span>}
+                              {selectedEp?.runtime ? <span>{selectedEp.runtime >= 60 ? `${Math.floor(selectedEp.runtime/60)}h ${selectedEp.runtime%60}m` : `${selectedEp.runtime}m`}</span> : null}
+                              {selectedEp?.vote_average > 0 && <span className="ep-featured-rating">★ {selectedEp.vote_average.toFixed(1)}</span>}
+                              {isFutureEp && !selectedEp?.air_date && <span className="ep-featured-upcoming">Release date TBA</span>}
                             </div>
-                            {selectedEp?.overview ? (
-                              <p style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)", lineHeight: 1.7, margin: "0 0 14px", display: "-webkit-box", WebkitLineClamp: 4, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{selectedEp.overview}</p>
-                            ) : (
-                              <p style={{ fontSize: "var(--text-sm)", color: "var(--text-muted)", margin: "0 0 14px" }}>No overview available.</p>
-                            )}
+                            <p className="ep-featured-overview">{selectedEp?.overview || "No overview available for this episode yet."}</p>
                             <button
-                              className="btn btn-primary"
+                              className="btn btn-primary ep-featured-play"
                               disabled={isFutureEp}
                               onClick={() => { setSelEpisode(selectedEp.episode_number); setShowPlayer(true); }}
-                              style={{ opacity: isFutureEp ? 0.5 : 1, cursor: isFutureEp ? "not-allowed" : "pointer" }}
                             >
-                              <Play size={16} fill="currentColor" /> {isFutureEp ? "Upcoming" : "Play Episode"}
+                              <Play size={18} fill="currentColor" /> {isFutureEp ? "Upcoming" : "Play Episode"}
                             </button>
                           </div>
                         </div>
-                        <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 6, scrollbarWidth: "thin" }}>
-                          {episodes.map((ep) => {
-                            const active = selEpisode === ep.episode_number;
-                            const future = ep.air_date ? ep.air_date > TODAY : false;
-                            return (
-                              <button
-                                key={ep.id}
-                                onClick={() => !future && setSelEpisode(ep.episode_number)}
-                                disabled={future}
-                                title={ep.name || `Episode ${ep.episode_number}`}
-                                style={{
-                                  flex: "0 0 auto",
-                                  width: 132,
-                                  textAlign: "left",
-                                  padding: 8,
-                                  borderRadius: "var(--radius-lg)",
-                                  border: active ? "1px solid var(--accent-border)" : "1px solid var(--border)",
-                                  background: active ? "var(--accent-subtle)" : "rgba(255,255,255,0.03)",
-                                  cursor: future ? "not-allowed" : "pointer",
-                                  opacity: future ? 0.45 : 1,
-                                }}
-                              >
-                                <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "var(--radius-md)", overflow: "hidden", background: "var(--bg-tertiary)", marginBottom: 6 }}>
-                                  {ep.still_path ? (
-                                    <Image src={`${IMG}/w300${ep.still_path}`} alt="" fill sizes="132px" style={{ objectFit: "cover" }} />
-                                  ) : (
-                                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--text-muted)" }}>E{ep.episode_number}</div>
-                                  )}
-                                </div>
-                                <p style={{ fontSize: 11, fontWeight: "var(--font-semibold)", color: active ? "var(--accent)" : "var(--text-primary)", margin: 0, lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                  E{String(ep.episode_number).padStart(2,"0")} {ep.name || ""}
-                                </p>
-                              </button>
-                            );
-                          })}
+
+                        {/* Episode list (horizontal rail) */}
+                        <div className="ep-rail-wrap">
+                          <p className="ep-rail-label">All episodes</p>
+                          <div className="ep-rail" role="listbox" aria-label="Episodes">
+                            {episodes.map((ep) => {
+                              const active = selEpisode === ep.episode_number;
+                              const future = ep.air_date ? ep.air_date > TODAY : false;
+                              return (
+                                <button
+                                  key={ep.id}
+                                  role="option"
+                                  aria-selected={active}
+                                  className={`ep-rail-card ${active ? "active" : ""} ${future ? "future" : ""}`}
+                                  onClick={() => !future && setSelEpisode(ep.episode_number)}
+                                  disabled={future}
+                                >
+                                  <div className="ep-rail-thumb">
+                                    {ep.still_path ? (
+                                      <Image src={`${IMG}/w300${ep.still_path}`} alt="" fill sizes="220px" style={{ objectFit: "cover" }} />
+                                    ) : (
+                                      <div className="ep-rail-thumb-fallback">E{ep.episode_number}</div>
+                                    )}
+                                    {active && <div className="ep-rail-active-indicator" />}
+                                  </div>
+                                  <div className="ep-rail-info">
+                                    <span className="ep-rail-num">Episode {ep.episode_number}</span>
+                                    <span className="ep-rail-name">{ep.name || `Episode ${ep.episode_number}`}</span>
+                                    {future ? (
+                                      <span className="ep-rail-airdate">{ep.air_date ? `Airs ${formatDate(ep.air_date)}` : "Release date TBA"}</span>
+                                    ) : ep.runtime ? (
+                                      <span className="ep-rail-dur">{ep.runtime}m</span>
+                                    ) : null}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
                     );
@@ -1641,302 +1573,108 @@ function TVShowDetailsContent({ params }) {
         .tv-info-card {
           min-width: 0;
         }
+        .tv-season-section { margin-bottom: 0; max-width: 100%; }
         .tv-episode-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
+          display: flex; justify-content: space-between; align-items: flex-end;
+          gap: 16px; margin-bottom: 18px; flex-wrap: wrap;
         }
-        .episodes-list {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
-          max-width: 100%;
-          overflow: hidden;
+        .tv-episode-title {
+          font-size: clamp(20px, 2.5vw, 28px); font-weight: var(--font-extrabold);
+          color: var(--text-primary); margin: 0; letter-spacing: -0.02em;
         }
-        .episodes-list-loading {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
-          max-width: 100%;
-          overflow: hidden;
+        .tv-episode-subtitle {
+          margin: 6px 0 0; font-size: var(--text-sm); color: var(--text-tertiary);
         }
-        .ep-detail-panel {
-          grid-template-columns: minmax(0, 280px) 1fr;
+        .tv-season-jump { display: flex; align-items: center; gap: 10px; }
+        .tv-season-jump-label {
+          font-size: 11px; font-weight: var(--font-bold); color: var(--text-muted);
+          text-transform: uppercase; letter-spacing: 0.08em;
         }
-        @media (max-width: 768px) {
-          .ep-detail-panel {
-            grid-template-columns: 1fr !important;
-          }
+        .tv-season-select {
+          appearance: none; background: rgba(255,255,255,0.04); color: var(--text-primary);
+          border: 1px solid var(--border); border-radius: var(--radius-lg);
+          padding: 10px 36px 10px 14px; font-size: var(--text-sm); font-weight: var(--font-semibold);
+          cursor: pointer; min-width: 170px;
+          background-image: linear-gradient(45deg, transparent 50%, var(--text-secondary) 50%), linear-gradient(135deg, var(--text-secondary) 50%, transparent 50%);
+          background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+          background-size: 6px 6px, 6px 6px; background-repeat: no-repeat;
         }
-        .episodes-empty {
-          text-align: center;
-          padding: 48px 20px;
-          color: var(--text-tertiary);
-        }
-        .tv-season-section {
-          margin-bottom: 0;
-          max-width: 100%;
-          overflow: hidden;
-        }
+        .tv-season-select:focus { outline: 2px solid var(--accent-border); outline-offset: 2px; }
         .tv-season-selector {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 20px;
-          overflow: hidden;
-          max-width: 100%;
+          display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+          padding: 10px; border-radius: var(--radius-xl);
+          background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+          border: 1px solid rgba(255,255,255,0.06);
         }
-        .season-nav-btn {
-          width: 34px;
-          height: 34px;
-          border-radius: var(--radius-md);
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid var(--border);
+        .tv-episodes-wrap { min-width: 0; }
+        .episodes-list-loading { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .episodes-empty { text-align: center; padding: 48px 20px; color: var(--text-tertiary); }
+        /* Redesigned season pills */
+        .season-pills-wrap { margin-bottom: 20px; }
+        .season-mobile-select-wrap { display: none; }
+        .season-mobile-label { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; display: block; }
+        .season-mobile-select {
+          width: 100%; appearance: none; padding: 12px 42px 12px 14px;
+          border-radius: 12px; border: 1px solid rgba(255,255,255,0.12);
+          background: rgba(255,255,255,0.05); color: var(--text-primary);
+          font-size: 14px; font-weight: 600;
+          background-image: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.7) 50%), linear-gradient(135deg, rgba(255,255,255,0.7) 50%, transparent 50%);
+          background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+          background-size: 6px 6px, 6px 6px; background-repeat: no-repeat;
+        }
+        .season-mobile-select:focus { outline: 2px solid rgba(229,9,20,0.45); outline-offset: 2px; }
+        .season-pills-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none; -ms-overflow-style: none; }
+        .season-pills-scroll::-webkit-scrollbar { display: none; }
+        .season-pill {
+          padding: 10px 20px;
+          border-radius: 999px;
+          font-size: 0.9rem;
+          font-weight: 600;
           color: var(--text-secondary);
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.1);
           cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          opacity: 1;
-          transition: all 0.2s;
-          flex-shrink: 0;
-        }
-        .season-nav-btn:disabled {
-          color: var(--text-muted);
-          cursor: not-allowed;
-          opacity: 0.4;
-        }
-        .season-scroll {
-          flex: 1;
-          min-width: 0;
-          display: flex;
-          gap: 6px;
-          overflow-x: auto;
-          overflow-y: hidden;
-          overscroll-behavior-x: contain;
-          scrollbar-width: thin;
-          scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
-          -ms-overflow-style: auto;
-          -webkit-overflow-scrolling: touch;
-          padding: 2px 0 6px;
-          scroll-behavior: smooth;
-        }
-        .season-scroll::-webkit-scrollbar {
-          height: 6px;
-        }
-        .season-scroll::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .season-scroll::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.25);
-          border-radius: var(--radius-full);
-        }
-        .season-btn {
-          padding: 8px 14px;
-          border-radius: var(--radius-md);
-          font-size: var(--text-sm);
-          font-weight: var(--font-semibold);
-          cursor: pointer;
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          color: var(--text-secondary);
-          transition: all 0.2s;
           white-space: nowrap;
-          flex-shrink: 0;
-          min-height: 36px;
-        }
-        .season-btn.active {
-          background: linear-gradient(135deg, #b8962e, #e6c76a);
-          border-color: var(--accent);
-          color: #1a1405;
-          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
-        }
-        .season-count {
-          opacity: 0.5;
-          margin-left: 3px;
-        }
-
-        /* Episode card */
-        .episode-card {
-          display: flex;
-          gap: 16px;
-          padding: 16px;
-          border-radius: var(--radius-lg);
-          cursor: pointer;
-          background: rgba(10, 10, 10, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.06);
           transition: all 0.2s ease;
-          align-items: flex-start;
-          opacity: 1;
-          max-width: 100%;
-          overflow: hidden;
-        }
-        .episode-card:hover {
-          background: rgba(23, 23, 23, 0.5);
-          border-color: rgba(255, 255, 255, 0.1);
-        }
-        .episode-card.active {
-          background: rgba(212, 175, 55, 0.12);
-          border-color: rgba(212, 175, 55, 0.35);
-          box-shadow: 0 0 16px rgba(212, 175, 55, 0.15);
-        }
-        .episode-card.future {
-          cursor: default;
-          opacity: 0.5;
-        }
-        .episode-ep-num {
-          width: 32px;
           flex-shrink: 0;
-          text-align: center;
-          padding-top: 2px;
         }
-        .episode-num-text {
-          font-size: var(--text-lg);
-          font-weight: var(--font-extrabold);
-          line-height: 1;
-          color: var(--text-muted);
-        }
-        .episode-card.active .episode-num-text {
-          color: var(--accent);
-        }
-        .episode-thumb {
-          width: 140px;
-          height: 80px;
-          flex-shrink: 0;
-          border-radius: var(--radius-md);
-          overflow: hidden;
-          background: var(--bg-tertiary);
-          position: relative;
-        }
-        .episode-thumb img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-        .episode-thumb-placeholder {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .episode-thumb-overlay {
-          position: absolute;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .episode-thumb-overlay.future-overlay {
-          background: rgba(0, 0, 0, 0.6);
-        }
-        .episode-play-btn {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: #ffffff;
-          color: #0b1220;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-        }
-        .episode-info {
-          flex: 1;
-          min-width: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-          overflow: hidden;
-        }
-        .episode-header-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 12px;
-          min-width: 0;
-        }
-        .episode-title {
-          font-size: var(--text-sm);
-          font-weight: var(--font-bold);
-          color: var(--text-primary);
-          margin: 0;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          min-width: 0;
-          flex: 1;
-        }
-        .episode-ratings {
-          display: flex;
-          gap: 6px;
-          flex-shrink: 0;
-          align-items: center;
-        }
-        .episode-rating {
-          display: inline-flex;
-          align-items: center;
-          gap: 3px;
-          font-size: 11px;
-          font-weight: var(--font-bold);
-        }
-        .episode-rating.high {
-          color: #22c55e;
-        }
-        .episode-rating.mid {
-          color: #f5c518;
-        }
-        .episode-rating.low {
-          color: #ef4444;
-        }
-        .episode-rating.omdb {
-          color: var(--gold);
-          background: var(--gold-subtle);
-          border: 1px solid var(--gold-border);
-          border-radius: var(--radius-sm);
-          padding: 2px 6px;
-        }
-        .episode-overview {
-          font-size: var(--text-xs);
-          color: var(--text-tertiary);
-          line-height: 1.6;
-          margin: 0;
-          overflow: hidden;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-        }
-        .episode-overview.no-overview {
-          color: var(--text-muted);
-          font-style: italic;
-        }
-        .episode-meta-row {
-          display: flex;
-          gap: 12px;
-          margin-top: 2px;
-          flex-wrap: wrap;
-        }
-        .episode-meta {
-          font-size: 11px;
-          color: var(--text-muted);
-          font-weight: var(--font-medium);
-          display: inline-flex;
-          align-items: center;
-          gap: 3px;
-        }
-        .episode-meta.upcoming {
-          color: var(--accent);
-          font-weight: var(--font-semibold);
-        }
-
-        @media (max-width: 1100px) {
-          .episode-thumb {
-            width: 120px;
-            height: 68px;
-          }
-        }
+        .season-pill:hover { color: var(--text-primary); background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+        .season-pill.active { background: #e50914; border-color: #e50914; color: #fff; }
+        /* Redesigned episode layout */
+        .ep-redesign { display: flex; flex-direction: column; gap: 28px; }
+        .ep-featured { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; }
+        .ep-featured-media { position: relative; aspect-ratio: 16/9; min-height: 240px; background: var(--bg-tertiary); }
+        .ep-featured-media img { object-fit: cover; }
+        .ep-featured-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .ep-featured-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,10,0.6) 0%, transparent 40%); pointer-events: none; }
+        .ep-featured-badge { position: absolute; top: 12px; left: 12px; padding: 4px 10px; border-radius: 4px; background: rgba(0,0,0,0.7); font-size: 0.75rem; font-weight: 700; color: #fff; letter-spacing: 0.05em; }
+        .ep-featured-info { padding: 28px 24px 28px 0; display: flex; flex-direction: column; justify-content: center; }
+        .ep-featured-kicker { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #e50914; margin: 0 0 10px; }
+        .ep-featured-title { font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 700; color: #fff; margin: 0 0 12px; line-height: 1.2; letter-spacing: -0.02em; }
+        .ep-featured-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 0.875rem; color: var(--text-tertiary); margin-bottom: 16px; }
+        .ep-featured-rating { color: var(--gold); font-weight: 600; }
+        .ep-featured-upcoming { color: var(--accent); font-weight: 600; }
+        .ep-featured-overview { font-size: 0.95rem; line-height: 1.7; color: var(--text-secondary); margin: 0 0 24px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+        .ep-featured-play { align-self: flex-start; padding: 12px 28px; font-size: 1rem; font-weight: 600; border-radius: 4px; }
+        .ep-featured-play:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ep-rail-wrap { }
+        .ep-rail-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 16px; }
+        .ep-rail { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
+        .ep-rail::-webkit-scrollbar { height: 6px; }
+        .ep-rail::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+        .ep-rail-card { flex: 0 0 220px; background: transparent; border: none; padding: 0; cursor: pointer; text-align: left; color: inherit; }
+        .ep-rail-card.future { opacity: 0.4; cursor: not-allowed; }
+        .ep-rail-thumb { position: relative; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; margin-bottom: 12px; background: var(--bg-tertiary); border: 2px solid transparent; transition: border-color 0.2s ease; }
+        .ep-rail-card:hover .ep-rail-thumb { border-color: rgba(255,255,255,0.3); }
+        .ep-rail-card.active .ep-rail-thumb { border-color: #e50914; }
+        .ep-rail-thumb img { object-fit: cover; }
+        .ep-rail-thumb-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-weight: 600; }
+        .ep-rail-active-indicator { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: #e50914; }
+        .ep-rail-info { display: flex; flex-direction: column; gap: 4px; }
+        .ep-rail-num { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-tertiary); }
+        .ep-rail-name { font-size: 0.95rem; font-weight: 500; color: #fff; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .ep-rail-dur { font-size: 0.8rem; color: var(--text-tertiary); }
+        .ep-rail-airdate { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
         @media (max-width: 768px) {
           .tv-detail-grid {
             grid-template-columns: 1fr;
@@ -1950,171 +1688,59 @@ function TVShowDetailsContent({ params }) {
             max-width: 180px;
             margin: 0 auto;
           }
-          .tv-scores-row {
-            gap: 16px;
-            margin-bottom: 20px;
+          .tv-scores-row { gap: 16px; margin-bottom: 20px; }
+          .tv-scores-row .score-ring svg { width: 44px; height: 44px; }
+          .tv-actions-row { margin-bottom: 24px; }
+          .tv-actions-row .btn { padding: 10px 16px; font-size: var(--text-sm); }
+          .tv-meta-grid { grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+          .tv-info-card { padding: 10px 12px; }
+          .tv-info-card-value { font-size: var(--text-xs) !important; }
+          .tv-external-links { margin-bottom: 28px; }
+          .tv-external-links a { padding: 8px 12px; font-size: var(--text-sm); }
+          .tv-episode-header { margin-bottom: 14px; align-items: stretch; }
+          .season-mobile-select-wrap { display: block; margin-bottom: 12px; }
+          .season-pills-scroll { display: none; }
+          .ep-redesign { gap: 20px; }
+          .ep-featured { grid-template-columns: 1fr; border-radius: 14px; }
+          .ep-featured-media { min-height: 180px; aspect-ratio: 16/9; }
+          .ep-featured-info { padding: 16px; }
+          .ep-featured-kicker { margin-bottom: 6px; }
+          .ep-featured-title { font-size: 1.35rem; margin-bottom: 8px; }
+          .ep-featured-meta { gap: 10px; font-size: 12px; margin-bottom: 10px; }
+          .ep-featured-overview { font-size: 13px; line-height: 1.6; -webkit-line-clamp: 3; margin-bottom: 14px; }
+          .ep-featured-play { width: 100%; justify-content: center; }
+          .ep-rail-label { margin-bottom: 12px; }
+          .ep-rail { flex-direction: column; gap: 10px; overflow: visible; padding-bottom: 0; }
+          .ep-rail-card {
+            flex: none; width: 100%; display: grid; grid-template-columns: 132px minmax(0, 1fr);
+            gap: 12px; align-items: center; padding: 8px; border-radius: 12px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
           }
-          .tv-scores-row .score-ring svg {
-            width: 44px;
-            height: 44px;
-          }
-          .tv-actions-row {
-            margin-bottom: 24px;
-          }
-          .tv-actions-row .btn {
-            padding: 10px 16px;
-            font-size: var(--text-sm);
-          }
-          .tv-meta-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 24px;
-          }
-          .tv-info-card {
-            padding: 10px 12px;
-          }
-          .tv-info-card-value {
-            font-size: var(--text-xs) !important;
-          }
-          .tv-external-links {
-            margin-bottom: 28px;
-          }
-          .tv-external-links a {
-            padding: 8px 12px;
-            font-size: var(--text-sm);
-          }
-          .tv-episode-header {
-            margin-bottom: 16px;
-          }
-          .tv-episode-header h3 {
-            font-size: var(--text-base) !important;
-          }
-          .tv-season-selector {
-            gap: 6px;
-            margin-bottom: 16px;
-          }
-          .season-nav-btn {
-            width: 32px;
-            height: 32px;
-          }
-          .season-btn {
-            padding: 8px 12px !important;
-            min-height: 36px !important;
-            font-size: var(--text-sm) !important;
-          }
-          .episode-card {
-            gap: 12px;
-            padding: 12px;
-          }
-          .episode-thumb {
-            width: 110px;
-            height: 64px;
-          }
-          .episode-ep-num {
-            width: 28px;
-          }
-          .episode-num-text {
-            font-size: var(--text-base);
-          }
-          .episode-title {
-            font-size: var(--text-sm);
-          }
-          .episode-overview {
-            font-size: var(--text-xs);
-            -webkit-line-clamp: 1;
-          }
-          .episode-rating {
-            font-size: 10px;
-          }
-          .episode-meta {
-            font-size: 10px;
-          }
-          .episodes-list,
-          .episodes-list-loading {
-            grid-template-columns: 1fr;
-          }
+          .ep-rail-card.active { background: rgba(229,9,20,0.08); border-color: rgba(229,9,20,0.35); }
+          .ep-rail-card:hover .ep-rail-thumb { border-color: transparent; }
+          .ep-rail-card.active .ep-rail-thumb { border-color: transparent; }
+          .ep-rail-thumb { margin-bottom: 0; border-radius: 8px; border: 0; aspect-ratio: 16/9; }
+          .ep-rail-active-indicator { height: 100%; width: 3px; right: auto; top: 0; bottom: 0; left: 0; }
+          .ep-rail-info { gap: 2px; min-width: 0; }
+          .ep-rail-num { font-size: 11px; }
+          .ep-rail-name { font-size: 14px; -webkit-line-clamp: 2; }
+          .ep-rail-dur, .ep-rail-airdate { font-size: 12px; }
         }
         @media (max-width: 480px) {
-          .tv-poster-wrapper {
-            max-width: 140px;
-          }
-          .tv-meta-grid {
-            grid-template-columns: 1fr;
-            gap: 8px;
-          }
-          .episode-card {
-            flex-direction: row;
-            gap: 10px;
-            padding: 10px;
-            align-items: center;
-          }
-          .episode-thumb {
-            width: 96px;
-            height: 54px;
-          }
-          .episode-ep-num {
-            display: none;
-          }
-          .episodes-list {
-            gap: 8px;
-          }
-          .episodes-list-loading {
-            gap: 8px;
-          }
-          .episode-title {
-            font-size: var(--text-xs);
-          }
-          .episode-overview {
-            display: none;
-          }
-          .episode-info {
-            gap: 4px;
-          }
-          .episode-meta-row {
-            gap: 8px;
-          }
-          .episode-meta {
-            font-size: 10px;
-          }
-          .episode-rating {
-            font-size: 10px;
-          }
-          .tv-actions-row {
-            gap: 8px;
-          }
-          .tv-actions-row .btn {
-            padding: 10px 14px;
-            font-size: var(--text-sm);
-            flex: 1;
-            justify-content: center;
-          }
-          .tv-external-links {
-            gap: 8px;
-            margin-bottom: 24px;
-          }
-          .tv-external-links a {
-            padding: 8px 10px;
-            font-size: var(--text-sm);
-            flex: 1 1 calc(50% - 8px);
-            justify-content: center;
-          }
-          .season-nav-btn {
-            width: 30px;
-            height: 30px;
-          }
-          .season-btn {
-            padding: 6px 10px !important;
-            min-height: 32px !important;
-          }
-          .tv-episode-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
-            margin-bottom: 14px;
-          }
+          .tv-poster-wrapper { max-width: 140px; }
+          .tv-meta-grid { grid-template-columns: 1fr; gap: 8px; }
+          .tv-actions-row { gap: 8px; }
+          .tv-actions-row .btn { padding: 10px 14px; font-size: var(--text-sm); flex: 1; justify-content: center; }
+          .tv-external-links { gap: 8px; margin-bottom: 24px; }
+          .tv-external-links a { padding: 8px 10px; font-size: var(--text-sm); flex: 1 1 calc(50% - 8px); justify-content: center; }
+          .ep-featured-media { min-height: 160px; }
+          .ep-featured-title { font-size: 1.2rem; }
+          .ep-featured-overview { -webkit-line-clamp: 2; }
+          .ep-rail-card { grid-template-columns: 112px minmax(0, 1fr); gap: 10px; padding: 7px; }
+          .ep-rail-name { font-size: 13px; }
         }
       `}</style>
-    </>
+    </div>
   );
 }
 

@@ -20,8 +20,11 @@ export default function ScrollRow({
     el.scrollBy({ left: dir * scrollAmount, behavior: "smooth" });
   };
 
+  const hasHeader = title || icon || subtitle || href;
+
   return (
     <section style={style}>
+      {hasHeader && (
       <div
         style={{
           display: "flex",
@@ -169,6 +172,7 @@ export default function ScrollRow({
           </div>
         </div>
       </div>
+      )}
       <div ref={ref} className="scroll-row">
         {children}
       </div>

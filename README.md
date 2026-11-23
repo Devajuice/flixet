@@ -13,10 +13,10 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 📺 **TV Show Support** - Full season and episode selection with OMDB ratings
 - ⭐ **External Ratings** - IMDb, Rotten Tomatoes, and Metacritic scores on movie/TV detail pages (via OMDB, when available)
 - ⏱️ **Movie End Time** - Movie pages show estimated finish time based on runtime and your device’s current time
-- 🎨 **Premium UI (redesigned)** - Cinematic dark UI with **liquid-glass** surfaces, **champagne gold** accents, and smooth motion
-- 💊 **Floating Navbar** - Glass pill header with redesigned dropdowns; mobile bottom sheet + full-screen search overlay
-- 📱 **Mobile-first navigation** - Bottom sheet menu optimized for one-handed use
-- 🏠 **Cinematic Home** - Auto-rotating hero with optional muted **YouTube trailer background** (when available), genre tiles, and content rows
+- 🎨 **Premium UI** - Cinematic dark UI with liquid-glass surfaces, smooth motion, and glass-styled buttons
+- 💊 **Floating Navbar** - Glass pill header with animated glide pill navigation; desktop nav links to Movies/TV pages directly
+- 📱 **Mobile Navigation** - Fixed bottom glass tab bar (Home/Movies/TV/Watchlist/Search) with active pill indicator
+- 🏠 **Netflix-style Home** - Full-bleed hero with trailer background, Home/Movies/TV filter pills, continuous infinite scroll for Movies/TV, and Continue Watching in Home view
 - 🏷️ **Hover-reveal cards** - Poster-first movie/TV cards that reveal details (title, rating, year, type) on hover
 - 🗂️ **Rich Browse Pages** - Movies/TV catalog with genre rail, sort, slide-in glass filter drawer, Infinite/Pages toggle
 - 🌍 **Auto region (OTT filter)** - “Streaming now (OTT)” uses **auto-detected region** (via server geo headers) with TMDb watch-provider filters
@@ -25,12 +25,12 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 🚀 **Coming Soon** - Dedicated pages for upcoming movies and airing TV shows
 - ♾️ **Infinite Scroll** - Seamlessly load more content as you browse
 - 🎞️ **Continue Watching** - Pick up right where you left off with episode tracking
-- 📺 **TV experience (redesigned)** - Season selector pills + **episode rail with selected-episode detail panel** (poster, overview, play)
+- 📺 **TV experience (redesigned)** - Season selector + featured episode panel + episode rail/list; mobile gets a season dropdown and vertical episode list, with release dates shown for unreleased episodes when available
 - 🖼️ **Image Handling** - Next.js `Image` with unoptimized delivery for TMDB assets to avoid Vercel image-transformation quota issues
 - ♿️ **Accessibility** - Focus states, skip-to-content, reduced-motion support (including hero trailer behavior), and ARIA improvements
 - 💫 **Loading Skeletons** - Smooth loading states with shimmer animations
 - 🧯 **Route Resilience** - Route-level loading/error boundaries for key pages
-- ⌨️ **Debounced Search** - Optimized search input with 300ms delay
+- ⌨️ **Debounced Search** - Optimized search input with 300ms delay; `/search` page includes a search input
 - 🎭 **Actor Pages** - Dedicated pages with filmography split into Known For / Movies / TV
 - 🔥 **Top Rated & Trending TV** - Sort the TV browse page by rating or popularity
 - 🕘 **Recently Viewed** - Quickly jump back to titles you watched recently
@@ -42,6 +42,7 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 📑 **FAQ Accordions + redesigned Legal pages** - Collapsible Q&A on Terms/Privacy/DMCA with glass styling
 - 🔢 **Paged Browsing** - Toggle the catalog between infinite scroll and page-number pagination
 - 🎚️ **Range Slider / 📅 Date Range Picker** - Year range + exact release-date filtering
+- ✨ **Page Transitions** - Subtle route transition animation via App Router `template.js`
 
 ## To Do
 
@@ -155,9 +156,11 @@ Flixet/
 │   ├── search/               # Search results page
 │   ├── page.js               # Home page
 │   ├── globals.css           # Global styles, design tokens, media queries
-│   └── layout.js             # Root layout
+│   ├── layout.js             # Root layout
+│   └── template.js           # Route transition animation wrapper
 ├── components/
-│   ├── Header.js             # Floating pill navbar + mobile bottom sheet menu (active-link highlight)
+│   ├── Header.js             # Desktop floating glass header + mobile bottom tab bar
+│   ├── PillNav.js            # Reusable glide pill navigation component
 │   ├── Footer.js             # Footer with links and disclaimer
 │   ├── SearchBar.js          # Search input with dropdown (debounced)
 │   ├── ScrollRow.js          # Horizontal scrollable row (inline section header)
@@ -247,8 +250,8 @@ Flixet/
 
 - **Cinematic dark theme**: Navy/near-black backgrounds with subtle gradients, glass surfaces, white primary actions, and yellow rating accents
 - **Cinematic home page**: Auto-rotating hero carousel and genre quick-links with uniform, catalog-sized content cards across home rows
-- **Floating pill navbar**: Centered, glass-morphism navbar that floats/stays centered while scrolling, with an active filled-pill link state
-- **Mobile bottom sheet menu**: Bottom sheet navigation with quick-access tiles and actions
+- **Floating pill navbar**: Centered glass-morphism navbar with animated glide pill navigation on desktop
+- **Mobile bottom tab bar**: Fixed glass bottom tab bar for Home/Movies/TV/Watchlist/Search on mobile
 - **Split-tile cards**: Uniform poster + info-bar cards in home rows and catalog grids (home rows sized to match catalog cards)
 - **Episode list improvements**: Responsive 2-column episode grid on desktop and compact mobile episode cards
 - **Shared browse template** (`CatalogPage.js`): Movies and TV share one browse experience (genre rail, sort dropdown, filter drawer, animated grid transitions, empty/end states)

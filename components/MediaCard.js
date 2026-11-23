@@ -74,9 +74,9 @@ function MediaCard({
           cursor: "pointer",
           border: "1px solid var(--border)",
           boxShadow: hovered
-            ? "0 16px 40px rgba(0, 0, 0, 0.55), 0 0 28px rgba(245, 158, 11, 0.12)"
+            ? "0 16px 40px rgba(0, 0, 0, 0.6)"
             : "var(--shadow-sm)",
-          transform: hovered ? "translateY(-4px)" : "none",
+          transform: hovered ? "scale(1.05)" : "none",
           transition: "all var(--transition-slow)",
           zIndex: hovered ? 10 : 1,
           height: "100%",
@@ -203,14 +203,14 @@ function MediaCard({
                     width: 46,
                     height: 46,
                     borderRadius: "var(--radius-full)",
-                    background: "linear-gradient(135deg, #b8962e, #e6c76a)",
+                    background: "#ffffff",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    boxShadow: "0 8px 28px rgba(212, 175, 55, 0.5)",
+                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.5)",
                   }}
                 >
-                  <Play size={19} fill="#1a1405" color="#1a1405" />
+                  <Play size={19} fill="#000000" color="#000000" />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -296,8 +296,8 @@ function MediaCard({
         background: "var(--bg-secondary)",
         cursor: "pointer",
         aspectRatio: variant === "backdrop" ? "16/9" : "2/3",
-        boxShadow: hovered ? "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(245, 158, 11, 0.15)" : "var(--shadow-md)",
-        transform: hovered ? "translateY(-4px) scale(1.02)" : "none",
+        boxShadow: hovered ? "var(--shadow-xl)" : "var(--shadow-md)",
+        transform: hovered ? "scale(1.08)" : "none",
         transition: "all var(--transition-slow)",
         zIndex: hovered ? 10 : 1,
       }}
@@ -379,14 +379,14 @@ function MediaCard({
                 width: 48,
                 height: 48,
                 borderRadius: "var(--radius-full)",
-                background: "linear-gradient(135deg, #b8962e, #e6c76a)",
+                background: "#ffffff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 8px 32px rgba(212, 175, 55, 0.5)",
+                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.5)",
               }}
             >
-              <Play size={20} fill="#1a1405" color="#1a1405" />
+              <Play size={20} fill="#000000" color="#000000" />
             </motion.div>
           )}
         </AnimatePresence>

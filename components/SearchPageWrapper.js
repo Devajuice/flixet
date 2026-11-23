@@ -1,6 +1,7 @@
 "use client";
 
 import SearchResults from "@/components/SearchResults";
+import SearchBar from "@/components/SearchBar";
 import { Search, Film, TrendingUp } from "lucide-react";
 
 export default function SearchPageWrapper({ query, data }) {
@@ -13,6 +14,9 @@ export default function SearchPageWrapper({ query, data }) {
         paddingBottom: 80,
       }}
     >
+      <div style={{ maxWidth: 720, margin: "0 auto 28px" }}>
+        <SearchBar autoFocus={!query} />
+      </div>
       {query ? (
         <>
           <div style={{ textAlign: "center", marginBottom: 32 }}>

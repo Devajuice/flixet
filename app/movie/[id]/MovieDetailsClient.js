@@ -423,7 +423,7 @@ export default function MovieDetails({ params }) {
   };
 
   return (
-    <>
+    <div style={{ marginTop: "calc(-1 * (var(--header-height) + 32px))" }}>
       <VideoPlayer
         isOpen={showPlayer}
         onClose={() => setShowPlayer(false)}
@@ -1042,6 +1042,6 @@ export default function MovieDetails({ params }) {
           }
         }
       `}</style>
-    </>
+    </div>
   );
 }

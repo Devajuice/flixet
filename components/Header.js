@@ -8,7 +8,6 @@ import {
   Search as SearchIcon,
   Home,
   Tv,
-  ChevronDown,
   Bookmark,
   Menu,
   X,
@@ -16,25 +15,16 @@ import {
 } from "lucide-react";
 import SearchBar from "./SearchBar";
 import RandomPicker from "./RandomPicker";
+import PillNav from "./PillNav";
 
 export default function Header() {
   const pathname = usePathname();
   const [showSearch, setShowSearch] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const [showMoviesMenu, setShowMoviesMenu] = useState(false);
-  const [showTVMenu, setShowTVMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [dropdownPositions, setDropdownPositions] = useState({
-    movies: { left: 0, top: 0 },
-    tv: { left: 0, top: 0 },
-  });
 
-  const moviesButtonRef = useRef(null);
-  const tvButtonRef = useRef(null);
-  const moviesPanelRef = useRef(null);
-  const tvPanelRef = useRef(null);
   const mobileSearchTriggerRef = useRef(null);
   const mobileMenuTriggerRef = useRef(null);
 
@@ -74,14 +64,7 @@ export default function Header() {
 
   // Escape closes whichever overlay is open and returns focus to its trigger.
   useEffect(() => {
-    if (
-      !showMobileSearch &&
-      !showMobileMenu &&
-      !showMoviesMenu &&
-      !showTVMenu
-    ) {
-      return;
-    }
+    if (!showMobileSearch && !showMobileMenu) return;
 
     const onKey = (e) => {
       if (e.key !== "Escape") return;
@@ -93,87 +76,19 @@ export default function Header() {
         setShowMobileMenu(false);
         document.body.classList.remove("menu-open");
         mobileMenuTriggerRef.current?.focus();
-      } else if (showMoviesMenu) {
-        setShowMoviesMenu(false);
-        moviesButtonRef.current?.focus();
-      } else if (showTVMenu) {
-        setShowTVMenu(false);
-        tvButtonRef.current?.focus();
       }
     };
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [
-    showMobileSearch,
-    showMobileMenu,
-    showMoviesMenu,
-    showTVMenu,
-  ]);
+  }, [showMobileSearch, showMobileMenu]);
 
-  useEffect(() => {
-    const updatePositions = () => {
-      if (moviesButtonRef.current) {
-        const rect = moviesButtonRef.current.getBoundingClientRect();
-        setDropdownPositions((prev) => ({
-          ...prev,
-          movies: { left: rect.left, top: rect.bottom },
-        }));
-      }
-      if (tvButtonRef.current) {
-        const rect = tvButtonRef.current.getBoundingClientRect();
-        setDropdownPositions((prev) => ({
-          ...prev,
-          tv: { left: rect.left, top: rect.bottom },
-        }));
-      }
-    };
-    updatePositions();
-    window.addEventListener("resize", updatePositions);
-    window.addEventListener("scroll", updatePositions);
-    return () => {
-      window.removeEventListener("resize", updatePositions);
-      window.removeEventListener("scroll", updatePositions);
-    };
-  }, []);
 
-  const movieGenres = [
-    "Action",
-    "Comedy",
-    "Drama",
-    "Horror",
-    "Sci-Fi",
-    "Thriller",
-    "Romance",
-    "Animation",
-  ];
-  const tvGenres = [
-    "Action & Adventure",
-    "Comedy",
-    "Drama",
-    "Crime",
-    "Documentary",
-    "Sci-Fi & Fantasy",
-    "Reality",
-    "Kids",
-  ];
 
   const navLinks = [
     { href: "/", label: "Home", icon: Home },
-    {
-      href: "/movies",
-      label: "Movies",
-      icon: Film,
-      ref: moviesButtonRef,
-      dropdown: "movies",
-    },
-    {
-      href: "/tv",
-      label: "TV Shows",
-      icon: Tv,
-      ref: tvButtonRef,
-      dropdown: "tv",
-    },
+    { href: "/movies", label: "Movies", icon: Film },
+    { href: "/tv", label: "TV Shows", icon: Tv },
     { href: "/watchlist", label: "Watchlist", icon: Bookmark },
   ];
 
@@ -189,6 +104,7 @@ export default function Header() {
   return (
     <>
       <div
+        className="header-floating-wrap"
         style={{
           position: "fixed",
           top: 16,
@@ -235,70 +151,12 @@ export default function Header() {
 
           {!isMobile && (
             <>
-              <nav className="header-nav">
-                {navLinks.map((link) => {
-                  const active = isActive(link.href);
-                  if (link.dropdown) {
-                    const isMovies = link.dropdown === "movies";
-                    const open = isMovies ? showMoviesMenu : showTVMenu;
-                    const setOpen = isMovies
-                      ? setShowMoviesMenu
-                      : setShowTVMenu;
-
-                    return (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        ref={link.ref}
-                        className={`nav-link${active ? " nav-link--active" : ""}`}
-                        aria-haspopup="true"
-                        aria-expanded={open}
-                        onClick={(e) => {
-                          // Let modified clicks behave like a normal navigation.
-                          if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-                          e.preventDefault();
-                          setOpen(!open);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "ArrowDown") {
-                            e.preventDefault();
-                            setOpen(true);
-                            requestAnimationFrame(() => {
-                              const panel = isMovies
-                                ? moviesPanelRef.current
-                                : tvPanelRef.current;
-                              panel?.querySelector("a")?.focus();
-                            });
-                          }
-                        }}
-                        onFocus={() => setOpen(true)}
-                        onBlur={(e) => {
-                          // Keep the panel open when focus moves into it.
-                          if (e.currentTarget.contains(e.relatedTarget)) return;
-                          const panel = isMovies
-                            ? moviesPanelRef.current
-                            : tvPanelRef.current;
-                          if (panel?.contains(e.relatedTarget)) return;
-                          setOpen(false);
-                        }}
-                        onMouseEnter={() => setOpen(true)}
-                        onMouseLeave={() => setOpen(false)}
-                      >
-                        {link.label} <ChevronDown size={13} />
-                      </Link>
-                    );
-                  }
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={`nav-link${active ? " nav-link--active" : ""}`}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                })}
-              </nav>
+              <PillNav
+                className="header-pill-nav"
+                ariaLabel="Primary"
+                activeIndex={navLinks.findIndex((l) => isActive(l.href))}
+                items={navLinks.map((l) => ({ label: l.label, href: l.href }))}
+              />
 
               <div className="header-random">
                 <RandomPicker variant="header" />
@@ -375,18 +233,19 @@ export default function Header() {
           letter-spacing: -0.03em;
           color: var(--text-primary);
         }
-        .header-nav {
-          display: flex;
-          align-items: center;
-          gap: 2px;
+        .header-pill-nav .pill-nav-track {
+          background: transparent;
+          border-color: transparent;
+          box-shadow: none;
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+          padding: 0;
         }
-        .nav-link {
-          position: relative;
-        }
-        .nav-link--active {
-          color: var(--text-primary) !important;
-          background: rgba(255, 255, 255, 0.12);
-          border: 1px solid rgba(255, 255, 255, 0.14);
+        .header-pill-nav .pill-nav-glide { top: 0; bottom: 0; }
+        .header-pill-nav .pill-nav-item {
+          height: 38px;
+          padding: 0 16px;
+          font-size: 14px;
         }
         .header-search {
           position: relative;
@@ -438,7 +297,10 @@ export default function Header() {
           }
         }
         @media (max-width: 768px) {
-          .header-nav,
+          .header-floating-wrap {
+            display: none !important;
+          }
+          .header-pill-nav,
           .header-search {
             display: none;
           }
@@ -454,263 +316,74 @@ export default function Header() {
             height: 16px;
           }
         }
-      `}</style>
 
-      {/* Dropdown portal */}
-      {!isMobile && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            pointerEvents: "none",
-            zIndex: 9999,
-          }}
-        >
-          <AnimatePresence>
-            {showMoviesMenu && (
-              <motion.div
-                ref={moviesPanelRef}
-                style={{
-                  position: "absolute",
-                  left: dropdownPositions.movies.left,
-                  top: dropdownPositions.movies.top + 12,
-                  pointerEvents: "auto",
-                }}
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.18 }}
-                onMouseEnter={() => setShowMoviesMenu(true)}
-                onMouseLeave={() => setShowMoviesMenu(false)}
-                onKeyDown={(e) => {
-                  if (e.key !== "Escape") return;
-                  e.preventDefault();
-                  setShowMoviesMenu(false);
-                  moviesButtonRef.current?.focus();
-                }}
-              >
-                <div
-                  role="menu"
-                  aria-label="Movie genres"
-                  style={{
-                    background: "rgba(12, 14, 20, 0.55)",
-                    backdropFilter: "blur(22px) saturate(1.7)",
-                    WebkitBackdropFilter: "blur(22px) saturate(1.7)",
-                    border: "1px solid rgba(255, 255, 255, 0.12)",
-                    borderTop: "2px solid var(--accent)",
-                    borderRadius: "var(--radius-xl)",
-                    padding: 16,
-                    minWidth: 210,
-                    maxHeight: 380,
-                    overflowY: "auto",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08), 0 24px 64px rgba(0,0,0,0.6), 0 0 24px rgba(212, 175, 55, 0.12)",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: 10,
-                      fontWeight: "var(--font-bold)",
-                      color: "var(--accent)",
-                      marginBottom: 10,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.09em",
-                      paddingBottom: 10,
-                      borderBottom: "1px solid var(--border)",
-                    }}
-                  >
-                    Movie Genres
-                  </p>
-                  <Link
-                    href="/movies"
-                    className="dropdown-all-link"
-                    onClick={() => setShowMoviesMenu(false)}
-                    style={{
-                      display: "block",
-                      padding: "8px 12px",
-                      background: "linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(251, 191, 36, 0.08))",
-                      border: "1px solid rgba(212, 175, 55, 0.25)",
-                      borderRadius: "var(--radius-lg)",
-                      fontSize: "var(--text-sm)",
-                      fontWeight: "var(--font-bold)",
-                      color: "var(--accent)",
-                      textDecoration: "none",
-                      marginBottom: 8,
-                    }}
-                  >
-                    All Movies
-                  </Link>
-                  {movieGenres.map((g) => (
-                    <Link
-                      key={g}
-                      href={`/movies?genre=${g.toLowerCase()}`}
-                      className="dropdown-item"
-                      onClick={() => setShowMoviesMenu(false)}
-                      style={{
-                        position: "relative",
-                        display: "block",
-                        padding: "8px 12px 8px 22px",
-                        borderRadius: "var(--radius-lg)",
-                        fontSize: "var(--text-sm)",
-                        fontWeight: "var(--font-medium)",
-                        color: "var(--text-secondary)",
-                        textDecoration: "none",
-                      }}
-                    >
-                      {g}
-                    </Link>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <AnimatePresence>
-            {showTVMenu && (
-              <motion.div
-                ref={tvPanelRef}
-                style={{
-                  position: "absolute",
-                  left: dropdownPositions.tv.left,
-                  top: dropdownPositions.tv.top + 12,
-                  pointerEvents: "auto",
-                }}
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.18 }}
-                onMouseEnter={() => setShowTVMenu(true)}
-                onMouseLeave={() => setShowTVMenu(false)}
-                onKeyDown={(e) => {
-                  if (e.key !== "Escape") return;
-                  e.preventDefault();
-                  setShowTVMenu(false);
-                  tvButtonRef.current?.focus();
-                }}
-              >
-                <div
-                  role="menu"
-                  aria-label="TV genres"
-                  style={{
-                    background: "rgba(12, 14, 20, 0.55)",
-                    backdropFilter: "blur(22px) saturate(1.7)",
-                    WebkitBackdropFilter: "blur(22px) saturate(1.7)",
-                    border: "1px solid rgba(255, 255, 255, 0.12)",
-                    borderTop: "2px solid var(--accent)",
-                    borderRadius: "var(--radius-xl)",
-                    padding: 16,
-                    minWidth: 210,
-                    maxHeight: 380,
-                    overflowY: "auto",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08), 0 24px 64px rgba(0,0,0,0.6), 0 0 24px rgba(212, 175, 55, 0.12)",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: 10,
-                      fontWeight: "var(--font-bold)",
-                      color: "var(--accent)",
-                      marginBottom: 10,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.09em",
-                      paddingBottom: 10,
-                      borderBottom: "1px solid var(--border)",
-                    }}
-                  >
-                    TV Genres
-                  </p>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 4,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <Link
-                      href="/tv?sort=vote_average.desc"
-                      className="dropdown-item"
-                      onClick={() => setShowTVMenu(false)}
-                      style={{
-                        position: "relative",
-                        display: "block",
-                        padding: "8px 12px 8px 22px",
-                        borderRadius: "var(--radius-lg)",
-                        fontSize: "var(--text-sm)",
-                        fontWeight: "var(--font-semibold)",
-                        color: "var(--text-secondary)",
-                        textDecoration: "none",
-                      }}
-                    >
-                      <span style={{ marginRight: 6 }}>⭐</span> Top Rated
-                    </Link>
-                    <Link
-                      href="/tv?sort=popularity.desc"
-                      className="dropdown-item"
-                      onClick={() => setShowTVMenu(false)}
-                      style={{
-                        position: "relative",
-                        display: "block",
-                        padding: "8px 12px 8px 22px",
-                        borderRadius: "var(--radius-lg)",
-                        fontSize: "var(--text-sm)",
-                        fontWeight: "var(--font-semibold)",
-                        color: "var(--text-secondary)",
-                        textDecoration: "none",
-                      }}
-                    >
-                      <span style={{ marginRight: 6 }}>🔥</span> Trending
-                    </Link>
-                  </div>
-                  <Link
-                    href="/tv"
-                    className="dropdown-all-link"
-                    onClick={() => setShowTVMenu(false)}
-                    style={{
-                      display: "block",
-                      padding: "8px 12px",
-                      background: "linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(251, 191, 36, 0.08))",
-                      border: "1px solid rgba(212, 175, 55, 0.25)",
-                      borderRadius: "var(--radius-lg)",
-                      fontSize: "var(--text-sm)",
-                      fontWeight: "var(--font-bold)",
-                      color: "var(--accent)",
-                      textDecoration: "none",
-                      marginBottom: 8,
-                    }}
-                  >
-                    All TV Shows
-                  </Link>
-                  {tvGenres.map((g) => {
-                    const slug = g
-                      .toLowerCase()
-                      .replace(/ & /g, "-")
-                      .replace(/ /g, "-");
-                    return (
-                      <Link
-                        key={g}
-                        href={`/tv?genre=${slug}`}
-                        className="dropdown-item"
-                        onClick={() => setShowTVMenu(false)}
-                        style={{
-                          position: "relative",
-                          display: "block",
-                          padding: "8px 12px 8px 22px",
-                          borderRadius: "var(--radius-lg)",
-                          fontSize: "var(--text-sm)",
-                          fontWeight: "var(--font-medium)",
-                          color: "var(--text-secondary)",
-                          textDecoration: "none",
-                        }}
-                      >
-                        {g}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
+        .mobile-tabbar {
+          position: fixed;
+          left: 12px;
+          right: 12px;
+          bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+          z-index: 1200;
+          padding: 6px;
+          border-radius: 28px;
+          background: rgba(20, 20, 20, 0.72);
+          border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+          backdrop-filter: blur(24px) saturate(1.4);
+          -webkit-backdrop-filter: blur(24px) saturate(1.4);
+        }
+        .mobile-tabbar-inner {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 4px;
+          align-items: center;
+        }
+        .mobile-tab {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          min-height: 56px;
+          padding: 8px 4px;
+          border-radius: 20px;
+          color: rgba(255,255,255,0.58);
+          text-decoration: none;
+          transition: color .2s ease;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .mobile-tab.active { color: #fff; }
+        .mobile-tab-icon {
+          position: relative;
+          width: 44px;
+          height: 32px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 999px;
+          isolation: isolate;
+        }
+        .mobile-tab-pill {
+          position: absolute;
+          inset: 0;
+          border-radius: 999px;
+          z-index: -1;
+          background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.1) 100%);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(255,255,255,0.06);
+          backdrop-filter: blur(12px) saturate(1.2);
+          -webkit-backdrop-filter: blur(12px) saturate(1.2);
+        }
+        .mobile-tab-label {
+          font-size: 10px;
+          font-weight: 600;
+          line-height: 1;
+          letter-spacing: -0.01em;
+          white-space: nowrap;
+        }
+        @media (min-width: 769px) {
+          .mobile-tabbar { display: none !important; }
+        }
+      `}</style>
 
       {/* Mobile search overlay */}
       <AnimatePresence>
@@ -756,8 +429,8 @@ export default function Header() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "rgba(212, 175, 55, 0.1)",
-                  border: "1px solid rgba(212, 175, 55, 0.25)",
+                  background: "rgba(255, 255, 255, 0.08)",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
                   borderRadius: "50%",
                   color: "var(--accent)",
                   cursor: "pointer",
@@ -864,8 +537,8 @@ export default function Header() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: "rgba(212, 175, 55, 0.1)",
-                    border: "1px solid rgba(212, 175, 55, 0.2)",
+                    background: "rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(255, 255, 255, 0.15)",
                     borderRadius: "50%",
                     color: "var(--accent)",
                     cursor: "pointer",
@@ -982,6 +655,36 @@ export default function Header() {
           </>
         )}
       </AnimatePresence>
+
+      {isMobile && (
+          <nav className="mobile-tabbar" aria-label="Mobile navigation">
+          <div className="mobile-tabbar-inner">
+            {[
+              { href: "/", label: "Home", icon: Home, active: isActive("/") },
+              { href: "/movies", label: "Movies", icon: Film, active: isActive("/movies") },
+              { href: "/tv", label: "TV Shows", icon: Tv, active: isActive("/tv") },
+              { href: "/watchlist", label: "Watchlist", icon: Bookmark, active: isActive("/watchlist") },
+              { href: "/search", label: "Search", icon: SearchIcon, active: pathname === "/search" },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`mobile-tab${item.active ? " active" : ""}`}
+                  aria-current={item.active ? "page" : undefined}
+                >
+                  <span className="mobile-tab-icon">
+                    {item.active && <motion.span layoutId="mobile-tab-pill" className="mobile-tab-pill" transition={{ type: "spring", stiffness: 500, damping: 38 }} />}
+                    <Icon size={20} strokeWidth={2.1} />
+                  </span>
+                  <span className="mobile-tab-label">{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </>
   );
 }
