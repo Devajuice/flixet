@@ -25,7 +25,7 @@ A modern, free movie and TV show streaming aggregator built with Next.js. Stream
 - 🚀 **Coming Soon** - Dedicated pages for upcoming movies and airing TV shows
 - ♾️ **Infinite Scroll** - Seamlessly load more content as you browse
 - 🎞️ **Continue Watching** - Pick up right where you left off with episode tracking
-- 📺 **TV experience (redesigned)** - Scrollable desktop season selector, mobile season dropdown, selected-episode preview panel, and a boxed episode grid (EP1, EP2...); upcoming episodes are selectable with local release dates and clear upcoming indicators
+- 📺 **TV experience (redesigned)** - Scrollable desktop season selector, mobile season dropdown, selected-episode preview panel, and a boxed episode grid (EP1, EP2...); upcoming episodes are selectable with local release dates and clear upcoming indicators; watched episodes show tick marks
 - 🖼️ **Image Handling** - Next.js `Image` with unoptimized delivery for TMDB assets to avoid Vercel image-transformation quota issues
 - ♿️ **Accessibility** - Focus states, skip-to-content, reduced-motion support (including hero trailer behavior), and ARIA improvements
 - 💫 **Loading Skeletons** - Smooth loading states with shimmer animations

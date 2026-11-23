@@ -81,18 +81,29 @@ export function ContinueWatchingProvider({ children }) {
   const addToContinueWatching = useCallback(
     (item) => {
       update((prev) => {
-        // Remove existing entry for this movie/show
-        const filtered = prev.filter(
-          (i) => !(i.id === item.id && i.type === item.type),
-        );
+        const existing = prev.find((i) => i.id === item.id && i.type === item.type);
+        const filtered = prev.filter((i) => !(i.id === item.id && i.type === item.type));
 
-        // Add new entry at the beginning (most recent first)
+        const watchedEpisodes = { ...(existing?.watchedEpisodes || {}) };
+        if (item.type === "tv" && item.season != null && item.episode != null && Number(item.progress) >= 90) {
+          const key = String(item.season);
+          const arr = Array.isArray(watchedEpisodes[key]) ? watchedEpisodes[key] : [];
+          watchedEpisodes[key] = Array.from(new Set([...arr, Number(item.episode)]));
+        }
+        if (item.watchedEpisodes && typeof item.watchedEpisodes === "object") {
+          for (const [k, v] of Object.entries(item.watchedEpisodes)) {
+            const arr = Array.isArray(watchedEpisodes[k]) ? watchedEpisodes[k] : [];
+            const nextArr = Array.isArray(v) ? v.map(Number) : [];
+            watchedEpisodes[k] = Array.from(new Set([...arr, ...nextArr]));
+          }
+        }
+
         const newItem = {
           ...item,
+          watchedEpisodes,
           lastWatched: new Date().toISOString(),
         };
 
-        // Keep only last 20 items
         return [newItem, ...filtered].slice(0, 20);
       });
     },
@@ -115,8 +126,17 @@ export function ContinueWatchingProvider({ children }) {
   const getProgress = useCallback(
     (id, type) => {
       return continueWatching.find(
-        (item) => item.id === id && item.type === type,
+        (item) => item.id === id && item.type === item.type,
       );
+    },
+    [continueWatching],
+  );
+
+  const isEpisodeWatched = useCallback(
+    (id, season, episode) => {
+      const item = continueWatching.find((i) => i.id === id && i.type === "tv");
+      const arr = item?.watchedEpisodes?.[String(season)];
+      return Array.isArray(arr) && arr.includes(Number(episode));
     },
     [continueWatching],
   );
@@ -128,6 +148,7 @@ export function ContinueWatchingProvider({ children }) {
       removeFromContinueWatching,
       clearContinueWatching,
       getProgress,
+      isEpisodeWatched,
       formatTime, // Export helper
     }),
     [
@@ -136,6 +157,7 @@ export function ContinueWatchingProvider({ children }) {
       removeFromContinueWatching,
       clearContinueWatching,
       getProgress,
+      isEpisodeWatched,
     ],
   );
 

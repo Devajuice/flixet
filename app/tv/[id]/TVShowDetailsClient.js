@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight as ChevronRightIcon,
+  Check,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -433,7 +434,7 @@ function TVShowDetailsContent({ params }) {
   const [showImdb, setShowImdb] = useState(undefined);
   const [omdbCache, setOmdbCache] = useState({});
   const omdbCacheRef = useRef({});
-  const { addToContinueWatching } = useContinueWatching();
+  const { addToContinueWatching, isEpisodeWatched } = useContinueWatching();
   const { addToHistory } = useHistory();
 
   const [prevShowId, setPrevShowId] = useState(showId);
@@ -1448,16 +1449,18 @@ function TVShowDetailsContent({ params }) {
                             {episodes.map((ep) => {
                               const active = selEpisode === ep.episode_number;
                               const future = ep.air_date ? ep.air_date > TODAY : false;
+                              const watched = !!isEpisodeWatched?.(show?.id, selSeason, ep.episode_number);
                               return (
                                 <button
                                   key={ep.id}
                                   role="option"
                                   aria-selected={active}
-                                  className={`ep-grid-btn ${active ? "active" : ""} ${future ? "future" : ""}`}
+                                  className={`ep-grid-btn ${active ? "active" : ""} ${future ? "future" : ""} ${watched ? "watched" : ""}`}
                                   onClick={() => setSelEpisode(ep.episode_number)}
-                                  title={future ? (ep.air_date ? `Upcoming · Airs ${formatAirDateLocal(ep.air_date)}` : "Upcoming · Release date TBA") : (ep.name || `Episode ${ep.episode_number}`)}
+                                  title={`${watched ? "Watched · " : ""}${future ? (ep.air_date ? `Upcoming · Airs ${formatAirDateLocal(ep.air_date)}` : "Upcoming · Release date TBA") : (ep.name || `Episode ${ep.episode_number}`)}`}
                                 >
-                                  EP{ep.episode_number}
+                                  {watched && <span className="ep-grid-watched" aria-label="Watched"><Check size={10} strokeWidth={3} /></span>}
+                                  <span className="ep-grid-btn-label">EP{ep.episode_number}</span>
                                 </button>
                               );
                             })}
@@ -1672,6 +1675,16 @@ function TVShowDetailsContent({ params }) {
           color: #fff; box-shadow: 0 8px 24px rgba(229,9,20,0.18);
         }
         .ep-grid-btn.future.active::after { background: #fff; }
+        .ep-grid-watched {
+          position: absolute; top: 4px; left: 4px;
+          width: 14px; height: 14px; border-radius: 50%;
+          display: inline-flex; align-items: center; justify-content: center;
+          background: rgba(46, 204, 113, 0.95); color: #08110b;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+        }
+        .ep-grid-watched svg { width: 9px; height: 9px; }
+        .ep-grid-btn.active .ep-grid-watched { background: #fff; color: #16a34a; }
+        .ep-grid-btn.future .ep-grid-watched { top: 5px; left: 5px; }
         .ep-grid-btn:disabled { opacity: 0.35; cursor: not-allowed; }
         @media (max-width: 768px) {
           .tv-detail-grid {
@@ -1725,6 +1738,8 @@ function TVShowDetailsContent({ params }) {
           .ep-grid-wrap { padding: 12px; }
           .ep-grid { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 8px; }
           .ep-grid-btn { padding: 10px 6px; font-size: 0.78rem; }
+          .ep-grid-watched { width: 12px; height: 12px; top: 3px; left: 3px; }
+          .ep-grid-watched svg { width: 8px; height: 8px; }
         }
       `}</style>
     </div>
