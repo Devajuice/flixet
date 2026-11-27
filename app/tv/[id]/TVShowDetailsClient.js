@@ -476,13 +476,27 @@ function TVShowDetailsContent({ params }) {
         if (validSeasons.length > 0) {
           const paramSeason = seasonParam ? parseInt(seasonParam, 10) : null;
           const paramEpisode = episodeParam ? parseInt(episodeParam, 10) : null;
-          const isValidSeason =
-            paramSeason &&
+          const hasParamSeason =
+            paramSeason != null &&
             validSeasons.some((s) => s.season_number === paramSeason);
-          setSelSeason(
-            isValidSeason ? paramSeason : validSeasons[0].season_number,
-          );
-          setSelEpisode(paramEpisode && paramEpisode > 0 ? paramEpisode : 1);
+
+          let cwSeason = null;
+          let cwEpisode = null;
+          if (!hasParamSeason && paramEpisode == null) {
+            try {
+              const cw = JSON.parse(localStorage.getItem("continueWatching") || "[]");
+              const item = cw.find((i) => String(i.id) === String(showId) && i.type === "tv");
+              if (item?.season && validSeasons.some((s) => s.season_number === Number(item.season))) {
+                cwSeason = Number(item.season);
+                cwEpisode = Number(item.episode) > 0 ? Number(item.episode) : 1;
+              }
+            } catch {}
+          }
+
+          const initialSeason = hasParamSeason ? paramSeason : (cwSeason ?? validSeasons[0].season_number);
+          const initialEpisode = paramEpisode && paramEpisode > 0 ? paramEpisode : (cwEpisode ?? 1);
+          setSelSeason(initialSeason);
+          setSelEpisode(initialEpisode);
         }
       })
       .catch((err) => {
@@ -548,6 +562,39 @@ function TVShowDetailsContent({ params }) {
 
     return () => controller.abort();
   }, [selSeason, showId]);
+
+  useEffect(() => {
+    if (!showId || selSeason == null || selEpisode == null) return;
+    const url = new URL(window.location.href);
+    const currentSeason = url.searchParams.get("season");
+    const currentEpisode = url.searchParams.get("episode");
+    if (currentSeason === String(selSeason) && currentEpisode === String(selEpisode)) return;
+    url.searchParams.set("season", String(selSeason));
+    url.searchParams.set("episode", String(selEpisode));
+    window.history.replaceState(window.history.state, "", url.toString());
+  }, [showId, selSeason, selEpisode]);
+
+  useEffect(() => {
+    if (!show || selSeason == null || selEpisode == null) return;
+    let existing = null;
+    try {
+      const cw = JSON.parse(localStorage.getItem("continueWatching") || "[]");
+      existing = cw.find((i) => String(i.id) === String(show.id) && i.type === "tv");
+    } catch {}
+    const sameEp = existing?.season === selSeason && existing?.episode === selEpisode;
+    const ep = seasonData?.episodes?.find((e) => e.episode_number === selEpisode);
+    addToContinueWatching({
+      id: show.id,
+      type: "tv",
+      name: show.name,
+      poster_path: show.poster_path,
+      backdrop_path: show.backdrop_path,
+      season: selSeason,
+      episode: selEpisode,
+      runtime: ep?.runtime || show.episode_run_time?.[0] || 45,
+      progress: sameEp ? (existing?.progress || 0) : 0,
+    });
+  }, [show, selSeason, selEpisode, seasonData, addToContinueWatching]);
 
   // `omdbCacheRef` mirrors omdbCache so this effect doesn't re-run (and re-fire
 // every in-flight request) on each cache write. Fetch in parallel and commit
